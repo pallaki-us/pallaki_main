@@ -5,28 +5,44 @@ const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
-  const [userType, setUserType] = useState(null) // 'planner' | 'vendor'
+  const [userType, setUserType] = useState(null)
   const [loading, setLoading] = useState(true)
+
+  // Fetch user_type from profiles table
+  async function fetchProfile(userId) {
+    if (!supabase) return
+    const { data } = await supabase
+      .from('profiles')
+      .select('user_type, name')
+      .eq('id', userId)
+      .single()
+    if (data) setUserType(data.user_type)
+  }
 
   useEffect(() => {
     if (!supabase) { setLoading(false); return }
 
+    // Get existing session on mount
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
+      if (session?.user) fetchProfile(session.user.id)
       setLoading(false)
     })
 
+    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
+      if (session?.user) fetchProfile(session.user.id)
+      else setUserType(null)
     })
 
     return () => subscription.unsubscribe()
   }, [])
 
-  const signUp = async (email, password, type, name) => {
+  async function signUp(email, password, type, name) {
     if (!supabase) {
-      // demo mode
-      setUser({ email, user_metadata: { name } })
+      // demo mode fallback
+      setUser({ email, user_metadata: { name, user_type: type } })
       setUserType(type)
       return { error: null }
     }
@@ -39,7 +55,7 @@ export function AuthProvider({ children }) {
     return { data, error }
   }
 
-  const signIn = async (email, password) => {
+  async function signIn(email, password) {
     if (!supabase) {
       // demo credentials
       if (email === 'test@pallaki.com' && password === 'test123') {
@@ -55,10 +71,11 @@ export function AuthProvider({ children }) {
       return { error: { message: 'Incorrect email or password.' } }
     }
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+    if (!error && data.user) await fetchProfile(data.user.id)
     return { data, error }
   }
 
-  const signOut = async () => {
+  async function signOut() {
     if (supabase) await supabase.auth.signOut()
     setUser(null)
     setUserType(null)
@@ -66,7 +83,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider value={{ user, userType, setUserType, loading, signUp, signIn, signOut }}>
-      {children}
+      {!loading && children}
     </AuthContext.Provider>
   )
 }

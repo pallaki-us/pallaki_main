@@ -1,18 +1,36 @@
 import { useState } from 'react'
-import { VENDORS } from '../data/vendors'
+import { useVendor } from '../lib/useVendors'
 import { useAuth } from '../lib/AuthContext'
 import { showToast } from '../lib/toast'
+import { supabase } from '../lib/supabase'
 
 export default function Detail({ vendorId, onBack, onShowAuth }) {
   const { user } = useAuth()
+  const { vendor: v, loading } = useVendor(vendorId)
   const [activeTab, setActiveTab] = useState('overview')
   const [message, setMessage] = useState('')
 
-  const v = VENDORS.find(x => x.id === vendorId) || VENDORS[0]
+  if (loading) return (
+    <div style={{ paddingTop: 64, textAlign: 'center', padding: '8rem 2rem', fontFamily: "'Cormorant Garamond',serif", fontSize: '1.2rem', fontStyle: 'italic', color: 'var(--tl)' }}>
+      Loading vendor…
+    </div>
+  )
 
-  function sendInquiry() {
+  if (!v) return null
+
+  async function sendInquiry() {
     if (!user) { onShowAuth('planner'); return }
+    if (supabase) {
+      const { error } = await supabase.from('inquiries').insert({
+        vendor_id: v.id,
+        planner_id: user.id,
+        message,
+        status: 'pending',
+      })
+      if (error) { showToast('Something went wrong. Try again.'); return }
+    }
     showToast('Inquiry sent! The vendor will respond within 24 hours. ✨')
+    setMessage('')
   }
 
   return (

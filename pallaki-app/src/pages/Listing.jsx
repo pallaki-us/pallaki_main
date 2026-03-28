@@ -1,11 +1,13 @@
 import { useState, useMemo } from 'react'
-import { VENDORS, EVENT_CATS } from '../data/vendors'
+import { EVENT_CATS } from '../data/vendors'
+import { useVendors } from '../lib/useVendors'
 import { useAuth } from '../lib/AuthContext'
 
 const ITEMS_PER_PAGE = 9
 
 export default function Listing({ initCat = 'All', initCity = '', onShowDetail, onGoHome }) {
   const { user } = useAuth()
+  const { vendors: allVendors, loading } = useVendors('All')
   const [activeCat, setActiveCat] = useState(initCat)
   const [filter, setFilter] = useState('all')
   const [otherCity, setOtherCity] = useState('')
@@ -15,8 +17,8 @@ export default function Listing({ initCat = 'All', initCity = '', onShowDetail, 
 
   const filtered = useMemo(() => {
     let list = activeCat === 'All'
-      ? VENDORS
-      : VENDORS.filter(v => v.cat === activeCat || v.services.some(s => s.toLowerCase().includes(activeCat.toLowerCase())))
+      ? allVendors
+      : allVendors.filter(v => v.cat === activeCat || v.services.some(s => s.toLowerCase().includes(activeCat.toLowerCase())))
 
     if (filter === 'top') list = list.filter(v => v.badge === 'top')
     else if (filter === 'my-loc' && initCity) {
@@ -27,7 +29,7 @@ export default function Listing({ initCat = 'All', initCity = '', onShowDetail, 
       list = list.filter(v => v.loc.toLowerCase().includes(lc))
     }
     return list
-  }, [activeCat, filter, otherCity, initCity])
+  }, [activeCat, filter, otherCity, initCity, allVendors])
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
   const pageItems = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE)
@@ -84,15 +86,18 @@ export default function Listing({ initCat = 'All', initCity = '', onShowDetail, 
 
       {/* Grid */}
       <div className="lb">
-        {pageItems.length === 0 ? (
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--tl)', fontFamily: "'Cormorant Garamond',serif", fontSize: '1.2rem', fontStyle: 'italic' }}>
+            Loading vendors…
+          </div>
+        ) : pageItems.length === 0 ? (
           <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '4rem 2rem' }}>
             <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🌸</div>
             <h3 style={{ fontFamily: "'Playfair Display',serif", fontSize: '1.4rem', color: 'var(--vx)', marginBottom: '.6rem' }}>We're working on it!</h3>
             <p style={{ fontSize: '.9rem', color: 'var(--tl)', maxWidth: 360, margin: '0 auto' }}>No vendors match this filter yet. Try a different filter!</p>
             <button className="btn-p" style={{ marginTop: '1.5rem' }} onClick={() => switchFilter('all')}>Show All Vendors</button>
           </div>
-        ) : (
-          <div className="lg">
+        ) : (          <div className="lg">
             {pageItems.map(v => (
               <div key={v.id} className="vc" onClick={() => onShowDetail(v.id)}>
                 <div className="vc-img" style={{ background: `linear-gradient(135deg,${v.bg})` }}>
