@@ -1,0 +1,189 @@
+import { useState } from 'react'
+import { VENDORS } from '../data/vendors'
+import { useAuth } from '../lib/AuthContext'
+import { showToast } from '../lib/toast'
+
+export default function Detail({ vendorId, onBack, onShowAuth }) {
+  const { user } = useAuth()
+  const [activeTab, setActiveTab] = useState('overview')
+  const [message, setMessage] = useState('')
+
+  const v = VENDORS.find(x => x.id === vendorId) || VENDORS[0]
+
+  function sendInquiry() {
+    if (!user) { onShowAuth('planner'); return }
+    showToast('Inquiry sent! The vendor will respond within 24 hours. ✨')
+  }
+
+  return (
+    <div id="page-detail">
+      {/* Header */}
+      <div className="dh">
+        <button className="dh-back" onClick={onBack}>← Back to Results</button>
+        <div className="dh-row">
+          <div className="dh-av">{v.icon}</div>
+          <div className="dh-info">
+            <h1>{v.name}</h1>
+            <div className="dh-tags">
+              <span className="dh-tag">{v.cat}</span>
+              <span className="dh-tag">📍 {v.loc}</span>
+            </div>
+            <div className="dh-r">
+              <span className="dh-rating">★★★★★ {v.rating}</span>
+              <span className="dh-rev">({v.reviews} reviews)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div className="tabs-bar">
+        {['overview', 'gallery', 'reviews', 'contact'].map(tab => (
+          <button
+            key={tab}
+            className={`tab-btn${activeTab === tab ? ' active' : ''}`}
+            onClick={() => setActiveTab(tab)}
+          >
+            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+          </button>
+        ))}
+      </div>
+
+      {/* Overview */}
+      {activeTab === 'overview' && (
+        <div className="tc active">
+          <div className="ov-grid">
+            <div className="ov-about">
+              <h2>About {v.name}</h2>
+              <p>{v.desc}</p>
+              <div style={{ display: 'flex', gap: '.5rem', flexWrap: 'wrap', marginTop: '1rem' }}>
+                {v.services.map(s => (
+                  <span key={s} style={{ padding: '.28rem .75rem', border: '1px solid var(--br)', borderRadius: '100px', fontSize: '.75rem', color: 'var(--tm)' }}>{s}</span>
+                ))}
+              </div>
+              <div className="ov-meta">
+                <div className="ov-meta-item">
+                  <div className="ov-meta-label">Events Covered</div>
+                  <div className="ov-meta-val">{v.events}</div>
+                </div>
+                <div className="ov-meta-item">
+                  <div className="ov-meta-label">Service Area</div>
+                  <div className="ov-meta-val">{(v.loc.split(',')[1] || v.loc).trim()} area</div>
+                </div>
+              </div>
+            </div>
+            <div className="cc-card">
+              <h3>Contact this Vendor</h3>
+              <div className="cc-row">📍 <span>{v.loc}</span></div>
+              <div className="cc-row">💌 Responds within 24 hours</div>
+              <div className="cc-row">✓ Identity verified by Pallaki</div>
+              <button className="inq-btn" onClick={sendInquiry}>Send Inquiry →</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Gallery */}
+      {activeTab === 'gallery' && (
+        <div className="tc active">
+          <div className="gal-grid">
+            {[
+              { emoji: '🌸', bg: 'linear-gradient(135deg,#FDEAED,#F5C4CB)' },
+              { emoji: '💐', bg: 'linear-gradient(135deg,#F0EAF8,#DDD0EC)' },
+              { emoji: '🎊', bg: 'linear-gradient(135deg,#F5EACA,#EDD8A0)' },
+              { emoji: '🎋', bg: 'linear-gradient(135deg,#EBF2ED,#C4DCC8)' },
+              { emoji: '🪷', bg: 'linear-gradient(135deg,#FFF0F5,#F5D0DF)' },
+              { emoji: '🌺', bg: 'linear-gradient(135deg,#EAE8F5,#C8C4E8)' },
+            ].map((item, i) => (
+              <div key={i} className="gal-item" style={{ background: item.bg }}>{item.emoji}</div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Reviews */}
+      {activeTab === 'reviews' && (
+        <div className="tc active">
+          <div className="rv-sum">
+            <div>
+              <div className="big-r">{v.rating}</div>
+              <div className="r-lbl">{v.reviews} reviews</div>
+            </div>
+            <div className="r-bars">
+              {[['5★', '85%'], ['4★', '10%'], ['3★', '3%'], ['2★', '1%'], ['1★', '1%']].map(([label, width]) => (
+                <div key={label} className="r-row">
+                  {label}
+                  <div className="r-bg"><div className="r-fill" style={{ width }} /></div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="rv-cards">
+            {[
+              { name: 'Priya M.', event: 'Wedding · Nov 2024', text: 'Absolutely stunning work. She captured every moment of our baraat and pheras so beautifully. Our families couldn\'t stop talking about the photos.' },
+              { name: 'Nisha K.', event: 'Engagement · Sep 2024', text: 'Professional, creative, and so easy to work with. The photos look like they belong in a magazine. Would highly recommend to any South Asian family!' },
+            ].map(r => (
+              <div key={r.name} className="rv-card">
+                <div className="rv-top">
+                  <div>
+                    <div className="rv-name">{r.name}</div>
+                    <div className="rv-det">{r.event}</div>
+                  </div>
+                  <div style={{ color: 'var(--g)', fontSize: '.82rem' }}>★★★★★</div>
+                </div>
+                <p className="rv-txt">{r.text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Contact */}
+      {activeTab === 'contact' && (
+        <div className="tc active">
+          <div className="ctab-grid">
+            <div>
+              <div className="map-ph">
+                <span style={{ fontSize: '1.5rem' }}>📍</span>
+                <span style={{ fontSize: '.85rem', color: 'var(--tl)' }}>{v.loc}</span>
+                <span style={{ fontSize: '.74rem', color: 'var(--tl)' }}>Map coming soon</span>
+              </div>
+              <div className="biz-h">
+                <h4>Business Hours</h4>
+                <div className="biz-row"><span>Mon – Fri</span><span>9am – 7pm</span></div>
+                <div className="biz-row"><span>Sat – Sun</span><span>10am – 5pm</span></div>
+              </div>
+            </div>
+            <div>
+              <div className="cc-card">
+                <h3>Send an Inquiry</h3>
+                <div className="auth-field" style={{ marginBottom: '.8rem' }}>
+                  <label>Your Event Date</label>
+                  <input type="month" style={{ padding: '.72rem .9rem', border: '1.5px solid var(--br)', borderRadius: 8, fontFamily: "'DM Sans',sans-serif", fontSize: '.86rem', outline: 'none', background: 'var(--cr)' }} />
+                </div>
+                <div className="auth-field" style={{ marginBottom: '.8rem' }}>
+                  <label>Message</label>
+                  <textarea
+                    style={{ padding: '.72rem .9rem', border: '1.5px solid var(--br)', borderRadius: 8, fontFamily: "'DM Sans',sans-serif", fontSize: '.86rem', width: '100%', outline: 'none', resize: 'vertical', minHeight: 80, background: 'var(--cr)' }}
+                    placeholder="Tell them about your event…"
+                    value={message}
+                    onChange={e => setMessage(e.target.value.slice(0, 500))}
+                  />
+                  <div style={{ fontSize: '.7rem', color: 'var(--tl)', textAlign: 'right' }}>{message.length}/500</div>
+                </div>
+                <button className="inq-btn" onClick={sendInquiry}>Send Inquiry →</button>
+              </div>
+              <div className="gr-plug">
+                <span className="gr-logo">⭐</span>
+                <div className="gr-text">
+                  <div className="gr-t">Google Reviews Integration</div>
+                  <div className="gr-s">Live reviews coming soon</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}

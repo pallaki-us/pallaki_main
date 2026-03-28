@@ -1,0 +1,156 @@
+import { useState } from 'react'
+import { useAuth } from '../lib/AuthContext'
+import { showToast } from '../lib/toast'
+
+export default function AuthModal({ open, onClose, defaultType = 'planner', onSuccess }) {
+  const { signIn, signUp, setUserType } = useAuth()
+  const [type, setType] = useState(defaultType)
+  const [screen, setScreen] = useState(`${defaultType}-choice`)
+
+  // form fields
+  const [fname, setFname] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [bizName, setBizName] = useState('')
+
+  if (!open) return null
+
+  function switchType(t) {
+    setType(t)
+    setScreen(`${t}-choice`)
+  }
+
+  async function handlePlannerSignup() {
+    if (!fname || !email || !password) return showToast('Please fill in all fields.')
+    if (password.length < 8) return showToast('Password must be at least 8 characters.')
+    const { error } = await signUp(email, password, 'planner', fname)
+    if (error) return showToast(error.message)
+    setUserType('planner')
+    onClose()
+    onSuccess('planner')
+  }
+
+  async function handlePlannerLogin() {
+    if (!email || !password) return showToast('Please enter your email and password.')
+    const { error } = await signIn(email, password)
+    if (error) return showToast(error.message)
+    onClose()
+    onSuccess('planner')
+  }
+
+  async function handleVendorSignup() {
+    if (!bizName || !email || !password) return showToast('Please fill in all fields.')
+    if (password.length < 8) return showToast('Password must be at least 8 characters.')
+    const { error } = await signUp(email, password, 'vendor', bizName)
+    if (error) return showToast(error.message)
+    setUserType('vendor')
+    onClose()
+    onSuccess('vendor')
+  }
+
+  async function handleVendorLogin() {
+    if (!email || !password) return showToast('Please enter your email and password.')
+    const { error } = await signIn(email, password)
+    if (error) return showToast(error.message)
+    onClose()
+    onSuccess('vendor')
+  }
+
+  function resetFields() {
+    setFname(''); setEmail(''); setPassword(''); setBizName('')
+  }
+
+  function goScreen(s) { resetFields(); setScreen(s) }
+
+  return (
+    <div className="auth-modal-overlay open" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="auth-modal">
+        <div className="auth-modal-head">
+          <button className="auth-modal-close" onClick={onClose}>✕</button>
+          <span className="auth-modal-logo">पल्लकी</span>
+          <h3>{type === 'vendor' ? 'Grow with Pallaki' : 'Welcome to Pallaki'}</h3>
+          <div className="modal-type-tabs">
+            <button className={`modal-type-tab${type === 'planner' ? ' act' : ''}`} onClick={() => switchType('planner')}>
+              👰 Event Planner
+            </button>
+            <button className={`modal-type-tab${type === 'vendor' ? ' act' : ''}`} onClick={() => switchType('vendor')}>
+              💼 Vendor
+            </button>
+          </div>
+        </div>
+
+        <div className="auth-modal-body">
+          {/* Planner choice */}
+          {screen === 'planner-choice' && (
+            <div className="auth-choice-row">
+              <button className="auth-choice-btn auth-choice-btn-primary" onClick={() => goScreen('planner-signup')}>
+                <span className="auth-choice-icon">🌸</span>
+                <div className="auth-choice-text"><strong>Create a Free Account</strong><span>Browse vendors & plan your event</span></div>
+              </button>
+              <button className="auth-choice-btn auth-choice-btn-secondary" onClick={() => goScreen('planner-login')}>
+                <span className="auth-choice-icon">🔑</span>
+                <div className="auth-choice-text"><strong>Sign In</strong><span>Already have an account?</span></div>
+              </button>
+            </div>
+          )}
+
+          {/* Planner signup */}
+          {screen === 'planner-signup' && (
+            <div className="modal-form">
+              <div className="modal-field"><label>First Name</label><input value={fname} onChange={e => setFname(e.target.value)} placeholder="Priya" /></div>
+              <div className="modal-field"><label>Email</label><input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="priya@email.com" /></div>
+              <div className="modal-field"><label>Password</label><input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Min. 8 characters" /></div>
+              <button className="modal-submit" onClick={handlePlannerSignup}>Create Account →</button>
+              <button className="modal-back" onClick={() => goScreen('planner-choice')}>← Back</button>
+            </div>
+          )}
+
+          {/* Planner login */}
+          {screen === 'planner-login' && (
+            <div className="modal-form">
+              <div className="modal-field"><label>Email</label><input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="priya@email.com" /></div>
+              <div className="modal-field"><label>Password</label><input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Your password" /></div>
+              <button className="modal-submit" onClick={handlePlannerLogin}>Sign In →</button>
+              <button className="modal-back" onClick={() => goScreen('planner-choice')}>← Back</button>
+            </div>
+          )}
+
+          {/* Vendor choice */}
+          {screen === 'vendor-choice' && (
+            <div className="auth-choice-row">
+              <button className="auth-choice-btn auth-choice-btn-primary" onClick={() => goScreen('vendor-signup')}>
+                <span className="auth-choice-icon">🚀</span>
+                <div className="auth-choice-text"><strong>List Your Business</strong><span>Create a vendor profile</span></div>
+              </button>
+              <button className="auth-choice-btn auth-choice-btn-secondary" onClick={() => goScreen('vendor-login')}>
+                <span className="auth-choice-icon">🔑</span>
+                <div className="auth-choice-text"><strong>Log In</strong><span>Access your vendor dashboard</span></div>
+              </button>
+            </div>
+          )}
+
+          {/* Vendor signup */}
+          {screen === 'vendor-signup' && (
+            <div className="modal-form">
+              <div className="modal-field"><label>Business Name</label><input value={bizName} onChange={e => setBizName(e.target.value)} placeholder="e.g. Riya Kapoor Photography" /></div>
+              <div className="modal-field"><label>Email</label><input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@business.com" /></div>
+              <div className="modal-field"><label>Password</label><input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Min. 8 characters" /></div>
+              <button className="modal-submit" onClick={handleVendorSignup}>Create Vendor Account →</button>
+              <button className="modal-back" onClick={() => goScreen('vendor-choice')}>← Back</button>
+            </div>
+          )}
+
+          {/* Vendor login */}
+          {screen === 'vendor-login' && (
+            <div className="modal-form">
+              <div className="modal-field"><label>Email</label><input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@business.com" /></div>
+              <div className="modal-field"><label>Password</label><input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Your password" /></div>
+              <button className="modal-submit" onClick={handleVendorLogin}>Log In →</button>
+              <button className="modal-back" onClick={() => goScreen('vendor-choice')}>← Back</button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
