@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../lib/AuthContext'
 import { showToast } from '../lib/toast'
+import ImageUpload from '../components/ImageUpload'
 
 const AN_DATA = {
   30:  { views: 127,  inquiries: 8,  bookings: 2,  rating: '4.9', rate: '11.8%', viewTrend: '↑ 14%', inqTrend: '↑ 3',  bkTrend: '↑ 1', contacts: [2,3,1,4,3,2,5,4,3,6,4,8],  profileViews: [12,15,10,18,14,11,22,19,14,26,18,28] },
@@ -16,6 +17,7 @@ export default function Dashboard({ activePage, onNavigate }) {
   const { user, signOut } = useAuth()
   const [period, setPeriod] = useState(365)
   const [selServices, setSelServices] = useState(['Weddings','Engagements'])
+  const [avatarUrl, setAvatarUrl] = useState('')
   const chartRef = useRef(null)
   const chartInstance = useRef(null)
 
@@ -82,10 +84,15 @@ export default function Dashboard({ activePage, onNavigate }) {
               </div>
               <div className="dash-card-body">
                 <div className="profile-img-row">
-                  <div className="profile-img-circle" onClick={() => showToast('Upload feature coming soon!')}>📸</div>
+                  <div className="profile-img-circle">
+                    {avatarUrl
+                      ? <img src={avatarUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                      : '📸'
+                    }
+                  </div>
                   <div>
-                    <p style={{ fontSize: '.86rem', color: 'var(--tm)' }}>Upload your best photo — this is the first thing families see.</p>
-                    <p style={{ fontSize: '.76rem', color: 'var(--tl)', marginTop: 4 }}>JPG or PNG · Max 5MB · Recommended 500×500px</p>
+                    <p style={{ fontSize: '.86rem', color: 'var(--tm)' }}>Your business profile photo — visible to families browsing Pallaki.</p>
+                    <p style={{ fontSize: '.76rem', color: 'var(--tl)', marginTop: 4 }}>Upload photos in the Portfolio section below to showcase your work.</p>
                   </div>
                 </div>
                 <div className="details-form" style={{ marginTop: '1.5rem' }}>
@@ -118,17 +125,32 @@ export default function Dashboard({ activePage, onNavigate }) {
             <div className="dash-card">
               <div className="dash-card-head"><h3>Photo Gallery</h3></div>
               <div className="dash-card-body">
-                {[['🌸 Portfolio Photos', '0 / 12'], ['🎬 Featured Work', '0 / 4']].map(([title, count]) => (
-                  <div key={title} className="upload-row" style={{ marginBottom: '1rem' }}>
+                <div className="upload-matrix">
+                  <div className="upload-row">
                     <div className="upload-row-head">
-                      <h4>{title}</h4>
-                      <span className="upload-count">{count} uploaded</span>
+                      <h4>🌸 Portfolio Photos</h4>
                     </div>
-                    <div className="upload-imgs">
-                      <div className="upload-slot" onClick={() => showToast('Upload feature coming soon!')}>＋</div>
+                    <div style={{ padding: '.85rem 1rem' }}>
+                      <ImageUpload
+                        folder="portfolio"
+                        maxFiles={12}
+                        onUploadComplete={urls => showToast(`Portfolio updated — ${urls.length} photos`)}
+                      />
                     </div>
                   </div>
-                ))}
+                  <div className="upload-row">
+                    <div className="upload-row-head">
+                      <h4>🎬 Featured Work</h4>
+                    </div>
+                    <div style={{ padding: '.85rem 1rem' }}>
+                      <ImageUpload
+                        folder="featured"
+                        maxFiles={4}
+                        onUploadComplete={urls => showToast(`Featured work updated — ${urls.length} photos`)}
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

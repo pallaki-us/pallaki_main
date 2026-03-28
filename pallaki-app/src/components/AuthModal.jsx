@@ -6,6 +6,7 @@ export default function AuthModal({ open, onClose, defaultType = 'planner', onSu
   const { signIn, signUp, setUserType } = useAuth()
   const [type, setType] = useState(defaultType)
   const [screen, setScreen] = useState(`${defaultType}-choice`)
+  const [verifyEmail, setVerifyEmail] = useState('')
 
   // form fields
   const [fname, setFname] = useState('')
@@ -26,8 +27,8 @@ export default function AuthModal({ open, onClose, defaultType = 'planner', onSu
     const { error } = await signUp(email, password, 'planner', fname)
     if (error) return showToast(error.message)
     setUserType('planner')
-    onClose()
-    onSuccess('planner')
+    setVerifyEmail(email)
+    setScreen('verify')
   }
 
   async function handlePlannerLogin() {
@@ -44,8 +45,8 @@ export default function AuthModal({ open, onClose, defaultType = 'planner', onSu
     const { error } = await signUp(email, password, 'vendor', bizName)
     if (error) return showToast(error.message)
     setUserType('vendor')
-    onClose()
-    onSuccess('vendor')
+    setVerifyEmail(email)
+    setScreen('verify')
   }
 
   async function handleVendorLogin() {
@@ -147,6 +148,28 @@ export default function AuthModal({ open, onClose, defaultType = 'planner', onSu
               <div className="modal-field"><label>Password</label><input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Your password" /></div>
               <button className="modal-submit" onClick={handleVendorLogin}>Log In →</button>
               <button className="modal-back" onClick={() => goScreen('vendor-choice')}>← Back</button>
+            </div>
+          )}
+
+          {/* Verification sent screen */}
+          {screen === 'verify' && (
+            <div style={{ textAlign: 'center', padding: '1.5rem 0' }}>
+              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📬</div>
+              <h3 style={{ fontFamily: "'Playfair Display',serif", fontSize: '1.3rem', color: 'var(--vx)', fontWeight: 400, marginBottom: '.6rem' }}>
+                Check your inbox
+              </h3>
+              <p style={{ fontSize: '.88rem', color: 'var(--tm)', lineHeight: 1.7, marginBottom: '.4rem', fontWeight: 300 }}>
+                We sent a verification link to
+              </p>
+              <p style={{ fontSize: '.9rem', color: 'var(--v)', fontWeight: 500, marginBottom: '1.4rem' }}>
+                {verifyEmail}
+              </p>
+              <p style={{ fontSize: '.8rem', color: 'var(--tl)', lineHeight: 1.7, marginBottom: '1.8rem', fontWeight: 300 }}>
+                Click the link in the email to activate your account. Check your spam folder if you don't see it.
+              </p>
+              <button className="modal-submit" onClick={() => { onClose(); onSuccess(type) }}>
+                Got it →
+              </button>
             </div>
           )}
         </div>
