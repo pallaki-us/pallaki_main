@@ -1,8 +1,8 @@
-name: Deploy Staging to GitHub Pages
+name: Deploy Demo to GitHub Pages
 
 on:
   push:
-    branches: [staging]
+    branches: [demo]
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -26,12 +26,12 @@ jobs:
         run: npm run build
         working-directory: pallaki-app
         env:
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL_STAGING }}
-          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY_STAGING }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: pallaki-app/dist
-          destination_dir: staging
+          destination_dir: demo
