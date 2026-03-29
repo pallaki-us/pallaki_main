@@ -3,6 +3,7 @@ import { useAuth } from '../lib/AuthContext'
 import { showToast } from '../lib/toast'
 import ImageUpload from '../components/ImageUpload'
 import { useVendorProfile } from '../lib/useVendorProfile'
+import { useVendorInquiries } from '../lib/useInquiries'
 
 const AN_DATA = {
   30:  { views: 127,  inquiries: 8,  bookings: 2,  rating: '4.9', rate: '11.8%', viewTrend: '↑ 14%', inqTrend: '↑ 3',  bkTrend: '↑ 1', contacts: [2,3,1,4,3,2,5,4,3,6,4,8],  profileViews: [12,15,10,18,14,11,22,19,14,26,18,28] },
@@ -17,6 +18,7 @@ const SERVICES = ['Weddings','Engagements','Mehndi Night','Sangeet','Pre-Wedding
 export default function Dashboard({ activePage, onNavigate }) {
   const { user, signOut } = useAuth()
   const { profile, saving, saveProfile } = useVendorProfile()
+  const { inquiries, updateStatus } = useVendorInquiries(profile?.id)
   const [period, setPeriod] = useState(365)
   const [selServices, setSelServices] = useState(['Weddings','Engagements'])
   const [avatarUrl, setAvatarUrl] = useState('')
@@ -284,26 +286,36 @@ export default function Dashboard({ activePage, onNavigate }) {
             <div className="an-card">
               <div className="an-card-head">
                 <h3>💌 Recent Inquiries</h3>
-                <span style={{ fontSize: '.7rem', color: 'var(--v)', fontWeight: 500 }}>3 new today</span>
+                <span style={{ fontSize: '.7rem', color: 'var(--v)', fontWeight: 500 }}>{inquiries.filter(i => i.status === 'pending').length} new</span>
               </div>
               <div className="an-card-body" style={{ display: 'flex', flexDirection: 'column', gap: '.65rem' }}>
-                {[
-                  { init: 'P', color: 'var(--v)',   name: 'Priya S.',   event: 'Telugu Wedding · Oct 2026', msg: '"Looking for someone who understands phera rituals in NJ..."', time: '2m ago',    isNew: true },
-                  { init: 'A', color: '#96AC9C',    name: 'Ananya M.',  event: 'Engagement · Dec 2026',    msg: '"Can you do mehendi + engagement combo shoot in Manhattan?"', time: '1h ago',   isNew: true },
-                  { init: 'K', color: 'var(--g)',   name: 'Kavita R.',  event: 'Sangeet · Nov 2026',       msg: '"We need a photographer who can capture candid moments..."', time: 'Yesterday', isNew: false },
-                ].map(inq => (
-                  <div key={inq.name} style={{ display: 'grid', gridTemplateColumns: '2.5rem 1fr auto', alignItems: 'flex-start', gap: '.85rem', padding: '.9rem', background: inq.isNew ? 'var(--vf)' : 'var(--wh)', border: `1px solid ${inq.isNew ? 'rgba(196,132,140,.3)' : 'var(--br)'}`, borderRadius: 12 }}>
-                    <div style={{ width: 38, height: 38, borderRadius: '50%', background: inq.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: '#fff' }}>{inq.init}</div>
+                {inquiries.length === 0 ? (
+                  <p style={{ fontSize: '.88rem', color: 'var(--tl)', textAlign: 'center', padding: '2rem', fontStyle: 'italic' }}>No inquiries yet — your listing is live and families can find you!</p>
+                ) : inquiries.slice(0, 5).map(inq => (
+                  <div key={inq.id} style={{ display: 'grid', gridTemplateColumns: '2.5rem 1fr auto', alignItems: 'flex-start', gap: '.85rem', padding: '.9rem', background: inq.status === 'pending' ? 'var(--vf)' : 'var(--wh)', border: `1px solid ${inq.status === 'pending' ? 'rgba(196,132,140,.3)' : 'var(--br)'}`, borderRadius: 12 }}>
+                    <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'var(--v)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: '#fff', fontSize: '.9rem' }}>
+                      {(inq.profiles?.name || inq.profiles?.email || '?').charAt(0).toUpperCase()}
+                    </div>
                     <div>
-                      <div style={{ fontSize: '.86rem', fontWeight: 500, color: 'var(--vx)' }}>{inq.name} · <span style={{ fontWeight: 300 }}>{inq.event}</span></div>
-                      <div style={{ fontSize: '.8rem', color: 'var(--tm)', marginTop: '.3rem', fontStyle: 'italic' }}>{inq.msg}</div>
-                      <div style={{ marginTop: '.5rem' }}>
-                        <button style={{ fontSize: '.7rem', padding: '.3rem .8rem', background: 'var(--v)', color: '#fff', border: 'none', borderRadius: 20, cursor: 'pointer', fontFamily: "'DM Sans',sans-serif" }} onClick={() => showToast('Reply feature coming soon!')}>Reply</button>
+                      <div style={{ fontSize: '.86rem', fontWeight: 500, color: 'var(--vx)' }}>
+                        {inq.profiles?.name || inq.profiles?.email} · <span style={{ fontWeight: 300 }}>{inq.profiles?.event_type || 'Event'}</span>
+                      </div>
+                      <div style={{ fontSize: '.8rem', color: 'var(--tm)', marginTop: '.3rem', fontStyle: 'italic' }}>"{inq.message}"</div>
+                      <div style={{ marginTop: '.5rem', display: 'flex', gap: '.5rem' }}>
+                        {inq.status === 'pending' && (
+                          <button style={{ fontSize: '.7rem', padding: '.3rem .8rem', background: 'var(--v)', color: '#fff', border: 'none', borderRadius: 20, cursor: 'pointer', fontFamily: "'DM Sans',sans-serif" }}
+                            onClick={() => updateStatus(inq.id, 'replied')}>
+                            Mark Replied ✓
+                          </button>
+                        )}
+                        {inq.status === 'replied' && (
+                          <span style={{ fontSize: '.7rem', color: 'var(--sage)', fontWeight: 500 }}>✓ Replied</span>
+                        )}
                       </div>
                     </div>
                     <div style={{ fontSize: '.68rem', color: 'var(--tl)', whiteSpace: 'nowrap', textAlign: 'right' }}>
-                      {inq.time}
-                      {inq.isNew && <div style={{ color: 'var(--v)', fontWeight: 500, marginTop: 2 }}>New</div>}
+                      {new Date(inq.created_at).toLocaleDateString()}
+                      {inq.status === 'pending' && <div style={{ color: 'var(--v)', fontWeight: 500, marginTop: 2 }}>New</div>}
                     </div>
                   </div>
                 ))}

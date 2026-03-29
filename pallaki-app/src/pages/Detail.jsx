@@ -3,12 +3,14 @@ import { useVendor } from '../lib/useVendors'
 import { useAuth } from '../lib/AuthContext'
 import { showToast } from '../lib/toast'
 import { supabase } from '../lib/supabase'
+import InquiryModal from '../components/InquiryModal'
 
 export default function Detail({ vendorId, onBack, onShowAuth }) {
   const { user } = useAuth()
   const { vendor: v, loading } = useVendor(vendorId)
   const [activeTab, setActiveTab] = useState('overview')
   const [message, setMessage] = useState('')
+  const [inquiryOpen, setInquiryOpen] = useState(false)
 
   if (loading) return (
     <div style={{ paddingTop: 64, textAlign: 'center', padding: '8rem 2rem', fontFamily: "'Cormorant Garamond',serif", fontSize: '1.2rem', fontStyle: 'italic', color: 'var(--tl)' }}>
@@ -20,17 +22,7 @@ export default function Detail({ vendorId, onBack, onShowAuth }) {
 
   async function sendInquiry() {
     if (!user) { onShowAuth('planner'); return }
-    if (supabase) {
-      const { error } = await supabase.from('inquiries').insert({
-        vendor_id: v.id,
-        planner_id: user.id,
-        message,
-        status: 'pending',
-      })
-      if (error) { showToast('Something went wrong. Try again.'); return }
-    }
-    showToast('Inquiry sent! The vendor will respond within 24 hours. ✨')
-    setMessage('')
+    setInquiryOpen(true)
   }
 
   return (
@@ -156,7 +148,6 @@ export default function Detail({ vendorId, onBack, onShowAuth }) {
         </div>
       )}
 
-      {/* Contact */}
       {activeTab === 'contact' && (
         <div className="tc active">
           <div className="ctab-grid">
@@ -175,20 +166,9 @@ export default function Detail({ vendorId, onBack, onShowAuth }) {
             <div>
               <div className="cc-card">
                 <h3>Send an Inquiry</h3>
-                <div className="auth-field" style={{ marginBottom: '.8rem' }}>
-                  <label>Your Event Date</label>
-                  <input type="month" style={{ padding: '.72rem .9rem', border: '1.5px solid var(--br)', borderRadius: 8, fontFamily: "'DM Sans',sans-serif", fontSize: '.86rem', outline: 'none', background: 'var(--cr)' }} />
-                </div>
-                <div className="auth-field" style={{ marginBottom: '.8rem' }}>
-                  <label>Message</label>
-                  <textarea
-                    style={{ padding: '.72rem .9rem', border: '1.5px solid var(--br)', borderRadius: 8, fontFamily: "'DM Sans',sans-serif", fontSize: '.86rem', width: '100%', outline: 'none', resize: 'vertical', minHeight: 80, background: 'var(--cr)' }}
-                    placeholder="Tell them about your event…"
-                    value={message}
-                    onChange={e => setMessage(e.target.value.slice(0, 500))}
-                  />
-                  <div style={{ fontSize: '.7rem', color: 'var(--tl)', textAlign: 'right' }}>{message.length}/500</div>
-                </div>
+                <div className="cc-row">📍 <span>{v.loc}</span></div>
+                <div className="cc-row">💌 Responds within 24 hours</div>
+                <div className="cc-row">✓ Identity verified by Pallaki</div>
                 <button className="inq-btn" onClick={sendInquiry}>Send Inquiry →</button>
               </div>
               <div className="gr-plug">
@@ -202,6 +182,13 @@ export default function Detail({ vendorId, onBack, onShowAuth }) {
           </div>
         </div>
       )}
+
+      <InquiryModal
+        open={inquiryOpen}
+        onClose={() => setInquiryOpen(false)}
+        vendor={v}
+        onShowAuth={onShowAuth}
+      />
     </div>
   )
 }
