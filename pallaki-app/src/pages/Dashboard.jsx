@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../lib/AuthContext'
 import { showToast } from '../lib/toast'
 import ImageUpload from '../components/ImageUpload'
+import { useVendorProfile } from '../lib/useVendorProfile'
 
 const AN_DATA = {
   30:  { views: 127,  inquiries: 8,  bookings: 2,  rating: '4.9', rate: '11.8%', viewTrend: '↑ 14%', inqTrend: '↑ 3',  bkTrend: '↑ 1', contacts: [2,3,1,4,3,2,5,4,3,6,4,8],  profileViews: [12,15,10,18,14,11,22,19,14,26,18,28] },
@@ -15,9 +16,45 @@ const SERVICES = ['Weddings','Engagements','Mehndi Night','Sangeet','Pre-Wedding
 
 export default function Dashboard({ activePage, onNavigate }) {
   const { user, signOut } = useAuth()
+  const { profile, saving, saveProfile } = useVendorProfile()
   const [period, setPeriod] = useState(365)
   const [selServices, setSelServices] = useState(['Weddings','Engagements'])
   const [avatarUrl, setAvatarUrl] = useState('')
+
+  // Form state
+  const [bizName, setBizName] = useState('')
+  const [category, setCategory] = useState('Photography')
+  const [city, setCity] = useState('')
+  const [state, setState] = useState('New York')
+  const [phone, setPhone] = useState('')
+  const [website, setWebsite] = useState('')
+  const [description, setDescription] = useState('')
+
+  // Populate form when profile loads
+  useEffect(() => {
+    if (!profile) return
+    setBizName(profile.name || '')
+    setCategory(profile.category || 'Photography')
+    setCity(profile.city || '')
+    setState(profile.state || 'New York')
+    setPhone(profile.phone || '')
+    setWebsite(profile.website || '')
+    setDescription(profile.description || '')
+    setSelServices(profile.services || ['Weddings','Engagements'])
+  }, [profile])
+
+  async function handleSave() {
+    const { error } = await saveProfile({
+      name: bizName,
+      category,
+      city,
+      state,
+      description,
+      services: selServices,
+    })
+    if (error) showToast('Error saving: ' + error.message)
+    else showToast('Profile saved! ✨')
+  }
   const chartRef = useRef(null)
   const chartInstance = useRef(null)
 
@@ -80,7 +117,9 @@ export default function Dashboard({ activePage, onNavigate }) {
             <div className="dash-card">
               <div className="dash-card-head">
                 <h3>Business Information</h3>
-                <button className="dash-btn dash-btn-out" style={{ color: 'var(--v)', borderColor: 'var(--br)' }} onClick={() => showToast('Saved!')}>Save Changes</button>
+                <button className="dash-btn dash-btn-out" style={{ color: 'var(--v)', borderColor: 'var(--br)' }} onClick={handleSave} disabled={saving}>
+                  {saving ? 'Saving…' : 'Save Changes'}
+                </button>
               </div>
               <div className="dash-card-body">
                 <div className="profile-img-row">
@@ -96,19 +135,21 @@ export default function Dashboard({ activePage, onNavigate }) {
                   </div>
                 </div>
                 <div className="details-form" style={{ marginTop: '1.5rem' }}>
-                  <div className="df"><label>Business Name</label><input type="text" defaultValue={name} /></div>
+                  <div className="df"><label>Business Name</label><input type="text" value={bizName} onChange={e => setBizName(e.target.value)} placeholder="e.g. Riya Kapoor Photography" /></div>
                   <div className="df"><label>Category</label>
-                    <select>
-                      {['Photography','Videography','Mehndi Artist','Bridal Makeup','Catering'].map(c => <option key={c}>{c}</option>)}
+                    <select value={category} onChange={e => setCategory(e.target.value)}>
+                      {['Photography','Videography','Mehndi Artist','Bridal Makeup','Catering','Mandap & Decor','Music & DJ','Priests & Pandits'].map(c => <option key={c}>{c}</option>)}
                     </select>
                   </div>
-                  <div className="df"><label>City</label><input type="text" placeholder="New York" /></div>
+                  <div className="df"><label>City</label><input type="text" value={city} onChange={e => setCity(e.target.value)} placeholder="New York" /></div>
                   <div className="df"><label>State</label>
-                    <select>{['New York','New Jersey','California','Texas','Illinois','Georgia'].map(s => <option key={s}>{s}</option>)}</select>
+                    <select value={state} onChange={e => setState(e.target.value)}>
+                      {['New York','New Jersey','California','Texas','Illinois','Georgia','Washington','Virginia','Maryland'].map(s => <option key={s}>{s}</option>)}
+                    </select>
                   </div>
-                  <div className="df"><label>Phone</label><input type="tel" placeholder="+1 (555) 000-0000" /></div>
-                  <div className="df"><label>Website / Instagram</label><input type="url" placeholder="instagram.com/yourbusiness" /></div>
-                  <div className="df full"><label>Business Description</label><textarea style={{ resize: 'vertical', minHeight: 100 }} placeholder="Tell families what makes your services special…" /></div>
+                  <div className="df"><label>Phone</label><input type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+1 (555) 000-0000" /></div>
+                  <div className="df"><label>Website / Instagram</label><input type="url" value={website} onChange={e => setWebsite(e.target.value)} placeholder="instagram.com/yourbusiness" /></div>
+                  <div className="df full"><label>Business Description</label><textarea style={{ resize: 'vertical', minHeight: 100 }} value={description} onChange={e => setDescription(e.target.value)} placeholder="Tell families what makes your services special…" /></div>
                 </div>
                 <div style={{ marginTop: '1rem' }}>
                   <p style={{ fontSize: '.72rem', textTransform: 'uppercase', letterSpacing: '.08em', color: 'var(--tl)', fontWeight: 500, marginBottom: '.6rem' }}>Services Offered</p>

@@ -1,6 +1,6 @@
 import { useAuth } from '../lib/AuthContext'
 
-export default function Nav({ onShowListing, onShowAuth, onGoHome }) {
+export default function Nav({ onShowListing, onShowAuth, onGoHome, onEditProfile }) {
   const { user, userType, signOut } = useAuth()
   const name = user?.user_metadata?.name || user?.email?.split('@')[0] || ''
 
@@ -28,6 +28,9 @@ export default function Nav({ onShowListing, onShowAuth, onGoHome }) {
             <div className="nav-user-dd">
               {userType === 'planner' ? (
                 <>
+                  <div className="nav-user-dd-item" onClick={onEditProfile}>
+                    ✎ Edit Profile
+                  </div>
                   <div className="nav-user-dd-item" onClick={() => onShowListing('All', '')}>
                     🔍 Browse Vendors
                   </div>

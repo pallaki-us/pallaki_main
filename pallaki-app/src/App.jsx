@@ -9,6 +9,7 @@ import Home from './pages/Home'
 import Listing from './pages/Listing'
 import Detail from './pages/Detail'
 import Dashboard from './pages/Dashboard'
+import PlannerProfile from './pages/PlannerProfile'
 
 function AppInner() {
   const { user, userType } = useAuth()
@@ -56,6 +57,7 @@ function AppInner() {
         onShowListing={showListing}
         onShowAuth={showAuth}
         onGoHome={goHome}
+        onEditProfile={() => setPage('planner-profile')}
       />
 
       <AuthModal
@@ -92,6 +94,12 @@ function AppInner() {
         <Dashboard
           activePage={page}
           onNavigate={setPage}
+        />
+      )}
+      {page === 'planner-profile' && (
+        <PlannerProfile
+          onGoHome={() => setPage('home')}
+          onBrowse={() => showListing('All', '')}
         />
       )}
     </>

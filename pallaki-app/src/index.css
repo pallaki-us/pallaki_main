@@ -102,3 +102,13 @@ nav {
 /* ── TOAST ── */
 .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); background: var(--vx); color: var(--cr); padding: .8rem 1.7rem; border-radius: 20px; font-size: .84rem; z-index: 999; box-shadow: 0 4px 20px rgba(0,0,0,.2); white-space: nowrap; font-family: 'DM Sans', sans-serif; animation: ft .22s ease; }
 @keyframes ft { from { opacity: 0; transform: translateX(-50%) translateY(8px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+
+/* ── PLANNER PROFILE ── */
+.pp-toggle { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
+.pp-toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+.pp-toggle-slider { position: absolute; inset: 0; background: var(--br); border-radius: 24px; cursor: pointer; transition: background .2s; }
+.pp-toggle-slider::before { content: ''; position: absolute; height: 18px; width: 18px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: transform .2s; box-shadow: 0 1px 4px rgba(0,0,0,.15); }
+.pp-toggle input:checked + .pp-toggle-slider { background: var(--v); }
+.pp-toggle input:checked + .pp-toggle-slider::before { transform: translateX(20px); }
+.pp-home-btn { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.22); color: rgba(255,255,255,.8); font-family: 'DM Sans', sans-serif; font-size: .78rem; font-weight: 500; padding: .45rem 1rem; border-radius: 20px; cursor: pointer; transition: all .18s; display: inline-flex; align-items: center; gap: 5px; }
+.pp-home-btn:hover { background: rgba(255,255,255,.22); color: #fff; }
