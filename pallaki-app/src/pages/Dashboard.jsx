@@ -177,7 +177,11 @@ export default function Dashboard({ activePage, onNavigate }) {
                       <ImageUpload
                         folder="portfolio"
                         maxFiles={12}
-                        onUploadComplete={urls => showToast(`Portfolio updated — ${urls.length} photos`)}
+                        existingUrls={profile?.portfolio_urls || []}
+                        onUploadComplete={async urls => {
+                          await saveProfile({ portfolio_urls: urls })
+                          showToast(`Portfolio updated — ${urls.length} photos`)
+                        }}
                       />
                     </div>
                   </div>
@@ -189,7 +193,11 @@ export default function Dashboard({ activePage, onNavigate }) {
                       <ImageUpload
                         folder="featured"
                         maxFiles={4}
-                        onUploadComplete={urls => showToast(`Featured work updated — ${urls.length} photos`)}
+                        existingUrls={profile?.featured_urls || []}
+                        onUploadComplete={async urls => {
+                          await saveProfile({ featured_urls: urls })
+                          showToast(`Featured work updated — ${urls.length} photos`)
+                        }}
                       />
                     </div>
                   </div>

@@ -96,18 +96,47 @@ export default function Detail({ vendorId, onBack, onShowAuth }) {
       {/* Gallery */}
       {activeTab === 'gallery' && (
         <div className="tc active">
-          <div className="gal-grid">
-            {[
-              { emoji: '🌸', bg: 'linear-gradient(135deg,#FDEAED,#F5C4CB)' },
-              { emoji: '💐', bg: 'linear-gradient(135deg,#F0EAF8,#DDD0EC)' },
-              { emoji: '🎊', bg: 'linear-gradient(135deg,#F5EACA,#EDD8A0)' },
-              { emoji: '🎋', bg: 'linear-gradient(135deg,#EBF2ED,#C4DCC8)' },
-              { emoji: '🪷', bg: 'linear-gradient(135deg,#FFF0F5,#F5D0DF)' },
-              { emoji: '🌺', bg: 'linear-gradient(135deg,#EAE8F5,#C8C4E8)' },
-            ].map((item, i) => (
-              <div key={i} className="gal-item" style={{ background: item.bg }}>{item.emoji}</div>
-            ))}
-          </div>
+          {v.portfolio_urls?.length > 0 || v.featured_urls?.length > 0 ? (
+            <div>
+              {v.portfolio_urls?.length > 0 && (
+                <div>
+                  <p style={{ fontFamily: "'Playfair Display',serif", fontSize: '1rem', color: 'var(--vx)', marginBottom: '1rem', fontWeight: 400 }}>Portfolio</p>
+                  <div className="gal-grid" style={{ marginBottom: '2rem' }}>
+                    {v.portfolio_urls.map((url, i) => (
+                      <div key={i} className="gal-item" style={{ background: 'var(--cd)', padding: 0, overflow: 'hidden' }}>
+                        <img src={url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {v.featured_urls?.length > 0 && (
+                <div>
+                  <p style={{ fontFamily: "'Playfair Display',serif", fontSize: '1rem', color: 'var(--vx)', marginBottom: '1rem', fontWeight: 400 }}>Featured Work</p>
+                  <div className="gal-grid">
+                    {v.featured_urls.map((url, i) => (
+                      <div key={i} className="gal-item" style={{ background: 'var(--cd)', padding: 0, overflow: 'hidden' }}>
+                        <img src={url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="gal-grid">
+              {[
+                { emoji: '🌸', bg: 'linear-gradient(135deg,#FDEAED,#F5C4CB)' },
+                { emoji: '💐', bg: 'linear-gradient(135deg,#F0EAF8,#DDD0EC)' },
+                { emoji: '🎊', bg: 'linear-gradient(135deg,#F5EACA,#EDD8A0)' },
+                { emoji: '🎋', bg: 'linear-gradient(135deg,#EBF2ED,#C4DCC8)' },
+                { emoji: '🪷', bg: 'linear-gradient(135deg,#FFF0F5,#F5D0DF)' },
+                { emoji: '🌺', bg: 'linear-gradient(135deg,#EAE8F5,#C8C4E8)' },
+              ].map((item, i) => (
+                <div key={i} className="gal-item" style={{ background: item.bg }}>{item.emoji}</div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 

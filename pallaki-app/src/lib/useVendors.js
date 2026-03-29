@@ -47,6 +47,8 @@ export function useVendors(category = 'All') {
         events: v.events_covered,
         bg: v.bg,
         is_verified: v.is_verified,
+        portfolio_urls: v.portfolio_urls || [],
+        featured_urls: v.featured_urls || [],
       })))
       setLoading(false)
     }
@@ -93,6 +95,8 @@ export function useVendor(id) {
           events: data.events_covered,
           bg: data.bg,
           is_verified: data.is_verified,
+          portfolio_urls: data.portfolio_urls || [],
+          featured_urls: data.featured_urls || [],
         })
       }
       setLoading(false)
