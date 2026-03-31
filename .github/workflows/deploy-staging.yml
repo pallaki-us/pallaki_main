@@ -13,6 +13,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Load secrets from 1Password
+        uses: 1password/load-secrets-action@v2
+        with:
+          export-env: true
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          VITE_SUPABASE_URL: op://Private/Pallaki Staging/supabase_url
+          VITE_SUPABASE_ANON_KEY: op://Private/Pallaki Staging/supabase_anon_key
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -25,9 +34,6 @@ jobs:
       - name: Build
         run: npm run build
         working-directory: pallaki-app
-        env:
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL_STAGING }}
-          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY_STAGING }}
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
