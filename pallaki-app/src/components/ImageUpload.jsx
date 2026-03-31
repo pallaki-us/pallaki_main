@@ -5,6 +5,7 @@ import { showToast } from '../lib/toast'
 
 const MAX_SIZE = 2 * 1024 * 1024 // 2MB
 const ALLOWED = ['image/jpeg', 'image/png', 'image/webp']
+const BUCKET = import.meta.env.VITE_STORAGE_BUCKET || 'pallaki-media-staging'
 
 export default function ImageUpload({ folder = 'portfolio', maxFiles = 12, existingUrls = [], onUploadComplete }) {
   const { user } = useAuth()
@@ -50,7 +51,7 @@ export default function ImageUpload({ folder = 'portfolio', maxFiles = 12, exist
       const path = `${user.id}/${folder}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
 
       const { error } = await supabase.storage
-        .from('pallaki-media')
+        .from(BUCKET)
         .upload(path, file, { upsert: false })
 
       if (error) {
@@ -59,7 +60,7 @@ export default function ImageUpload({ folder = 'portfolio', maxFiles = 12, exist
       }
 
       const { data } = supabase.storage
-        .from('pallaki-media')
+        .from(BUCKET)
         .getPublicUrl(path)
 
       uploaded.push(data.publicUrl)
@@ -74,9 +75,8 @@ export default function ImageUpload({ folder = 'portfolio', maxFiles = 12, exist
 
   async function removeImage(url, index) {
     if (supabase && url.includes('supabase')) {
-      // Extract path from URL
-      const path = url.split('/pallaki-media/')[1]
-      await supabase.storage.from('pallaki-media').remove([path])
+      const path = url.split(`/${BUCKET}/`)[1]
+      await supabase.storage.from(BUCKET).remove([path])
     }
     const updated = images.filter((_, i) => i !== index)
     setImages(updated)

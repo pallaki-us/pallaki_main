@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:op": "op run --env-file='.env.1password' -- vite",
     "build": "vite build",
+    "build:op": "op run --env-file='.env.1password' -- vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },

@@ -14,6 +14,7 @@ export default function InquiryModal({ open, onClose, vendor, onShowAuth }) {
 
   async function handleSend() {
     if (!user) { onClose(); onShowAuth('planner'); return }
+    if (userType === 'vendor') { showToast('Vendor accounts cannot send inquiries.'); return }
     if (!message.trim()) { showToast('Please write a message.'); return }
 
     setSending(true)
@@ -70,7 +71,7 @@ export default function InquiryModal({ open, onClose, vendor, onShowAuth }) {
                   type="month"
                   value={eventDate}
                   onChange={e => setEventDate(e.target.value)}
-                  style={{ padding: '.75rem .9rem', border: '1.5px solid var(--br)', borderRadius: 10, fontFamily: "'DM Sans',sans-serif", fontSize: '.88rem', outline: 'none', background: 'var(--cr)' }}
+                  style={{ padding: '.75rem .9rem', border: '1.5px solid var(--br)', borderRadius: 10, fontFamily: "'Cormorant Garamond',serif", fontSize: '.88rem', outline: 'none', background: 'var(--cr)' }}
                 />
               </div>
 
@@ -80,7 +81,7 @@ export default function InquiryModal({ open, onClose, vendor, onShowAuth }) {
                   value={message}
                   onChange={e => setMessage(e.target.value.slice(0, 500))}
                   placeholder="Tell them about your event — date, location, what you're looking for…"
-                  style={{ padding: '.75rem .9rem', border: '1.5px solid var(--br)', borderRadius: 10, fontFamily: "'DM Sans',sans-serif", fontSize: '.88rem', outline: 'none', resize: 'vertical', minHeight: 110, background: 'var(--cr)', width: '100%' }}
+                  style={{ padding: '.75rem .9rem', border: '1.5px solid var(--br)', borderRadius: 10, fontFamily: "'Cormorant Garamond',serif", fontSize: '.88rem', outline: 'none', resize: 'vertical', minHeight: 110, background: 'var(--cr)', width: '100%' }}
                 />
                 <div style={{ fontSize: '.68rem', color: 'var(--tl)', textAlign: 'right' }}>{message.length}/500</div>
               </div>

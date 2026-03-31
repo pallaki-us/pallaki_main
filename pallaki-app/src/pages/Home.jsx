@@ -1,8 +1,8 @@
-import { useState } from 'react'
-import { CAT_VENDORS } from '../data/vendors'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../lib/AuthContext'
-
-const CITIES = ['new york', 'new jersey', 'chicago', 'houston', 'los angeles', 'atlanta', 'dallas', 'san jose', 'fremont', 'edison']
+import { supabase } from '../lib/supabase'
+import VendorShowcase from '../components/VendorShowcase'
+import AnimatedLogo from '../components/AnimatedLogo'
 
 const EVENT_TYPES = [
   { icon: '💍', label: 'Wedding' },
@@ -22,29 +22,103 @@ const CAT_CHIPS = [
   { icon: '🪔', label: 'Priests & Pandits' },
 ]
 
-export default function Home({ onSearch, onShowAuth, onShowDetail, onShowListing }) {
+export default function Home({ onSearch, onShowAuth, onShowDetail, onShowListing, onShowPrivacy, onShowTerms }) {
   const { user } = useAuth()
   const [selEvent, setSelEvent] = useState('Wedding')
   const [city, setCity] = useState('')
   const [cat, setCat] = useState('')
   const [noMatch, setNoMatch] = useState(false)
   const [activeCat, setActiveCat] = useState('Photography')
+  const [trendingVendors, setTrendingVendors] = useState([])
+  const [stats, setStats] = useState({ vendors: 0, cities: 0, categories: 10, planners: 0 })
+  const [citySuggestions, setCitySuggestions] = useState([])
+  const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' })
+  const [contactStatus, setContactStatus] = useState(null)
+
+  const IS_PROD = import.meta.env.VITE_ENV === 'prod'
+
+  useEffect(() => {
+    fetchTrending('Photography')
+    fetchCities()
+    if (IS_PROD) fetchStats()
+  }, [])
+
+  async function fetchCities() {
+    if (!supabase) return
+    const { data } = await supabase
+      .from('vendors')
+      .select('city')
+    if (data) {
+      const unique = [...new Set(data.map(v => v.city).filter(Boolean))]
+        .sort()
+      setCitySuggestions(unique)
+    }
+  }
+
+  async function fetchStats() {
+    if (!supabase) return
+    const [vendorsRes, plannersRes] = await Promise.all([
+      supabase.from('vendors').select('city', { count: 'exact' }),
+      supabase.from('planner_profiles').select('id', { count: 'exact' }),
+    ])
+    const vendorCount = vendorsRes.count || 0
+    const cities = vendorsRes.data
+      ? new Set(vendorsRes.data.map(v => v.city?.toLowerCase()).filter(Boolean)).size
+      : 0
+    setStats({ vendors: vendorCount, cities, categories: 10, planners: plannersRes.count || 0 })
+  }
+
+  async function fetchTrending(category) {
+    if (!supabase) { setTrendingVendors([]); return }
+    const { data } = await supabase
+      .from('vendors')
+      .select('id, name, city, state, icon, bg, rating, review_count, category')
+      .eq('category', category)
+      .order('rating', { ascending: false })
+      .limit(5)
+    setTrendingVendors(data?.map(v => ({
+      id: v.id,
+      name: v.name,
+      loc: `${v.city}, ${v.state}`,
+      icon: v.icon,
+      bg: v.bg || 'linear-gradient(135deg,#FDEAED,#F5C4CB)',
+      rating: v.rating?.toFixed(1),
+      reviews: v.review_count,
+    })) || [])
+  }
+
+  function selectCat(label) {
+    setActiveCat(label)
+    fetchTrending(label)
+  }
 
   function checkCity(v) {
     setCity(v)
-    setNoMatch(v.length > 2 && !CITIES.some(c => c.includes(v.toLowerCase())))
+    setNoMatch(v.length > 2 && citySuggestions.length > 0 && !citySuggestions.some(c => c.toLowerCase().includes(v.toLowerCase())))
+  }
+
+  async function submitContact(e) {
+    e.preventDefault()
+    if (!contactForm.name || !contactForm.email || !contactForm.message) return
+    setContactStatus('sending')
+    try {
+      if (supabase) {
+        const { error } = await supabase
+          .from('contact_messages')
+          .insert({ name: contactForm.name, email: contactForm.email, message: contactForm.message })
+        if (error) throw error
+      }
+      setContactStatus('sent')
+      setContactForm({ name: '', email: '', message: '' })
+    } catch {
+      setContactStatus('error')
+    }
   }
 
   function doSearch() {
     if (!user) { onShowAuth('planner'); return }
     onSearch(cat || 'All', city)
   }
-
-  function selectCat(label) {
-    setActiveCat(label)
-  }
-
-  const trendingVendors = CAT_VENDORS[activeCat] || []
 
   return (
     <div>
@@ -78,8 +152,8 @@ export default function Home({ onSearch, onShowAuth, onShowDetail, onShowListing
             <div className="htb-side right">
               <div className="htb-side-dot" /><div className="htb-side-dot big" /><div className="htb-side-dot" />
             </div>
-            <h1>India's Traditions, <em>American Stage.</em></h1>
-            <p className="hero-sub">Discover trusted South Asian event vendors, wherever you celebrate.</p>
+            <h1 style={{ textAlign: 'center' }}>Rooted in Tradition,<br />Celebrated Everywhere.</h1>
+            <p className="hero-sub">Find South Asian wedding vendors who understand your story.</p>
           </div>
 
           <span className="ev-label">Looking vendors for</span>
@@ -123,7 +197,7 @@ export default function Home({ onSearch, onShowAuth, onShowDetail, onShowListing
               <div className="no-match show">😕 No vendors in that area yet — check nearby cities!</div>
             )}
             <div className="pop-tags">
-              {['New York', 'New Jersey', 'Chicago', 'Houston', 'Los Angeles', 'Atlanta', 'Dallas'].map(c => (
+              {citySuggestions.slice(0, 7).map(c => (
                 <span key={c} className="tag" onClick={() => { setCity(c); setNoMatch(false) }}>📍 {c}</span>
               ))}
             </div>
@@ -176,7 +250,7 @@ export default function Home({ onSearch, onShowAuth, onShowDetail, onShowListing
       </section>
 
       {/* ── HOW IT WORKS ── */}
-      <section className="how-section">
+      <section className="how-section" id="how-it-works">
         <div className="how-inner">
           <h2 className="how-title">How Pallaki Works</h2>
           <div className="how-timeline">
@@ -199,18 +273,23 @@ export default function Home({ onSearch, onShowAuth, onShowDetail, onShowListing
       </section>
 
       {/* ── OUR STORY ── */}
-      <section className="about-section">
+      <section className="about-section" id="our-story">
         <h2 className="how-title" style={{ marginBottom: '2.5rem' }}>Our Story</h2>
         <div className="about-inner">
           <div className="about-text">
-            <div className="aq">
-              <p>"Finding South Asian vendors who truly understand our traditions shouldn't be so hard. Pallaki exists to change that."</p>
-              <cite>— The Pallaki Team</cite>
-            </div>
-            <p>We are South Asians who've lived the struggle — spending months searching for the right mehndi artist, the right photographer who knows how to capture the pheras, the right caterer who knows what biryani should taste like at a Telugu/Hyderabadi wedding.</p>
-            <p>Pallaki is not just a directory. It's a curated community of vendors who love what they do and understand the beauty of South Asian celebrations.</p>
+            <p>Hi, we're Shruti and Vamsi — the founders of Pallaki — and a couple who have been through this journey ourselves.</p>
+            <p>When we started planning our wedding in the U.S., one of the biggest challenges we faced wasn't finding vendors — it was finding them easily. Most of our search happened through endless scrolling on Instagram, jumping between pages, sending DMs, and waiting for responses. Everything felt scattered, and there was no single place to explore options in a structured way.</p>
+            <p>At the same time, we realized how valuable it was to work with vendors who understood our traditions and expectations without needing detailed explanations. That sense of familiarity made the experience so much smoother.</p>
+            <p>We were fortunate to have a beautiful wedding at the BAPS Swaminarayan Temple Chino Hills — a day filled with love and memories we'll always cherish. But getting there involved more effort than it should have.</p>
+            <p>That's why we created Pallaki. A one-stop platform designed to make vendor discovery simple and streamlined. Instead of spending hours searching across different platforms, couples can find everything they need in one place.</p>
+            <p>Our goal is simple — to remove the hassle, bring everything together, and make wedding planning a more seamless experience. Welcome — this space was built for you.</p>
             <div className="stats-mini" style={{ marginTop: '2rem' }}>
-              {[['100+', 'Verified Vendors'], ['9', 'Cities Covered'], ['10', 'Categories'], ['200+', 'Happy Families']].map(([n, l]) => (
+              {[
+                [IS_PROD ? (stats.vendors > 0 ? `${stats.vendors}+` : '—') : '100+', 'Verified Vendors'],
+                [IS_PROD ? (stats.cities > 0 ? `${stats.cities}` : '—') : '9', 'Cities Covered'],
+                [stats.categories, 'Categories'],
+                [IS_PROD ? (stats.planners > 0 ? `${stats.planners}+` : '—') : '200+', 'Happy Families'],
+              ].map(([n, l]) => (
                 <div key={l} className="smi">
                   <div className="smi-n">{n}</div>
                   <div className="smi-l">{l}</div>
@@ -241,67 +320,55 @@ export default function Home({ onSearch, onShowAuth, onShowDetail, onShowListing
                 </div>
               ))}
             </div>
-            <div className="fv-cta-row">
-              <button className="btn-p" onClick={() => onShowAuth('vendor')}>List Your Business — It's Free</button>
-              <button className="btn-s" onClick={() => onShowAuth('vendor')}>See How It Works</button>
-            </div>
+
             <div className="fv-trust">
               <div className="fv-trust-av">
                 {['R', 'A', 'S', 'M'].map(l => <span key={l}>{l}</span>)}
               </div>
-              <p className="fv-trust-txt"><strong>100+ vendors</strong> already growing on Pallaki</p>
+              <p className="fv-trust-txt"><strong>{IS_PROD ? (stats.vendors > 0 ? `${stats.vendors}+` : 'Growing') : '100+'} vendors</strong> already growing on Pallaki</p>
             </div>
           </div>
-          <div className="fv-right">
-            <div className="fv-right-pattern" />
-            <div className="fvd-dh">
-              <div className="fvd-dh-row">
-                <div className="fvd-dh-av">📸</div>
-                <div className="fvd-dh-info">
-                  <div className="fvd-dh-name">Riya Kapoor Photography</div>
-                  <div className="fvd-dh-tags">
-                    <span className="fvd-dh-tag">Wedding Photography</span>
-                    <span className="fvd-dh-tag">New York, NY</span>
-                    <span className="fvd-dh-tag fvd-dh-tag-gold">✓ Verified</span>
-                  </div>
-                  <div className="fvd-dh-rating">★★★★★ 4.9 · <span className="fvd-dh-rev">87 reviews</span></div>
-                </div>
-                <div className="fvd-live"><div className="fvd-live-dot" />Live</div>
-              </div>
-            </div>
-            <div className="fvd-tabs">
-              <span className="fvd-tab-item">Overview</span>
-              <span className="fvd-tab-item act">Analytics</span>
-              <span className="fvd-tab-item">Inquiries</span>
-              <span className="fvd-tab-item">Reviews</span>
-            </div>
-            <div className="fvd-body">
-              <div className="fvd-kpi-row">
-                {[['1,284','Profile Views','↑ 23%'],['64','Inquiries','↑ 18%'],['11.2%','Inquiry Rate','↑ 4.1%'],['12','Bookings','↑ 4 new']].map(([n,l,d]) => (
-                  <div key={l} className="fvd-kpi">
-                    <span className="fvd-kpi-n">{n}</span>
-                    <span className="fvd-kpi-l">{l}</span>
-                    <span className="fvd-kpi-d up">{d}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+          <VendorShowcase />
         </div>
       </section>
 
       {/* ── CONTACT ── */}
-      <section className="ct-section">
+      <section className="ct-section" id="contact">
         <div className="ct-inner">
           <h2 className="how-title">Get in Touch</h2>
           <p className="ct-intro">We'd love to hear from you.</p>
           <p className="ct-intro ct-sub">Have questions, feedback, or want to partner with us? Drop us a note and we'll get back to you within 24 hours.</p>
-          <div className="fg">
-            <div className="ff"><label>Name</label><input type="text" placeholder="Your name" /></div>
-            <div className="ff"><label>Email</label><input type="email" placeholder="you@email.com" /></div>
-            <div className="ff full"><label>Message</label><textarea placeholder="Tell us how we can help…" /></div>
-          </div>
-          <button className="btn-sub">Send Message</button>
+          {contactStatus === 'sent' ? (
+            <div className="contact-success">
+              <span className="contact-success-icon">🌸</span>
+              <h3>Thank you for reaching out!</h3>
+              <p>We've received your message and will get back to you as soon as we can.</p>
+              <button className="btn-sub" style={{ marginTop: '1.2rem' }} onClick={() => setContactStatus(null)}>Send Another Message</button>
+            </div>
+          ) : (
+            <form onSubmit={submitContact}>
+              <div className="fg">
+                <div className="ff">
+                  <label>Name</label>
+                  <input type="text" placeholder="Your name" value={contactForm.name} onChange={e => setContactForm(f => ({ ...f, name: e.target.value }))} required />
+                </div>
+                <div className="ff">
+                  <label>Email</label>
+                  <input type="email" placeholder="you@email.com" value={contactForm.email} onChange={e => setContactForm(f => ({ ...f, email: e.target.value }))} required />
+                </div>
+                <div className="ff full">
+                  <label>Message</label>
+                  <textarea placeholder="Tell us how we can help…" value={contactForm.message} onChange={e => setContactForm(f => ({ ...f, message: e.target.value }))} required />
+                </div>
+              </div>
+              {contactStatus === 'error' && (
+                <p style={{ color: '#c0392b', fontSize: '.84rem', marginTop: '.75rem' }}>Something went wrong. Please try again.</p>
+              )}
+              <button className="btn-sub" type="submit" disabled={contactStatus === 'sending'}>
+                {contactStatus === 'sending' ? 'Sending…' : 'Send Message'}
+              </button>
+            </form>
+          )}
         </div>
       </section>
 
@@ -309,7 +376,7 @@ export default function Home({ onSearch, onShowAuth, onShowDetail, onShowListing
       <footer>
         <div className="fi">
           <div>
-            <div className="flogo">पल्लकी</div>
+            <div className="flogo"><AnimatedLogo size="1.65rem" color="var(--gl)" /></div>
             <p className="ftag">Where Indian traditions meet American celebrations.</p>
           </div>
           <div className="fc">
@@ -326,14 +393,18 @@ export default function Home({ onSearch, onShowAuth, onShowDetail, onShowListing
           </div>
           <div className="fc">
             <h4>Company</h4>
-            <a>About Us</a>
-            <a onClick={() => onShowAuth('vendor')}>For Vendors</a>
-            <a>How It Works</a>
-            <a>Contact</a>
+            <a style={{cursor:'pointer'}} onClick={() => document.getElementById('our-story')?.scrollIntoView({behavior:'smooth'})}>About Us</a>
+            <a style={{cursor:'pointer'}} onClick={() => onShowAuth('vendor', true)}>For Vendors</a>
+            <a style={{cursor:'pointer'}} onClick={() => document.getElementById('how-it-works')?.scrollIntoView({behavior:'smooth'})}>How It Works</a>
+            <a style={{cursor:'pointer'}} onClick={() => document.getElementById('contact')?.scrollIntoView({behavior:'smooth'})}>Contact</a>
           </div>
         </div>
         <div className="fb">
           <span>© 2025 Pallaki. All rights reserved.</span>
+          <div style={{ display: 'flex', gap: '1.2rem' }}>
+            <span style={{ cursor: 'pointer', textDecoration: 'underline' }} onClick={onShowPrivacy}>Privacy Policy</span>
+            <span style={{ cursor: 'pointer', textDecoration: 'underline' }} onClick={onShowTerms}>Terms & Conditions</span>
+          </div>
           <span>Made with 🌸 for South Asian families in America</span>
         </div>
       </footer>

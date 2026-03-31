@@ -2,17 +2,15 @@ import { useState, useEffect } from 'react'
 import { supabase } from './supabase'
 import { VENDORS } from '../data/vendors' // fallback for demo mode
 
-export function useVendors(category = 'All') {
+export function useVendors(category = 'All', city = '') {
   const [vendors, setVendors] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
   useEffect(() => {
     if (!supabase) {
-      // demo mode — use hardcoded data
-      const filtered = category === 'All'
-        ? VENDORS
-        : VENDORS.filter(v => v.cat === category)
+      let filtered = category === 'All' ? VENDORS : VENDORS.filter(v => v.cat === category)
+      if (city) filtered = filtered.filter(v => v.loc.toLowerCase().includes(city.toLowerCase()))
       setVendors(filtered)
       setLoading(false)
       return
@@ -25,14 +23,12 @@ export function useVendors(category = 'All') {
         .select('*')
         .order('rating', { ascending: false })
 
-      if (category !== 'All') {
-        query = query.eq('category', category)
-      }
+      if (category !== 'All') query = query.eq('category', category)
+      if (city) query = query.ilike('city', `%${city}%`)
 
       const { data, error } = await query
       if (error) { setError(error.message); setLoading(false); return }
 
-      // Normalize DB shape to match component expectations
       setVendors(data.map(v => ({
         id: v.id,
         name: v.name,
@@ -54,7 +50,7 @@ export function useVendors(category = 'All') {
     }
 
     fetch()
-  }, [category])
+  }, [category, city])
 
   return { vendors, loading, error }
 }

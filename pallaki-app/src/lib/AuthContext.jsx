@@ -8,15 +8,20 @@ export function AuthProvider({ children }) {
   const [userType, setUserType] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  // Fetch user_type from profiles table
-  async function fetchProfile(userId) {
+  // Fetch user_type from profiles table, fall back to user_metadata
+  async function fetchProfile(userId, userMeta) {
     if (!supabase) return
     const { data } = await supabase
       .from('profiles')
       .select('user_type, name')
       .eq('id', userId)
       .single()
-    if (data) setUserType(data.user_type)
+    if (data?.user_type) {
+      setUserType(data.user_type)
+    } else if (userMeta?.user_type) {
+      // fallback to metadata set at signup
+      setUserType(userMeta.user_type)
+    }
   }
 
   useEffect(() => {
@@ -25,14 +30,22 @@ export function AuthProvider({ children }) {
     // Get existing session on mount
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
-      if (session?.user) fetchProfile(session.user.id)
+      if (session?.user) fetchProfile(session.user.id, session.user.user_metadata)
       setLoading(false)
     })
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (_event === 'SIGNED_IN' && window.location.hash.includes('type=signup')) {
+        // Email just verified — sign them out so they must log in manually
+        window.history.replaceState(null, '', window.location.pathname)
+        await supabase.auth.signOut()
+        setUser(null)
+        setUserType('__verified__') // signal to App to show sign-in modal
+        return
+      }
       setUser(session?.user ?? null)
-      if (session?.user) fetchProfile(session.user.id)
+      if (session?.user) fetchProfile(session.user.id, session.user.user_metadata)
       else setUserType(null)
     })
 
@@ -41,7 +54,6 @@ export function AuthProvider({ children }) {
 
   async function signUp(email, password, type, name) {
     if (!supabase) {
-      // demo mode fallback
       setUser({ email, user_metadata: { name, user_type: type } })
       setUserType(type)
       return { error: null }
@@ -51,7 +63,15 @@ export function AuthProvider({ children }) {
       password,
       options: { data: { name, user_type: type } },
     })
-    if (!error) setUserType(type)
+    if (!error && data.user) {
+      // Explicitly write to profiles in case trigger doesn't fire
+      await supabase.from('profiles').upsert({
+        id: data.user.id,
+        name,
+        user_type: type,
+      }, { onConflict: 'id' })
+      setUserType(type)
+    }
     return { data, error }
   }
 
@@ -71,7 +91,7 @@ export function AuthProvider({ children }) {
       return { error: { message: 'Incorrect email or password.' } }
     }
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-    if (!error && data.user) await fetchProfile(data.user.id)
+    if (!error && data.user) await fetchProfile(data.user.id, data.user.user_metadata)
     return { data, error }
   }
 

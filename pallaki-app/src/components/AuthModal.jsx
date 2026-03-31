@@ -1,11 +1,28 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../lib/AuthContext'
 import { showToast } from '../lib/toast'
+import AnimatedLogo from './AnimatedLogo'
 
-export default function AuthModal({ open, onClose, defaultType = 'planner', onSuccess }) {
+export default function AuthModal({ open, onClose, defaultType = 'planner', onSuccess, onShowPrivacy, onShowTerms, vendorOnly = false, directSignup = false, directLogin = false }) {
   const { signIn, signUp, setUserType } = useAuth()
   const [type, setType] = useState(defaultType)
-  const [screen, setScreen] = useState(`${defaultType}-choice`)
+  const [screen, setScreen] = useState(() => {
+    if (directSignup && defaultType === 'vendor') return 'vendor-signup'
+    if (vendorOnly) return 'vendor-choice'
+    return `${defaultType}-choice`
+  })
+
+  // Reset screen when modal opens
+  useEffect(() => {
+    if (open) {
+      if (directSignup && defaultType === 'vendor') setScreen('vendor-signup')
+      else if (directLogin) setScreen(`${defaultType}-login`)
+      else if (vendorOnly) setScreen('vendor-choice')
+      else setScreen(`${defaultType}-choice`)
+      setType(defaultType)
+      setFname(''); setEmail(''); setPassword(''); setBizName('')
+    }
+  }, [open])
   const [verifyEmail, setVerifyEmail] = useState('')
 
   // form fields
@@ -68,12 +85,14 @@ export default function AuthModal({ open, onClose, defaultType = 'planner', onSu
       <div className="auth-modal">
         <div className="auth-modal-head">
           <button className="auth-modal-close" onClick={onClose}>✕</button>
-          <span className="auth-modal-logo">पल्लकी</span>
+          <span className="auth-modal-logo"><AnimatedLogo size="1.8rem" color="var(--gl)" /></span>
           <h3>{type === 'vendor' ? 'Grow with Pallaki' : 'Welcome to Pallaki'}</h3>
           <div className="modal-type-tabs">
-            <button className={`modal-type-tab${type === 'planner' ? ' act' : ''}`} onClick={() => switchType('planner')}>
-              👰 Event Planner
-            </button>
+            {!vendorOnly && (
+              <button className={`modal-type-tab${type === 'planner' ? ' act' : ''}`} onClick={() => switchType('planner')}>
+                👰 Event Planner
+              </button>
+            )}
             <button className={`modal-type-tab${type === 'vendor' ? ' act' : ''}`} onClick={() => switchType('vendor')}>
               💼 Vendor
             </button>
@@ -101,6 +120,12 @@ export default function AuthModal({ open, onClose, defaultType = 'planner', onSu
               <div className="modal-field"><label>First Name</label><input value={fname} onChange={e => setFname(e.target.value)} placeholder="Priya" /></div>
               <div className="modal-field"><label>Email</label><input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="priya@email.com" /></div>
               <div className="modal-field"><label>Password</label><input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Min. 8 characters" /></div>
+              <p style={{ fontSize: '.72rem', color: 'var(--tl)', textAlign: 'center', lineHeight: 1.6 }}>
+                By signing up you agree to our{' '}
+                <span style={{ color: 'var(--v)', cursor: 'pointer', textDecoration: 'underline' }} onClick={() => { onClose(); onShowTerms?.() }}>Terms & Conditions</span>
+                {' '}and{' '}
+                <span style={{ color: 'var(--v)', cursor: 'pointer', textDecoration: 'underline' }} onClick={() => { onClose(); onShowPrivacy?.() }}>Privacy Policy</span>
+              </p>
               <button className="modal-submit" onClick={handlePlannerSignup}>Create Account →</button>
               <button className="modal-back" onClick={() => goScreen('planner-choice')}>← Back</button>
             </div>
@@ -134,9 +159,15 @@ export default function AuthModal({ open, onClose, defaultType = 'planner', onSu
           {screen === 'vendor-signup' && (
             <div className="modal-form">
               <div className="modal-field"><label>Business Name</label><input value={bizName} onChange={e => setBizName(e.target.value)} placeholder="e.g. Riya Kapoor Photography" /></div>
-              <div className="modal-field"><label>Email</label><input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@business.com" /></div>
+              <div className="modal-field"><label>Business Email</label><input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@business.com" /></div>
               <div className="modal-field"><label>Password</label><input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Min. 8 characters" /></div>
               <button className="modal-submit" onClick={handleVendorSignup}>Create Vendor Account →</button>
+              <p style={{ fontSize: '.72rem', color: 'var(--tl)', textAlign: 'center', lineHeight: 1.6 }}>
+                By signing up you agree to our{' '}
+                <span style={{ color: 'var(--gl)', cursor: 'pointer', textDecoration: 'underline' }} onClick={() => { onClose(); onShowTerms?.() }}>Terms & Conditions</span>
+                {' '}and{' '}
+                <span style={{ color: 'var(--gl)', cursor: 'pointer', textDecoration: 'underline' }} onClick={() => { onClose(); onShowPrivacy?.() }}>Privacy Policy</span>
+              </p>
               <button className="modal-back" onClick={() => goScreen('vendor-choice')}>← Back</button>
             </div>
           )}
@@ -155,7 +186,7 @@ export default function AuthModal({ open, onClose, defaultType = 'planner', onSu
           {screen === 'verify' && (
             <div style={{ textAlign: 'center', padding: '1.5rem 0' }}>
               <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📬</div>
-              <h3 style={{ fontFamily: "'Playfair Display',serif", fontSize: '1.3rem', color: 'var(--vx)', fontWeight: 400, marginBottom: '.6rem' }}>
+              <h3 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '1.3rem', color: 'var(--vx)', fontWeight: 400, marginBottom: '.6rem' }}>
                 Check your inbox
               </h3>
               <p style={{ fontSize: '.88rem', color: 'var(--tm)', lineHeight: 1.7, marginBottom: '.4rem', fontWeight: 300 }}>

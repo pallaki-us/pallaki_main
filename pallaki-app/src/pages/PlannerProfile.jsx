@@ -77,16 +77,12 @@ export default function PlannerProfile({ onGoHome, onBrowse }) {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--cd)' }}>
-      {/* Header */}
-      <div style={{ background: 'linear-gradient(135deg,var(--vx) 0%,#3D1D2A 100%)', padding: '1.4rem 2.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
-          <button className="pp-home-btn" onClick={onGoHome}>← Home</button>
-          <div style={{ fontFamily: "'Tiro Devanagari Hindi',serif", fontSize: '1.5rem', color: 'var(--gl)' }}>पल्लकी</div>
-        </div>
-        <div style={{ textAlign: 'center' }}>
-          <div className="dash-title">Edit My Profile</div>
-          <div style={{ fontSize: '.72rem', color: 'rgba(255,255,255,.5)', marginTop: '.2rem' }}>Your details help vendors understand your event</div>
+    <div style={{ minHeight: '100vh', background: 'var(--cd)', paddingTop: 64 }}>
+      {/* Sticky action bar */}
+      <div style={{ position: 'sticky', top: 64, zIndex: 100, background: 'var(--cr)', borderBottom: '1px solid var(--br)', padding: '.75rem 2.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem' }}>
+          <button className="btn-o" style={{ padding: '.45rem 1rem', fontSize: '.78rem' }} onClick={onGoHome}>← Back</button>
+          <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '1rem', color: 'var(--vx)', fontWeight: 400 }}>Edit My Profile</span>
         </div>
         <button className="dash-btn dash-btn-gold" onClick={handleSave} disabled={saving}>
           {saving ? 'Saving…' : 'Save Profile ✓'}

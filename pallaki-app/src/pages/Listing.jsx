@@ -7,35 +7,32 @@ const ITEMS_PER_PAGE = 9
 
 export default function Listing({ initCat = 'All', initCity = '', onShowDetail, onGoHome }) {
   const { user } = useAuth()
-  const { vendors: allVendors, loading } = useVendors('All')
+  const { vendors: allVendors, loading } = useVendors('All', initCity)
   const [activeCat, setActiveCat] = useState(initCat)
-  const [filter, setFilter] = useState('all')
+  const [topRated, setTopRated] = useState(false)
   const [otherCity, setOtherCity] = useState('')
   const [page, setPage] = useState(1)
 
-  const tabs = EVENT_CATS['Wedding'] // show all cats regardless of event type
+  const tabs = EVENT_CATS['Wedding']
 
   const filtered = useMemo(() => {
     let list = activeCat === 'All'
       ? allVendors
       : allVendors.filter(v => v.cat === activeCat || v.services.some(s => s.toLowerCase().includes(activeCat.toLowerCase())))
 
-    if (filter === 'top') list = list.filter(v => v.badge === 'top')
-    else if (filter === 'my-loc' && initCity) {
-      const lc = initCity.toLowerCase()
-      list = list.filter(v => v.loc.toLowerCase().includes(lc))
-    } else if (filter === 'other' && otherCity) {
+    if (topRated) list = list.filter(v => v.badge === 'top')
+
+    if (otherCity) {
       const lc = otherCity.toLowerCase()
       list = list.filter(v => v.loc.toLowerCase().includes(lc))
     }
     return list
-  }, [activeCat, filter, otherCity, initCity, allVendors])
+  }, [activeCat, topRated, otherCity, allVendors])
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
   const pageItems = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE)
 
   function switchCat(cat) { setActiveCat(cat); setPage(1) }
-  function switchFilter(f) { setFilter(f); setPage(1) }
 
   return (
     <div id="page-listing">
@@ -62,11 +59,12 @@ export default function Listing({ initCat = 'All', initCity = '', onShowDetail, 
       {/* Filters */}
       <div className="l-filters">
         <span style={{ fontSize: '.74rem', color: 'var(--tl)', fontWeight: 500 }}>Filter:</span>
-        <div className={`fchip${filter === 'all' ? ' act' : ''}`} onClick={() => switchFilter('all')}>All</div>
-        <div className={`fchip${filter === 'top' ? ' act' : ''}`} onClick={() => switchFilter('top')}>Top Rated</div>
-        {initCity && (
-          <div className={`fchip${filter === 'my-loc' ? ' act' : ''}`} onClick={() => switchFilter('my-loc')}>
-            📍 {initCity}
+        <div className={`fchip${activeCat === 'All' && !topRated ? ' act' : ''}`} onClick={() => { switchCat('All'); setTopRated(false) }}>All</div>
+        <div className={`fchip${topRated ? ' act' : ''}`} onClick={() => setTopRated(t => !t)}>Top Rated</div>
+        {activeCat !== 'All' && (
+          <div className="fchip act" style={{ display: 'flex', alignItems: 'center', gap: '.35rem' }}>
+            {activeCat}
+            <span style={{ cursor: 'pointer', opacity: .7 }} onClick={() => switchCat('All')}>×</span>
           </div>
         )}
         <div className="other-loc-wrap">
@@ -75,11 +73,11 @@ export default function Listing({ initCat = 'All', initCity = '', onShowDetail, 
             type="text"
             placeholder="Search other city…"
             value={otherCity}
-            onChange={e => { setOtherCity(e.target.value); if (e.target.value) switchFilter('other'); else switchFilter('all') }}
-            style={{ border: 'none', outline: 'none', fontFamily: "'DM Sans',sans-serif", fontSize: '.74rem', color: 'var(--td)', background: 'transparent', width: 130 }}
+            onChange={e => { setOtherCity(e.target.value); setPage(1) }}
+            style={{ border: 'none', outline: 'none', fontFamily: "'Cormorant Garamond',serif", fontSize: '.74rem', color: 'var(--td)', background: 'transparent', width: 130 }}
           />
           {otherCity && (
-            <button onClick={() => { setOtherCity(''); switchFilter('all') }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--tl)', fontSize: '.9rem', padding: 0 }}>×</button>
+            <button onClick={() => setOtherCity('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--tl)', fontSize: '.9rem', padding: 0 }}>×</button>
           )}
         </div>
       </div>
@@ -93,9 +91,9 @@ export default function Listing({ initCat = 'All', initCity = '', onShowDetail, 
         ) : pageItems.length === 0 ? (
           <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '4rem 2rem' }}>
             <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🌸</div>
-            <h3 style={{ fontFamily: "'Playfair Display',serif", fontSize: '1.4rem', color: 'var(--vx)', marginBottom: '.6rem' }}>We're working on it!</h3>
+            <h3 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '1.4rem', color: 'var(--vx)', marginBottom: '.6rem' }}>We're working on it!</h3>
             <p style={{ fontSize: '.9rem', color: 'var(--tl)', maxWidth: 360, margin: '0 auto' }}>No vendors match this filter yet. Try a different filter!</p>
-            <button className="btn-p" style={{ marginTop: '1.5rem' }} onClick={() => switchFilter('all')}>Show All Vendors</button>
+            <button className="btn-p" style={{ marginTop: '1.5rem' }} onClick={() => { switchCat('All'); setTopRated(false) }}>Show All Vendors</button>
           </div>
         ) : (          <div className="lg">
             {pageItems.map(v => (

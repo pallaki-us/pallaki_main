@@ -15,13 +15,14 @@ const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov
 
 const SERVICES = ['Weddings','Engagements','Mehndi Night','Sangeet','Pre-Wedding','Birthdays']
 
-export default function Dashboard({ activePage, onNavigate }) {
+export default function Dashboard({ activePage, onNavigate, onShowDetail, onBrowseWebsite, onShowVendorListing }) {
   const { user, signOut } = useAuth()
   const { profile, saving, saveProfile } = useVendorProfile()
   const { inquiries, updateStatus } = useVendorInquiries(profile?.id)
   const [period, setPeriod] = useState(365)
   const [selServices, setSelServices] = useState(['Weddings','Engagements'])
   const [avatarUrl, setAvatarUrl] = useState('')
+  const avatarInputRef = useRef()
 
   // Form state
   const [bizName, setBizName] = useState('')
@@ -43,7 +44,31 @@ export default function Dashboard({ activePage, onNavigate }) {
     setWebsite(profile.website || '')
     setDescription(profile.description || '')
     setSelServices(profile.services || ['Weddings','Engagements'])
+    setAvatarUrl(profile.avatar_url || '')
   }, [profile])
+
+  async function handleAvatarUpload(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (!['image/jpeg','image/png','image/webp'].includes(file.type)) {
+      showToast('Only JPG, PNG or WebP allowed.'); return
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      showToast('Max 2MB for profile photo.'); return
+    }
+    const { supabase } = await import('../lib/supabase')
+    if (!supabase) return
+    const BUCKET = import.meta.env.VITE_STORAGE_BUCKET || 'pallaki-media-staging'
+    const ext = file.name.split('.').pop()
+    const path = `${user.id}/avatar/profile.${ext}`
+    const { error } = await supabase.storage.from(BUCKET).upload(path, file, { upsert: true })
+    if (error) { showToast('Upload failed: ' + error.message); return }
+    const { data } = supabase.storage.from(BUCKET).getPublicUrl(path)
+    const url = data.publicUrl + '?t=' + Date.now()
+    setAvatarUrl(url)
+    await saveProfile({ avatar_url: url })
+    showToast('Profile photo updated ✨')
+  }
 
   async function handleSave() {
     const { error } = await saveProfile({
@@ -51,6 +76,8 @@ export default function Dashboard({ activePage, onNavigate }) {
       category,
       city,
       state,
+      phone,
+      website,
       description,
       services: selServices,
     })
@@ -79,7 +106,7 @@ export default function Dashboard({ activePage, onNavigate }) {
             { label: 'Profile Views', data: d.profileViews, borderColor: '#C49A3C', backgroundColor: 'rgba(196,154,60,0.08)', tension: .4, pointBackgroundColor: '#C49A3C', pointRadius: 3 },
           ],
         },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { font: { family: 'DM Sans', size: 11 }, boxWidth: 12 } } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { family: 'DM Sans', size: 10 } } }, x: { grid: { display: false }, ticks: { font: { family: 'DM Sans', size: 10 } } } } },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { font: { family: 'Cormorant Garamond', size: 11 }, boxWidth: 12 } } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { family: 'Cormorant Garamond', size: 10 } } }, x: { grid: { display: false }, ticks: { font: { family: 'Cormorant Garamond', size: 10 } } } } },
       })
     }
 
@@ -100,6 +127,25 @@ export default function Dashboard({ activePage, onNavigate }) {
 
   const name = user?.user_metadata?.name || 'Vendor'
 
+  // Pending approval state
+  if (profile && !profile.is_verified) return (
+    <div style={{ paddingTop: 64, minHeight: '100vh', background: 'var(--cr)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+      <div style={{ textAlign: 'center', maxWidth: 480 }}>
+        <div style={{ fontSize: '3.5rem', marginBottom: '1.5rem' }}>⏳</div>
+        <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '1.8rem', color: 'var(--vx)', marginBottom: '.75rem', fontWeight: 400 }}>
+          Your profile is under review
+        </h2>
+        <p style={{ fontSize: '.95rem', color: 'var(--tm)', lineHeight: 1.8, marginBottom: '.5rem', fontWeight: 300 }}>
+          We're verifying your listing for <strong>{profile.name}</strong>. This usually takes 24–48 hours.
+        </p>
+        <p style={{ fontSize: '.85rem', color: 'var(--tl)', lineHeight: 1.7, marginBottom: '2rem', fontWeight: 300 }}>
+          You'll receive an email once your profile is live on Pallaki.
+        </p>
+        <button className="btn-o" onClick={signOut}>Sign Out</button>
+      </div>
+    </div>
+  )
+
   return (
     <div style={{ paddingTop: 64, minHeight: '100vh', background: 'var(--cd)' }}>
 
@@ -109,8 +155,9 @@ export default function Dashboard({ activePage, onNavigate }) {
           <div className="dash-header">
             <div><div className="dash-title">My Vendor Profile</div></div>
             <div className="dash-actions">
+              <button className="dash-btn dash-btn-out" onClick={onBrowseWebsite}>🌐 Browse Website</button>
               <button className="dash-btn dash-btn-out" onClick={() => onNavigate('analytics')}>View Analytics</button>
-              <button className="dash-btn dash-btn-gold" onClick={() => showToast('Preview coming soon!')}>Preview Listing</button>
+              <button className="dash-btn dash-btn-gold" onClick={() => profile?.id ? onShowVendorListing() : showToast('Save your profile first!')}>Preview Listing</button>
             </div>
           </div>
 
@@ -125,15 +172,16 @@ export default function Dashboard({ activePage, onNavigate }) {
               </div>
               <div className="dash-card-body">
                 <div className="profile-img-row">
-                  <div className="profile-img-circle">
+                  <div className="profile-img-circle" onClick={() => avatarInputRef.current.click()} title="Click to upload photo" style={{ cursor: 'pointer' }}>
                     {avatarUrl
                       ? <img src={avatarUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
-                      : '📸'
+                      : <span style={{ fontSize: '2.5rem' }}>📸</span>
                     }
                   </div>
+                  <input ref={avatarInputRef} type="file" accept="image/jpeg,image/png,image/webp" style={{ display: 'none' }} onChange={handleAvatarUpload} />
                   <div>
                     <p style={{ fontSize: '.86rem', color: 'var(--tm)' }}>Your business profile photo — visible to families browsing Pallaki.</p>
-                    <p style={{ fontSize: '.76rem', color: 'var(--tl)', marginTop: 4 }}>Upload photos in the Portfolio section below to showcase your work.</p>
+                    <p style={{ fontSize: '.76rem', color: 'var(--tl)', marginTop: 4 }}>Click the photo to upload. JPG, PNG or WebP · Max 2MB.</p>
                   </div>
                 </div>
                 <div className="details-form" style={{ marginTop: '1.5rem' }}>
@@ -311,7 +359,7 @@ export default function Dashboard({ activePage, onNavigate }) {
                       <div style={{ fontSize: '.8rem', color: 'var(--tm)', marginTop: '.3rem', fontStyle: 'italic' }}>"{inq.message}"</div>
                       <div style={{ marginTop: '.5rem', display: 'flex', gap: '.5rem' }}>
                         {inq.status === 'pending' && (
-                          <button style={{ fontSize: '.7rem', padding: '.3rem .8rem', background: 'var(--v)', color: '#fff', border: 'none', borderRadius: 20, cursor: 'pointer', fontFamily: "'DM Sans',sans-serif" }}
+                          <button style={{ fontSize: '.7rem', padding: '.3rem .8rem', background: 'var(--v)', color: '#fff', border: 'none', borderRadius: 20, cursor: 'pointer', fontFamily: "'Cormorant Garamond',serif" }}
                             onClick={() => updateStatus(inq.id, 'replied')}>
                             Mark Replied ✓
                           </button>
