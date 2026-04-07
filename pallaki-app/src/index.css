@@ -100,8 +100,6 @@ nav {
 .modal-submit:hover { background: var(--vd); }
 .modal-back { background: none; border: none; color: var(--tl); font-size: .78rem; cursor: pointer; font-family: 'Cormorant Garamond', serif; padding: 0; margin-top: .5rem; display: inline-flex; align-items: center; gap: 4px; }
 .modal-back:hover { color: var(--v); }
-.auth-google-btn { background: #fff; color: #3c4043; border: 1.5px solid #dadce0 !important; }
-.auth-google-btn:hover { background: #f8f9fa; border-color: #bbb !important; }
 .auth-divider { display: flex; align-items: center; gap: .75rem; color: var(--tl); font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; }
 .auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: var(--br); }
 
