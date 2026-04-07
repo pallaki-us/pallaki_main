@@ -51,7 +51,7 @@ export function AuthProvider({ children }) {
           const { data: profile } = await supabase.from('profiles').select('user_type').eq('id', session.user.id).single()
           if (!profile?.user_type) {
             const name = session.user.user_metadata?.full_name || session.user.user_metadata?.name || ''
-            await supabase.from('profiles').upsert({ id: session.user.id, user_type: 'planner', name })
+            await supabase.from('profiles').upsert({ id: session.user.id, user_type: 'planner', name, email: session.user.email })
             setUserType('planner')
           } else {
             setUserType(profile.user_type)
