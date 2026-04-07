@@ -20,7 +20,7 @@ export default function Nav({ onShowAuth, onShowVendorListing }) {
       </div>
       <div style={{ flex: 1, overflow: 'hidden', height: '100%', display: 'flex', alignItems: 'center' }}>
         <video
-          src="/procession.mp4"
+          src={`${import.meta.env.BASE_URL}procession.mp4`}
           autoPlay
           loop
           muted
