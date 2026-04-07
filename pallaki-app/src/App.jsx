@@ -35,6 +35,15 @@ function AppInner() {
     }
   }, [userType])
 
+  // Handle post-Google-OAuth redirect
+  useEffect(() => {
+    const oauthType = sessionStorage.getItem('pallaki_oauth_type')
+    if (oauthType && user && userType === 'planner') {
+      sessionStorage.removeItem('pallaki_oauth_type')
+      navigate('/profile')
+    }
+  }, [user, userType])
+
   // Scroll to top on every route change
   useEffect(() => { window.scrollTo({ top: 0 }) }, [location.pathname])
 

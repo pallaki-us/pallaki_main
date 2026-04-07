@@ -45,8 +45,23 @@ export function AuthProvider({ children }) {
         return
       }
       setUser(session?.user ?? null)
-      if (session?.user) fetchProfile(session.user.id, session.user.user_metadata)
-      else setUserType(null)
+      if (session?.user) {
+        const provider = session.user.app_metadata?.provider
+        if (provider === 'google') {
+          const { data: profile } = await supabase.from('profiles').select('user_type').eq('id', session.user.id).single()
+          if (!profile?.user_type) {
+            const name = session.user.user_metadata?.full_name || session.user.user_metadata?.name || ''
+            await supabase.from('profiles').upsert({ id: session.user.id, user_type: 'planner', name })
+            setUserType('planner')
+          } else {
+            setUserType(profile.user_type)
+          }
+        } else {
+          fetchProfile(session.user.id, session.user.user_metadata)
+        }
+      } else {
+        setUserType(null)
+      }
     })
 
     return () => subscription.unsubscribe()
@@ -89,6 +104,16 @@ export function AuthProvider({ children }) {
     return { data, error }
   }
 
+  async function signInWithGoogle() {
+    if (!supabase) return { error: { message: 'Not available in demo' } }
+    sessionStorage.setItem('pallaki_oauth_type', 'planner')
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.origin },
+    })
+    return { error }
+  }
+
   async function signOut() {
     if (supabase) await supabase.auth.signOut()
     setUser(null)
@@ -96,7 +121,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, userType, setUserType, loading, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, userType, setUserType, loading, signUp, signIn, signInWithGoogle, signOut }}>
       {!loading && children}
     </AuthContext.Provider>
   )
