@@ -49,3 +49,29 @@ jobs:
           personal_token: ${{ secrets.GH_PAT }}
           publish_dir: pallaki-app/dist
           destination_dir: staging
+          keep_files: true
+
+      - name: Deploy root 404.html for SPA routing
+        run: |
+          mkdir -p root-404
+          cat > root-404/404.html << 'HTMLEOF'
+          <!DOCTYPE html>
+          <html>
+          <script>
+            var l = window.location;
+            var segs = l.pathname.split('/').filter(Boolean);
+            if (segs.length > 0) {
+              var base = '/' + segs[0] + '/';
+              var rest = l.pathname.slice(base.length);
+              l.replace(l.protocol + '//' + l.host + base + '?p=' + encodeURIComponent('/' + rest) + l.hash);
+            }
+          </script>
+          </html>
+          HTMLEOF
+
+      - name: Deploy root 404.html
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          personal_token: ${{ secrets.GH_PAT }}
+          publish_dir: root-404
+          keep_files: true
