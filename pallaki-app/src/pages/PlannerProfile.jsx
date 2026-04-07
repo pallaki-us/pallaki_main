@@ -34,8 +34,13 @@ export default function PlannerProfile() {
 
   // Populate from DB
   useEffect(() => {
-    if (!profile) return
     const fallbackName = user?.user_metadata?.full_name || user?.user_metadata?.name || ''
+    if (!profile) {
+      const nameParts = fallbackName.split(' ')
+      setFname(nameParts[0] || '')
+      setLname(nameParts.slice(1).join(' ') || '')
+      return
+    }
     const nameParts = (profile.name || fallbackName).split(' ')
     setFname(nameParts[0] || '')
     setLname(nameParts.slice(1).join(' ') || '')
