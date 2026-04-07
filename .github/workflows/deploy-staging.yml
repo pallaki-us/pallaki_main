@@ -34,6 +34,11 @@ jobs:
       - name: Build
         run: npm run build
         working-directory: pallaki-app
+        env:
+          VITE_BASE_PATH: /pallaki-claude/staging/
+
+      - name: Add 404.html for SPA routing
+        run: cp pallaki-app/dist/index.html pallaki-app/dist/404.html
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
