@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/AuthContext'
 import { showToast } from '../lib/toast'
 import ImageUpload from '../components/ImageUpload'
@@ -15,8 +16,9 @@ const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov
 
 const SERVICES = ['Weddings','Engagements','Mehndi Night','Sangeet','Pre-Wedding','Birthdays']
 
-export default function Dashboard({ activePage, onNavigate, onShowDetail, onBrowseWebsite, onShowVendorListing }) {
+export default function Dashboard({ activePage, onShowVendorListing }) {
   const { user, signOut } = useAuth()
+  const navigate = useNavigate()
   const { profile, saving, saveProfile } = useVendorProfile()
   const { inquiries, updateStatus } = useVendorInquiries(profile?.id)
   const [period, setPeriod] = useState(365)
@@ -155,8 +157,8 @@ export default function Dashboard({ activePage, onNavigate, onShowDetail, onBrow
           <div className="dash-header">
             <div><div className="dash-title">My Vendor Profile</div></div>
             <div className="dash-actions">
-              <button className="dash-btn dash-btn-out" onClick={onBrowseWebsite}>🌐 Browse Website</button>
-              <button className="dash-btn dash-btn-out" onClick={() => onNavigate('analytics')}>View Analytics</button>
+              <button className="dash-btn dash-btn-out" onClick={() => navigate('/')}>🌐 Browse Website</button>
+              <button className="dash-btn dash-btn-out" onClick={() => navigate('/analytics')}>View Analytics</button>
               <button className="dash-btn dash-btn-gold" onClick={() => profile?.id ? onShowVendorListing() : showToast('Save your profile first!')}>Preview Listing</button>
             </div>
           </div>
@@ -261,7 +263,7 @@ export default function Dashboard({ activePage, onNavigate, onShowDetail, onBrow
         <>
           <div className="an-header">
             <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '.75rem' }}>
-              <button className="dash-btn dash-btn-out" onClick={() => onNavigate('dashboard')} style={{ color: 'rgba(255,255,255,.8)', fontSize: '.75rem' }}>← Back to Profile</button>
+              <button className="dash-btn dash-btn-out" onClick={() => navigate('/dashboard')} style={{ color: 'rgba(255,255,255,.8)', fontSize: '.75rem' }}>← Back to Profile</button>
               <div style={{ display: 'flex', gap: '.4rem', background: 'rgba(0,0,0,.2)', borderRadius: 20, padding: '.25rem' }}>
                 {[30, 180, 365].map(p => (
                   <button key={p} className={`an-period-tab${period === p ? ' an-period-tab-act' : ''}`} onClick={() => setPeriod(p)}>

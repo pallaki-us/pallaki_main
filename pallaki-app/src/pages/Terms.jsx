@@ -1,4 +1,7 @@
-export default function Terms({ onClose, onShowPrivacy }) {
+import { useNavigate } from 'react-router-dom'
+
+export default function Terms() {
+  const navigate = useNavigate()
   const sections = [
     {
       title: 'Use of the Platform',
@@ -33,7 +36,7 @@ export default function Terms({ onClose, onShowPrivacy }) {
   return (
     <div style={{ paddingTop: 64, minHeight: '100vh', background: 'var(--cr)' }}>
       <div style={{ maxWidth: 720, margin: '0 auto', padding: '4rem 2rem 6rem' }}>
-        <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--tl)', fontSize: '.8rem', cursor: 'pointer', fontFamily: "'Cormorant Garamond',serif", marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: 5 }}>
+        <button onClick={() => navigate(-1)} style={{ background: 'none', border: 'none', color: 'var(--tl)', fontSize: '.8rem', cursor: 'pointer', fontFamily: "'Cormorant Garamond',serif", marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: 5 }}>
           ← Back
         </button>
 
@@ -66,7 +69,7 @@ export default function Terms({ onClose, onShowPrivacy }) {
             Questions? Contact us at{' '}
             <a href="mailto:info@pallaki.us" style={{ color: 'var(--v)', textDecoration: 'none' }}>info@pallaki.us</a>
             {' '}· Also see our{' '}
-            <span style={{ color: 'var(--v)', cursor: 'pointer', textDecoration: 'underline' }} onClick={onShowPrivacy}>Privacy Policy</span>
+            <span style={{ color: 'var(--v)', cursor: 'pointer', textDecoration: 'underline' }} onClick={() => navigate('/privacy')}>Privacy Policy</span>
           </p>
         </div>
       </div>

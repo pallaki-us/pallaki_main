@@ -1,46 +1,40 @@
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { EVENT_CATS } from '../data/vendors'
 import { useVendors } from '../lib/useVendors'
 import { useAuth } from '../lib/AuthContext'
 
-const ITEMS_PER_PAGE = 9
-
-export default function Listing({ initCat = 'All', initCity = '', onShowDetail, onGoHome }) {
+export default function Listing({ onShowAuth }) {
   const { user } = useAuth()
-  const { vendors: allVendors, loading } = useVendors('All', initCity)
+  const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const initCat = searchParams.get('cat') || 'All'
+  const initCity = searchParams.get('city') || ''
+
   const [activeCat, setActiveCat] = useState(initCat)
   const [topRated, setTopRated] = useState(false)
   const [otherCity, setOtherCity] = useState('')
   const [page, setPage] = useState(1)
 
+  const city = otherCity || initCity
+  const { vendors, loading, total } = useVendors(activeCat, city, page, topRated)
+  const totalPages = Math.ceil(total / 9)
   const tabs = EVENT_CATS['Wedding']
 
-  const filtered = useMemo(() => {
-    let list = activeCat === 'All'
-      ? allVendors
-      : allVendors.filter(v => v.cat === activeCat || v.services.some(s => s.toLowerCase().includes(activeCat.toLowerCase())))
-
-    if (topRated) list = list.filter(v => v.badge === 'top')
-
-    if (otherCity) {
-      const lc = otherCity.toLowerCase()
-      list = list.filter(v => v.loc.toLowerCase().includes(lc))
-    }
-    return list
-  }, [activeCat, topRated, otherCity, allVendors])
-
-  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
-  const pageItems = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE)
-
   function switchCat(cat) { setActiveCat(cat); setPage(1) }
+
+  function handleVendorClick(id) {
+    if (!user) { onShowAuth('planner'); return }
+    navigate(`/vendor/${id}`)
+  }
 
   return (
     <div id="page-listing">
       {/* Header */}
       <div className="lh">
-        <button className="lh-back" onClick={onGoHome}>← Back to Home</button>
+        <button className="lh-back" onClick={() => navigate('/')}>← Back to Home</button>
         <h1 className="lh-title">{activeCat === 'All' ? 'All Vendors' : `${activeCat} Vendors`}</h1>
-        <p className="lh-sub">{initCity ? `Showing vendors in ${initCity}` : 'Browse our curated vendor network'}</p>
+        <p className="lh-sub">{city ? `Showing vendors in ${city}` : 'Browse our curated vendor network'}</p>
       </div>
 
       {/* Category tabs */}
@@ -60,7 +54,7 @@ export default function Listing({ initCat = 'All', initCity = '', onShowDetail, 
       <div className="l-filters">
         <span style={{ fontSize: '.74rem', color: 'var(--tl)', fontWeight: 500 }}>Filter:</span>
         <div className={`fchip${activeCat === 'All' && !topRated ? ' act' : ''}`} onClick={() => { switchCat('All'); setTopRated(false) }}>All</div>
-        <div className={`fchip${topRated ? ' act' : ''}`} onClick={() => setTopRated(t => !t)}>Top Rated</div>
+        <div className={`fchip${topRated ? ' act' : ''}`} onClick={() => { setTopRated(t => !t); setPage(1) }}>Top Rated</div>
         {activeCat !== 'All' && (
           <div className="fchip act" style={{ display: 'flex', alignItems: 'center', gap: '.35rem' }}>
             {activeCat}
@@ -88,16 +82,17 @@ export default function Listing({ initCat = 'All', initCity = '', onShowDetail, 
           <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--tl)', fontFamily: "'Cormorant Garamond',serif", fontSize: '1.2rem', fontStyle: 'italic' }}>
             Loading vendors…
           </div>
-        ) : pageItems.length === 0 ? (
+        ) : vendors.length === 0 ? (
           <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '4rem 2rem' }}>
             <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🌸</div>
             <h3 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '1.4rem', color: 'var(--vx)', marginBottom: '.6rem' }}>We're working on it!</h3>
             <p style={{ fontSize: '.9rem', color: 'var(--tl)', maxWidth: 360, margin: '0 auto' }}>No vendors match this filter yet. Try a different filter!</p>
             <button className="btn-p" style={{ marginTop: '1.5rem' }} onClick={() => { switchCat('All'); setTopRated(false) }}>Show All Vendors</button>
           </div>
-        ) : (          <div className="lg">
-            {pageItems.map(v => (
-              <div key={v.id} className="vc" onClick={() => onShowDetail(v.id)}>
+        ) : (
+          <div className="lg">
+            {vendors.map(v => (
+              <div key={v.id} className="vc" onClick={() => handleVendorClick(v.id)}>
                 <div className="vc-img" style={{ background: `linear-gradient(135deg,${v.bg})` }}>
                   {v.icon}
                   {v.badge === 'featured' && <div className="vcbdg bdg-f">Featured</div>}
@@ -106,7 +101,9 @@ export default function Listing({ initCat = 'All', initCity = '', onShowDetail, 
                 <div className="vc-body">
                   <div className="vc-meta">
                     <span className="vc-cat">{v.cat}</span>
-                    <div className="vc-rat"><span className="stars">★★★★★</span> {v.rating} ({v.reviews})</div>
+                    <div className="vc-rat">
+                      <span className="stars">{'★'.repeat(Math.round(parseFloat(v.rating) || 0))}{'☆'.repeat(5 - Math.round(parseFloat(v.rating) || 0))}</span> {v.rating} ({v.reviews})
+                    </div>
                   </div>
                   <div className="vc-name">{v.name}</div>
                   <div className="vc-loc">📍 {v.loc}</div>

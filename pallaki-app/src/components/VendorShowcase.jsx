@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { VENDORS } from '../data/vendors'
-
-const IS_PROD = import.meta.env.VITE_ENV === 'prod'
+import { IS_PROD } from '../lib/env'
 
 export default function VendorShowcase() {
   const [vendors, setVendors] = useState([])

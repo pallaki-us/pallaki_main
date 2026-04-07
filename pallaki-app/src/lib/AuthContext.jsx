@@ -61,17 +61,11 @@ export function AuthProvider({ children }) {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { name, user_type: type } },
+      options: {
+        data: { name, user_type: type },
+        emailRedirectTo: `${window.location.origin}`,
+      },
     })
-    if (!error && data.user) {
-      // Explicitly write to profiles in case trigger doesn't fire
-      await supabase.from('profiles').upsert({
-        id: data.user.id,
-        name,
-        user_type: type,
-      }, { onConflict: 'id' })
-      setUserType(type)
-    }
     return { data, error }
   }
 

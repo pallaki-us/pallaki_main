@@ -5,16 +5,22 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:demo": "vite --mode demo",
+    "dev:staging": "op run --env-file='.env.1password.staging' -- vite",
     "dev:op": "op run --env-file='.env.1password' -- vite",
     "build": "vite build",
+    "build:demo": "vite build --mode demo",
+    "build:staging": "op run --env-file='.env.1password.staging' -- vite build",
     "build:op": "op run --env-file='.env.1password' -- vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.82.0",
     "@supabase/supabase-js": "^2.100.1",
     "react": "^19.2.4",
-    "react-dom": "^19.2.4"
+    "react-dom": "^19.2.4",
+    "react-router-dom": "^7.13.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",

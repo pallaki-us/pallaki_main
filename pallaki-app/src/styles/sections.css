@@ -2,7 +2,7 @@
 .trending-section { padding: 3.5rem 3rem 4rem; background: var(--cr); }
 .trending-inner { max-width: 1200px; margin: 0 auto; }
 .trending-header { text-align: center; margin-bottom: 1.5rem; }
-.trending-title { font-family: 'Great Vibes', cursive; font-size: 3rem; font-weight: 400; color: var(--v); margin: 0; }
+.trending-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 300; letter-spacing: 0.06em; color: var(--vx); margin: 0; }
 .loved-scroll { display: flex; gap: 0; justify-content: space-between; padding: 1.5rem 0 1rem; }
 .loved-chip { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: .7rem; cursor: pointer; transition: transform .2s; }
 .loved-chip:hover { transform: translateY(-3px); }
@@ -31,7 +31,7 @@
 
 /* ── HOW IT WORKS ── */
 .how-section { padding: 4rem; background: var(--cd); }
-.how-title { font-family: 'Great Vibes', cursive; font-size: 3rem; font-weight: 400; color: var(--v); text-align: center; margin-bottom: 2rem; }
+.how-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 300; letter-spacing: 0.06em; color: var(--vx); text-align: center; margin-bottom: 2rem; }
 .how-inner { max-width: 600px; margin: 0 auto; }
 .how-timeline { display: flex; flex-direction: column; gap: 0; margin-top: 2rem; position: relative; }
 .how-item { display: flex; gap: 1.5rem; align-items: flex-start; position: relative; }
@@ -42,9 +42,9 @@
 .how-content p { font-family: 'Cormorant Garamond', serif; font-size: .86rem; color: var(--tm); line-height: 1.7; font-weight: 300; }
 
 /* ── ABOUT ── */
-.about-section { padding: 5.5rem 4rem; }
+.about-section { padding: 4rem 4rem; }
 .about-inner { max-width: 680px; margin: 0 auto; }
-.about-text p { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; font-style: italic; color: var(--tm); line-height: 1.85; margin-bottom: 1.1rem; font-weight: 400; }
+.about-text p { font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: var(--tm); line-height: 1.9; margin-bottom: 1rem; font-weight: 300; }
 .aq { position: relative; padding: 1.8rem 2rem 1.5rem 2.5rem; margin-bottom: 1.8rem; }
 .aq::before { content: '\201C'; position: absolute; top: -.5rem; left: .2rem; font-family: 'Cormorant Garamond', serif; font-size: 6rem; color: rgba(196,132,140,.2); line-height: 1; font-style: italic; }
 .aq p { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-style: italic; color: var(--vx); line-height: 1.65; font-weight: 400; }
@@ -102,7 +102,7 @@
 .fvd-kpi-d.up { color: #96AC9C; }
 
 /* ── CONTACT ── */
-.ct-section { padding: 5.5rem 4rem; }
+.ct-section { padding: 4rem 4rem; }
 .ct-inner { max-width: 680px; margin: 0 auto; }
 .ct-intro { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-style: italic; color: var(--vx); margin-bottom: .6rem; line-height: 1.6; font-weight: 400; }
 .ct-sub { font-size: 1rem; color: var(--tm); margin-bottom: 2rem; }
@@ -175,6 +175,40 @@ footer { background: var(--vx); padding: 3.5rem 4rem; }
   .fi { grid-template-columns: 1fr; }
   .loved-circle { width: 50px; height: 50px; font-size: 1.2rem; }
   .loved-name { font-size: .7rem; max-width: 52px; }
+}
+
+/* ── SECTION DIVIDER ── */
+.sec-divider { display: flex; align-items: center; gap: 1rem; padding: 0 4rem; max-width: 1200px; margin: 0 auto; }
+.sec-divider::before, .sec-divider::after { content: ''; flex: 1; height: 1px; background: var(--br); }
+.sec-divider span { color: var(--g); font-size: .5rem; letter-spacing: 4px; opacity: .65; }
+
+/* ── FEATURED CITIES ── */
+.cities-section { padding: 3rem 3rem 3.5rem; background: var(--cr); }
+.cities-inner { max-width: 1200px; margin: 0 auto; text-align: center; }
+.cities-label { font-family: 'Cormorant Garamond', serif; font-size: .7rem; letter-spacing: .2em; text-transform: uppercase; color: var(--tl); margin-bottom: 1.2rem; display: block; }
+.cities-row { display: flex; flex-wrap: wrap; gap: .5rem; justify-content: center; }
+.city-chip { font-family: 'Cormorant Garamond', serif; font-size: .82rem; color: var(--tm); border: 1px solid var(--br); padding: .38rem 1rem; border-radius: 100px; cursor: pointer; transition: all .18s; background: var(--wh); }
+.city-chip:hover { background: var(--v); color: var(--wh); border-color: var(--v); }
+
+/* ── TESTIMONIALS ── */
+.testimonials-section { padding: 4rem 3rem; background: var(--cd); }
+.testimonials-inner { max-width: 1200px; margin: 0 auto; }
+.testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 2.5rem; }
+.testi-card { background: var(--wh); border: 1px solid var(--br); border-radius: 16px; padding: 1.8rem; }
+.testi-stars { color: var(--g); font-size: .75rem; margin-bottom: .75rem; letter-spacing: 2px; }
+.testi-quote { font-family: 'Cormorant Garamond', serif; font-size: .98rem; color: var(--tm); line-height: 1.8; margin-bottom: 1.2rem; font-weight: 300; }
+.testi-author { display: flex; align-items: center; gap: .75rem; padding-top: 1rem; border-top: 1px solid var(--br); }
+.testi-av { width: 36px; height: 36px; border-radius: 50%; background: var(--vp); border: 1.5px solid var(--br); display: flex; align-items: center; justify-content: center; font-size: .95rem; flex-shrink: 0; }
+.testi-name { font-family: 'Cormorant Garamond', serif; font-size: .88rem; color: var(--vx); font-weight: 500; }
+.testi-event { font-size: .7rem; color: var(--tl); margin-top: 2px; letter-spacing: .03em; }
+
+@media (max-width: 768px) {
+  .testimonials-grid { grid-template-columns: 1fr; }
+  .cities-section { padding: 2rem 1.4rem 2.5rem; }
+  .testimonials-section { padding: 2.5rem 1.4rem; }
+  .sec-divider { padding: 0 1.4rem; }
+  .how-title { font-size: 1.5rem; }
+  .trending-title { font-size: 1.5rem; }
 }
 
 /* ── CONTACT SUCCESS ── */

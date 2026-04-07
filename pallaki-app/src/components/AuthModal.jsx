@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/AuthContext'
 import { showToast } from '../lib/toast'
 import AnimatedLogo from './AnimatedLogo'
 
-export default function AuthModal({ open, onClose, defaultType = 'planner', onSuccess, onShowPrivacy, onShowTerms, vendorOnly = false, directSignup = false, directLogin = false }) {
+export default function AuthModal({ open, onClose, defaultType = 'planner', onSuccess, vendorOnly = false, directSignup = false, directLogin = false }) {
+  const navigate = useNavigate()
   const { signIn, signUp, setUserType } = useAuth()
   const [type, setType] = useState(defaultType)
   const [screen, setScreen] = useState(() => {
@@ -122,9 +124,9 @@ export default function AuthModal({ open, onClose, defaultType = 'planner', onSu
               <div className="modal-field"><label>Password</label><input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Min. 8 characters" /></div>
               <p style={{ fontSize: '.72rem', color: 'var(--tl)', textAlign: 'center', lineHeight: 1.6 }}>
                 By signing up you agree to our{' '}
-                <span style={{ color: 'var(--v)', cursor: 'pointer', textDecoration: 'underline' }} onClick={() => { onClose(); onShowTerms?.() }}>Terms & Conditions</span>
+                <span style={{ color: 'var(--v)', cursor: 'pointer', textDecoration: 'underline' }} onClick={() => { onClose(); navigate('/terms') }}>Terms & Conditions</span>
                 {' '}and{' '}
-                <span style={{ color: 'var(--v)', cursor: 'pointer', textDecoration: 'underline' }} onClick={() => { onClose(); onShowPrivacy?.() }}>Privacy Policy</span>
+                <span style={{ color: 'var(--v)', cursor: 'pointer', textDecoration: 'underline' }} onClick={() => { onClose(); navigate('/privacy') }}>Privacy Policy</span>
               </p>
               <button className="modal-submit" onClick={handlePlannerSignup}>Create Account →</button>
               <button className="modal-back" onClick={() => goScreen('planner-choice')}>← Back</button>
@@ -164,9 +166,9 @@ export default function AuthModal({ open, onClose, defaultType = 'planner', onSu
               <button className="modal-submit" onClick={handleVendorSignup}>Create Vendor Account →</button>
               <p style={{ fontSize: '.72rem', color: 'var(--tl)', textAlign: 'center', lineHeight: 1.6 }}>
                 By signing up you agree to our{' '}
-                <span style={{ color: 'var(--gl)', cursor: 'pointer', textDecoration: 'underline' }} onClick={() => { onClose(); onShowTerms?.() }}>Terms & Conditions</span>
+                <span style={{ color: 'var(--gl)', cursor: 'pointer', textDecoration: 'underline' }} onClick={() => { onClose(); navigate('/terms') }}>Terms & Conditions</span>
                 {' '}and{' '}
-                <span style={{ color: 'var(--gl)', cursor: 'pointer', textDecoration: 'underline' }} onClick={() => { onClose(); onShowPrivacy?.() }}>Privacy Policy</span>
+                <span style={{ color: 'var(--gl)', cursor: 'pointer', textDecoration: 'underline' }} onClick={() => { onClose(); navigate('/privacy') }}>Privacy Policy</span>
               </p>
               <button className="modal-back" onClick={() => goScreen('vendor-choice')}>← Back</button>
             </div>

@@ -1,35 +1,58 @@
 import { useState, useEffect } from 'react'
 import { supabase } from './supabase'
-import { VENDORS } from '../data/vendors' // fallback for demo mode
+import { IS_DEMO } from './env'
+import { VENDORS } from '../data/vendors'
 
-export function useVendors(category = 'All', city = '') {
+const PAGE_SIZE = 9
+
+// Columns needed for listing cards — excludes heavy fields like portfolio_urls
+const LISTING_COLS = 'id, name, category, city, state, icon, bg, rating, review_count, badge, description, services, events_covered, is_verified'
+
+export function useVendors(category = 'All', city = '', page = 1, topRated = false) {
   const [vendors, setVendors] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [total, setTotal] = useState(0)
 
   useEffect(() => {
-    if (!supabase) {
+    if (!supabase || IS_DEMO) {
       let filtered = category === 'All' ? VENDORS : VENDORS.filter(v => v.cat === category)
       if (city) filtered = filtered.filter(v => v.loc.toLowerCase().includes(city.toLowerCase()))
-      setVendors(filtered)
+      if (topRated) filtered = filtered.filter(v => v.badge === 'top')
+      setTotal(filtered.length)
+      const start = (page - 1) * PAGE_SIZE
+      setVendors(filtered.slice(start, start + PAGE_SIZE))
       setLoading(false)
       return
     }
 
-    async function fetch() {
+    async function fetchVendors() {
       setLoading(true)
+      setError(null)
+
+      const start = (page - 1) * PAGE_SIZE
+      const end = start + PAGE_SIZE - 1
+
       let query = supabase
         .from('vendors')
-        .select('*')
+        .select(LISTING_COLS, { count: 'exact' })
         .order('rating', { ascending: false })
+        .range(start, end)
 
       if (category !== 'All') query = query.eq('category', category)
       if (city) query = query.ilike('city', `%${city}%`)
+      if (topRated) query = query.eq('badge', 'top')
 
-      const { data, error } = await query
-      if (error) { setError(error.message); setLoading(false); return }
+      const { data, error: err, count } = await query
 
-      setVendors(data.map(v => ({
+      if (err) {
+        setError(err.message)
+        setLoading(false)
+        return
+      }
+
+      setTotal(count || 0)
+      setVendors((data || []).map(v => ({
         id: v.id,
         name: v.name,
         cat: v.category,
@@ -43,16 +66,14 @@ export function useVendors(category = 'All', city = '') {
         events: v.events_covered,
         bg: v.bg,
         is_verified: v.is_verified,
-        portfolio_urls: v.portfolio_urls || [],
-        featured_urls: v.featured_urls || [],
       })))
       setLoading(false)
     }
 
-    fetch()
-  }, [category, city])
+    fetchVendors()
+  }, [category, city, page, topRated])
 
-  return { vendors, loading, error }
+  return { vendors, loading, error, total }
 }
 
 export function useVendor(id) {
@@ -62,14 +83,14 @@ export function useVendor(id) {
   useEffect(() => {
     if (!id) return
 
-    if (!supabase) {
-      const v = VENDORS.find(x => x.id === id) || VENDORS[0]
+    if (!supabase || IS_DEMO) {
+      const v = VENDORS.find(x => String(x.id) === String(id)) || VENDORS[0]
       setVendor(v)
       setLoading(false)
       return
     }
 
-    async function fetch() {
+    async function fetchVendor() {
       const { data, error } = await supabase
         .from('vendors')
         .select('*')
@@ -98,7 +119,7 @@ export function useVendor(id) {
       setLoading(false)
     }
 
-    fetch()
+    fetchVendor()
   }, [id])
 
   return { vendor, loading }

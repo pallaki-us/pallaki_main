@@ -1,8 +1,15 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/AuthContext'
 import { supabase } from '../lib/supabase'
-import VendorShowcase from '../components/VendorShowcase'
+import { IS_DEMO, IS_PROD } from '../lib/env'
 import AnimatedLogo from '../components/AnimatedLogo'
+import TrendingSection from '../components/TrendingSection'
+import HowItWorksSection from '../components/HowItWorksSection'
+import TestimonialsSection from '../components/TestimonialsSection'
+import ContactSection from '../components/ContactSection'
+
+const DEMO_CITIES = ['Dallas', 'Chicago', 'Atlanta', 'Houston', 'Los Angeles', 'New York', 'San Jose', 'Seattle', 'Austin', 'New Jersey']
 
 const EVENT_TYPES = [
   { icon: '💍', label: 'Wedding' },
@@ -12,84 +19,49 @@ const EVENT_TYPES = [
   { icon: '🍼', label: 'Baby Shower' },
 ]
 
-const CAT_CHIPS = [
-  { icon: '📸', label: 'Photography' },
-  { icon: '🪷', label: 'Mehndi Artists' },
-  { icon: '💄', label: 'Bridal Makeup' },
-  { icon: '🍛', label: 'Catering' },
-  { icon: '🌸', label: 'Mandap & Decor' },
-  { icon: '🎵', label: 'Music & DJ' },
-  { icon: '🪔', label: 'Priests & Pandits' },
-]
-
-export default function Home({ onSearch, onShowAuth, onShowDetail, onShowListing, onShowPrivacy, onShowTerms }) {
+export default function Home({ onShowAuth }) {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [selEvent, setSelEvent] = useState('Wedding')
   const [city, setCity] = useState('')
   const [cat, setCat] = useState('')
   const [noMatch, setNoMatch] = useState(false)
-  const [activeCat, setActiveCat] = useState('Photography')
-  const [trendingVendors, setTrendingVendors] = useState([])
-  const [stats, setStats] = useState({ vendors: 0, cities: 0, categories: 10, planners: 0 })
   const [citySuggestions, setCitySuggestions] = useState([])
-  const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' })
-  const [contactStatus, setContactStatus] = useState(null)
-
-  const IS_PROD = import.meta.env.VITE_ENV === 'prod'
+  const [stats, setStats] = useState({ vendors: 0, cities: 0, categories: 10, planners: 0 })
 
   useEffect(() => {
-    fetchTrending('Photography')
     fetchCities()
     if (IS_PROD) fetchStats()
   }, [])
 
   async function fetchCities() {
-    if (!supabase) return
-    const { data } = await supabase
-      .from('vendors')
-      .select('city')
-    if (data) {
-      const unique = [...new Set(data.map(v => v.city).filter(Boolean))]
-        .sort()
+    if (!supabase || IS_DEMO) return
+    try {
+      const { data, error } = await supabase.from('vendors').select('city')
+      if (error) throw error
+      const unique = [...new Set(data.map(v => v.city).filter(Boolean))].sort()
       setCitySuggestions(unique)
+    } catch (err) {
+      console.error('Failed to fetch cities:', err)
     }
   }
 
   async function fetchStats() {
     if (!supabase) return
-    const [vendorsRes, plannersRes] = await Promise.all([
-      supabase.from('vendors').select('city', { count: 'exact' }),
-      supabase.from('planner_profiles').select('id', { count: 'exact' }),
-    ])
-    const vendorCount = vendorsRes.count || 0
-    const cities = vendorsRes.data
-      ? new Set(vendorsRes.data.map(v => v.city?.toLowerCase()).filter(Boolean)).size
-      : 0
-    setStats({ vendors: vendorCount, cities, categories: 10, planners: plannersRes.count || 0 })
-  }
-
-  async function fetchTrending(category) {
-    if (!supabase) { setTrendingVendors([]); return }
-    const { data } = await supabase
-      .from('vendors')
-      .select('id, name, city, state, icon, bg, rating, review_count, category')
-      .eq('category', category)
-      .order('rating', { ascending: false })
-      .limit(5)
-    setTrendingVendors(data?.map(v => ({
-      id: v.id,
-      name: v.name,
-      loc: `${v.city}, ${v.state}`,
-      icon: v.icon,
-      bg: v.bg || 'linear-gradient(135deg,#FDEAED,#F5C4CB)',
-      rating: v.rating?.toFixed(1),
-      reviews: v.review_count,
-    })) || [])
-  }
-
-  function selectCat(label) {
-    setActiveCat(label)
-    fetchTrending(label)
+    try {
+      const [vendorsRes, plannersRes] = await Promise.all([
+        supabase.from('vendors').select('city', { count: 'exact' }),
+        supabase.from('planner_profiles').select('id', { count: 'exact' }),
+      ])
+      if (vendorsRes.error) throw vendorsRes.error
+      const vendorCount = vendorsRes.count || 0
+      const cities = vendorsRes.data
+        ? new Set(vendorsRes.data.map(v => v.city?.toLowerCase()).filter(Boolean)).size
+        : 0
+      setStats({ vendors: vendorCount, cities, categories: 10, planners: plannersRes.count || 0 })
+    } catch (err) {
+      console.error('Failed to fetch stats:', err)
+    }
   }
 
   function checkCity(v) {
@@ -97,27 +69,12 @@ export default function Home({ onSearch, onShowAuth, onShowDetail, onShowListing
     setNoMatch(v.length > 2 && citySuggestions.length > 0 && !citySuggestions.some(c => c.toLowerCase().includes(v.toLowerCase())))
   }
 
-  async function submitContact(e) {
-    e.preventDefault()
-    if (!contactForm.name || !contactForm.email || !contactForm.message) return
-    setContactStatus('sending')
-    try {
-      if (supabase) {
-        const { error } = await supabase
-          .from('contact_messages')
-          .insert({ name: contactForm.name, email: contactForm.email, message: contactForm.message })
-        if (error) throw error
-      }
-      setContactStatus('sent')
-      setContactForm({ name: '', email: '', message: '' })
-    } catch {
-      setContactStatus('error')
-    }
-  }
-
   function doSearch() {
     if (!user) { onShowAuth('planner'); return }
-    onSearch(cat || 'All', city)
+    const params = new URLSearchParams()
+    if (cat) params.set('cat', cat)
+    if (city) params.set('city', city)
+    navigate(`/vendors${params.toString() ? '?' + params.toString() : ''}`)
   }
 
   return (
@@ -205,72 +162,23 @@ export default function Home({ onSearch, onShowAuth, onShowDetail, onShowListing
         </div>
       </section>
 
-      {/* ── TRENDING ── */}
-      <section className="trending-section">
-        <div className="trending-inner">
-          <div className="trending-header">
-            <h2 className="trending-title">Trending on Pallaki</h2>
-          </div>
-          <div className="loved-scroll">
-            {CAT_CHIPS.map(c => (
-              <div
-                key={c.label}
-                className={`loved-chip${activeCat === c.label ? ' active' : ''}`}
-                onClick={() => selectCat(c.label)}
-              >
-                <div className="loved-circle">{c.icon}</div>
-                <span className="loved-name">{c.label}</span>
-              </div>
+      <TrendingSection onShowAuth={onShowAuth} />
+
+      {/* ── FEATURED CITIES ── */}
+      <section className="cities-section">
+        <div className="cities-inner">
+          <span className="cities-label">Vendors available across</span>
+          <div className="cities-row">
+            {(citySuggestions.length > 0 ? citySuggestions : DEMO_CITIES).map(c => (
+              <span key={c} className="city-chip" onClick={() => { if (!user) { onShowAuth('planner'); return } navigate(`/vendors?city=${encodeURIComponent(c)}`) }}>📍 {c}</span>
             ))}
-          </div>
-          <div className="tv-header">
-            <span className="tv-label">{activeCat} · Most Searched</span>
-            <span className="tv-view-all" onClick={() => onShowListing(activeCat, '')}>View All →</span>
-          </div>
-          <div className="tv-track-wrap">
-            <button className="tv-arr" onClick={() => document.getElementById('tv-track').scrollBy(-220, 0)}>‹</button>
-            <div className="tv-track" id="tv-track">
-              {trendingVendors.map((v, i) => (
-                <div key={i} className="tv-card" onClick={() => user ? onShowDetail(v.id) : onShowAuth('planner')}>
-                  <div className="tv-card-img" style={{ background: v.bg }}>
-                    <div className="tv-card-rank">#{i + 1}</div>
-                    {v.icon}
-                  </div>
-                  <div className="tv-card-body">
-                    <div className="tv-card-name">{v.name}</div>
-                    <div className="tv-card-loc">📍 {v.loc}</div>
-                    <div className="tv-card-rat">★★★★★ {v.rating} · {v.reviews} reviews</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <button className="tv-arr" onClick={() => document.getElementById('tv-track').scrollBy(220, 0)}>›</button>
           </div>
         </div>
       </section>
 
-      {/* ── HOW IT WORKS ── */}
-      <section className="how-section" id="how-it-works">
-        <div className="how-inner">
-          <h2 className="how-title">How Pallaki Works</h2>
-          <div className="how-timeline">
-            {[
-              { n: '1', title: 'Browse Vendors', desc: 'Search by category and city to find trusted South Asian event vendors near you.' },
-              { n: '2', title: 'Create Your Profile', desc: 'Sign up and share your event details so vendors understand exactly what you need.' },
-              { n: '3', title: 'Send an Inquiry', desc: 'Message vendors directly and discuss your event on your own terms.' },
-              { n: '4', title: 'Celebrate', desc: 'Book your perfect team and let Pallaki help you create memories that last forever.' },
-            ].map(step => (
-              <div key={step.n} className="how-item">
-                <div className="how-dot">{step.n}</div>
-                <div className="how-content">
-                  <h3>{step.title}</h3>
-                  <p>{step.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <div className="sec-divider"><span>◆ ◇ ◆</span></div>
+
+      <HowItWorksSection />
 
       {/* ── OUR STORY ── */}
       <section className="about-section" id="our-story">
@@ -300,6 +208,10 @@ export default function Home({ onSearch, onShowAuth, onShowDetail, onShowListing
         </div>
       </section>
 
+      <TestimonialsSection />
+
+      <div className="sec-divider"><span>◆ ◇ ◆</span></div>
+
       {/* ── FOR VENDORS ── */}
       <section className="fv-section">
         <div className="fv-inner">
@@ -320,7 +232,6 @@ export default function Home({ onSearch, onShowAuth, onShowDetail, onShowListing
                 </div>
               ))}
             </div>
-
             <div className="fv-trust">
               <div className="fv-trust-av">
                 {['R', 'A', 'S', 'M'].map(l => <span key={l}>{l}</span>)}
@@ -328,49 +239,10 @@ export default function Home({ onSearch, onShowAuth, onShowDetail, onShowListing
               <p className="fv-trust-txt"><strong>{IS_PROD ? (stats.vendors > 0 ? `${stats.vendors}+` : 'Growing') : '100+'} vendors</strong> already growing on Pallaki</p>
             </div>
           </div>
-          <VendorShowcase />
         </div>
       </section>
 
-      {/* ── CONTACT ── */}
-      <section className="ct-section" id="contact">
-        <div className="ct-inner">
-          <h2 className="how-title">Get in Touch</h2>
-          <p className="ct-intro">We'd love to hear from you.</p>
-          <p className="ct-intro ct-sub">Have questions, feedback, or want to partner with us? Drop us a note and we'll get back to you within 24 hours.</p>
-          {contactStatus === 'sent' ? (
-            <div className="contact-success">
-              <span className="contact-success-icon">🌸</span>
-              <h3>Thank you for reaching out!</h3>
-              <p>We've received your message and will get back to you as soon as we can.</p>
-              <button className="btn-sub" style={{ marginTop: '1.2rem' }} onClick={() => setContactStatus(null)}>Send Another Message</button>
-            </div>
-          ) : (
-            <form onSubmit={submitContact}>
-              <div className="fg">
-                <div className="ff">
-                  <label>Name</label>
-                  <input type="text" placeholder="Your name" value={contactForm.name} onChange={e => setContactForm(f => ({ ...f, name: e.target.value }))} required />
-                </div>
-                <div className="ff">
-                  <label>Email</label>
-                  <input type="email" placeholder="you@email.com" value={contactForm.email} onChange={e => setContactForm(f => ({ ...f, email: e.target.value }))} required />
-                </div>
-                <div className="ff full">
-                  <label>Message</label>
-                  <textarea placeholder="Tell us how we can help…" value={contactForm.message} onChange={e => setContactForm(f => ({ ...f, message: e.target.value }))} required />
-                </div>
-              </div>
-              {contactStatus === 'error' && (
-                <p style={{ color: '#c0392b', fontSize: '.84rem', marginTop: '.75rem' }}>Something went wrong. Please try again.</p>
-              )}
-              <button className="btn-sub" type="submit" disabled={contactStatus === 'sending'}>
-                {contactStatus === 'sending' ? 'Sending…' : 'Send Message'}
-              </button>
-            </form>
-          )}
-        </div>
-      </section>
+      <ContactSection />
 
       {/* ── FOOTER ── */}
       <footer>
@@ -382,7 +254,7 @@ export default function Home({ onSearch, onShowAuth, onShowDetail, onShowListing
           <div className="fc">
             <h4>Discover</h4>
             {['Photography', 'Mehndi Artists', 'Bridal Makeup', 'Catering'].map(c => (
-              <a key={c} onClick={() => onShowListing(c, '')}>{c}</a>
+              <a key={c} onClick={() => navigate(`/vendors?cat=${encodeURIComponent(c)}`)}>{c}</a>
             ))}
           </div>
           <div className="fc">
@@ -393,17 +265,17 @@ export default function Home({ onSearch, onShowAuth, onShowDetail, onShowListing
           </div>
           <div className="fc">
             <h4>Company</h4>
-            <a style={{cursor:'pointer'}} onClick={() => document.getElementById('our-story')?.scrollIntoView({behavior:'smooth'})}>About Us</a>
-            <a style={{cursor:'pointer'}} onClick={() => onShowAuth('vendor', true)}>For Vendors</a>
-            <a style={{cursor:'pointer'}} onClick={() => document.getElementById('how-it-works')?.scrollIntoView({behavior:'smooth'})}>How It Works</a>
-            <a style={{cursor:'pointer'}} onClick={() => document.getElementById('contact')?.scrollIntoView({behavior:'smooth'})}>Contact</a>
+            <a style={{ cursor: 'pointer' }} onClick={() => document.getElementById('our-story')?.scrollIntoView({ behavior: 'smooth' })}>About Us</a>
+            <a style={{ cursor: 'pointer' }} onClick={() => onShowAuth('vendor', true)}>For Vendors</a>
+            <a style={{ cursor: 'pointer' }} onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}>How It Works</a>
+            <a style={{ cursor: 'pointer' }} onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}>Contact</a>
           </div>
         </div>
         <div className="fb">
           <span>© 2025 Pallaki. All rights reserved.</span>
           <div style={{ display: 'flex', gap: '1.2rem' }}>
-            <span style={{ cursor: 'pointer', textDecoration: 'underline' }} onClick={onShowPrivacy}>Privacy Policy</span>
-            <span style={{ cursor: 'pointer', textDecoration: 'underline' }} onClick={onShowTerms}>Terms & Conditions</span>
+            <span style={{ cursor: 'pointer', textDecoration: 'underline' }} onClick={() => navigate('/privacy')}>Privacy Policy</span>
+            <span style={{ cursor: 'pointer', textDecoration: 'underline' }} onClick={() => navigate('/terms')}>Terms & Conditions</span>
           </div>
           <span>Made with 🌸 for South Asian families in America</span>
         </div>

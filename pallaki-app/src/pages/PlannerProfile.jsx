@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/AuthContext'
 import { usePlannerProfile } from '../lib/usePlannerProfile'
 import { showToast } from '../lib/toast'
@@ -9,8 +10,9 @@ const TRADITIONS = ['Hindu (North Indian)','Hindu (South Indian)','Muslim / Nika
 const GUEST_OPTIONS = ['Under 50','50 - 100','100 - 200','200 - 400','400+']
 const BUDGET_OPTIONS = ['Under $2,000','$2,000 - $5,000','$5,000 - $10,000','$10,000 - $25,000','$25,000 - $50,000','$50,000+','Prefer not to say']
 
-export default function PlannerProfile({ onGoHome, onBrowse }) {
+export default function PlannerProfile() {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const { profile, saving, saveProfile } = usePlannerProfile()
 
   const [fname, setFname] = useState('')
@@ -81,7 +83,7 @@ export default function PlannerProfile({ onGoHome, onBrowse }) {
       {/* Sticky action bar */}
       <div style={{ position: 'sticky', top: 64, zIndex: 100, background: 'var(--cr)', borderBottom: '1px solid var(--br)', padding: '.75rem 2.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem' }}>
-          <button className="btn-o" style={{ padding: '.45rem 1rem', fontSize: '.78rem' }} onClick={onGoHome}>← Back</button>
+          <button className="btn-o" style={{ padding: '.45rem 1rem', fontSize: '.78rem' }} onClick={() => navigate('/')}>← Back</button>
           <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '1rem', color: 'var(--vx)', fontWeight: 400 }}>Edit My Profile</span>
         </div>
         <button className="dash-btn dash-btn-gold" onClick={handleSave} disabled={saving}>
@@ -191,9 +193,9 @@ export default function PlannerProfile({ onGoHome, onBrowse }) {
 
         {/* Actions */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '.75rem', paddingBottom: '3rem', flexWrap: 'wrap' }}>
-          <button className="btn-o" onClick={onGoHome}>← Back to Home</button>
+          <button className="btn-o" onClick={() => navigate('/')}>← Back to Home</button>
           <div style={{ display: 'flex', gap: '.65rem' }}>
-            <button className="btn-o" onClick={onBrowse}>Browse Vendors</button>
+            <button className="btn-o" onClick={() => navigate('/vendors')}>Browse Vendors</button>
             <button className="btn-p" onClick={handleSave} disabled={saving}>{saving ? 'Saving…' : 'Save Profile ✓'}</button>
           </div>
         </div>

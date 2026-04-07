@@ -1,11 +1,16 @@
 import { useState, useEffect } from 'react'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useVendor } from '../lib/useVendors'
 import { useAuth } from '../lib/AuthContext'
 import { showToast } from '../lib/toast'
 import { supabase } from '../lib/supabase'
 import InquiryModal from '../components/InquiryModal'
 
-export default function Detail({ vendorId, onBack, onShowAuth, isOwnListing = false }) {
+export default function Detail({ onShowAuth }) {
+  const { id: vendorId } = useParams()
+  const [searchParams] = useSearchParams()
+  const isOwnListing = searchParams.get('own') === 'true'
+  const navigate = useNavigate()
   const { user, userType } = useAuth()
   const { vendor: v, loading } = useVendor(vendorId)
   const [activeTab, setActiveTab] = useState('overview')
@@ -47,7 +52,7 @@ export default function Detail({ vendorId, onBack, onShowAuth, isOwnListing = fa
     <div id="page-detail">
       {/* Header */}
       <div className="dh">
-        <button className="dh-back" onClick={onBack}>{isOwnListing ? '← Back to Profile' : '← Back to Results'}</button>
+        <button className="dh-back" onClick={() => navigate(isOwnListing ? '/dashboard' : '/vendors')}>{isOwnListing ? '← Back to Profile' : '← Back to Results'}</button>
         <div className="dh-row">
           <div className="dh-av">{v.icon}</div>
           <div className="dh-info">
@@ -57,7 +62,7 @@ export default function Detail({ vendorId, onBack, onShowAuth, isOwnListing = fa
               <span className="dh-tag">📍 {v.loc}</span>
             </div>
             <div className="dh-r">
-              <span className="dh-rating">★★★★★ {v.rating}</span>
+              <span className="dh-rating">{'★'.repeat(Math.round(parseFloat(v.rating) || 0))}{'☆'.repeat(5 - Math.round(parseFloat(v.rating) || 0))} {v.rating}</span>
               <span className="dh-rev">({v.reviews} reviews)</span>
             </div>
           </div>

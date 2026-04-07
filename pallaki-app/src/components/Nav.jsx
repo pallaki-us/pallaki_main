@@ -1,24 +1,31 @@
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/AuthContext'
 import AnimatedLogo from './AnimatedLogo'
 import PalanquinProcession from './PalanquinProcession'
 
-export default function Nav({ onShowListing, onShowAuth, onGoHome, onEditProfile, onShowVendorListing }) {
+export default function Nav({ onShowAuth, onShowVendorListing }) {
   const { user, userType, signOut } = useAuth()
+  const navigate = useNavigate()
   const name = user?.user_metadata?.name || user?.email?.split('@')[0] || ''
+
+  function goHome() {
+    if (userType === 'vendor') navigate('/dashboard')
+    else navigate('/')
+  }
 
   return (
     <nav>
-      <div className="logo-wrap" onClick={onGoHome} style={{ width: 120, flexShrink: 0 }}>
-        <AnimatedLogo size="2rem" color="var(--v)" onClick={onGoHome} />
+      <div className="logo-wrap" onClick={goHome} style={{ width: 120, flexShrink: 0 }}>
+        <AnimatedLogo size="2rem" color="var(--v)" />
       </div>
       <div style={{ flex: 1, overflow: 'hidden', height: '100%', display: 'flex', alignItems: 'center' }}>
         <video
-          src="/pallaki_main/procession.mp4"
+          src="/procession.mp4"
           autoPlay
           loop
           muted
           playsInline
-          style={{ height: 44, width: '100%', objectFit: 'contain', objectPosition: 'center' }}
+          style={{ height: 44, width: '100%', objectFit: 'contain' }}
         />
       </div>
       <div className="nav-r">
@@ -36,10 +43,10 @@ export default function Nav({ onShowListing, onShowAuth, onGoHome, onEditProfile
             <span className="nav-user-name">My Dashboard</span>
             <div className="nav-user-av">{name.charAt(0).toUpperCase()}</div>
             <div className="nav-user-dd">
-              <div className="nav-user-dd-item" onClick={() => onGoHome('dashboard')}>
+              <div className="nav-user-dd-item" onClick={() => navigate('/dashboard')}>
                 📊 Back to Dashboard
               </div>
-              <div className="nav-user-dd-item" onClick={() => onGoHome('analytics')}>
+              <div className="nav-user-dd-item" onClick={() => navigate('/analytics')}>
                 📈 Analytics
               </div>
               <div className="nav-user-dd-item" onClick={onShowVendorListing}>
@@ -56,10 +63,10 @@ export default function Nav({ onShowListing, onShowAuth, onGoHome, onEditProfile
             <span className="nav-user-name">{`Hi, ${name}`}</span>
             <div className="nav-user-av">{name.charAt(0).toUpperCase()}</div>
             <div className="nav-user-dd">
-              <div className="nav-user-dd-item" onClick={onEditProfile}>
+              <div className="nav-user-dd-item" onClick={() => navigate('/profile')}>
                 ✎ Edit Profile
               </div>
-              <div className="nav-user-dd-item" onClick={() => onShowListing('All', '')}>
+              <div className="nav-user-dd-item" onClick={() => navigate('/vendors')}>
                 🔍 Browse Vendors
               </div>
               <div className="nav-user-dd-div" />

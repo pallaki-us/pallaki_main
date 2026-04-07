@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/AuthContext'
 import { supabase } from '../lib/supabase'
 import { showToast } from '../lib/toast'
@@ -10,7 +11,8 @@ const CATEGORIES = ['Photography', 'Videography', 'Mehndi Artist', 'Bridal Makeu
 const STATES = ['California', 'Georgia', 'Illinois', 'Maryland', 'New Jersey', 'New York', 'Texas', 'Virginia', 'Washington', 'Florida', 'Pennsylvania', 'Michigan', 'Ohio']
 const SERVICES = ['Weddings', 'Engagements', 'Mehndi Night', 'Sangeet', 'Pre-Wedding', 'Birthdays', 'Baby Showers', 'House Warming']
 
-export default function VendorOnboarding({ onComplete }) {
+export default function VendorOnboarding() {
+  const navigate = useNavigate()
   const { user } = useAuth()
   const [step, setStep] = useState(0)
   const [saving, setSaving] = useState(false)
@@ -56,7 +58,7 @@ export default function VendorOnboarding({ onComplete }) {
   }
 
   async function handleSubmit() {
-    if (!user || !supabase) { onComplete(); return }
+    if (!user || !supabase) { navigate('/dashboard'); return }
     setSaving(true)
 
     const { error } = await supabase.from('vendors').upsert({
@@ -93,7 +95,7 @@ export default function VendorOnboarding({ onComplete }) {
         <p style={{ fontSize: '.88rem', color: 'var(--tl)', marginBottom: '2rem', fontWeight: 300 }}>
           In the meantime, you can update your profile and add more photos from your dashboard.
         </p>
-        <button className="btn-p" onClick={onComplete}>Go to My Dashboard →</button>
+        <button className="btn-p" onClick={() => navigate('/dashboard')}>Go to My Dashboard →</button>
       </div>
     </div>
   )
