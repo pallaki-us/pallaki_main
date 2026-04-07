@@ -8,6 +8,7 @@ import TrendingSection from '../components/TrendingSection'
 import HowItWorksSection from '../components/HowItWorksSection'
 import TestimonialsSection from '../components/TestimonialsSection'
 import ContactSection from '../components/ContactSection'
+import ourStoryImg from '../assets/our story.jpg'
 
 const DEMO_CITIES = ['Dallas', 'Chicago', 'Atlanta', 'Houston', 'Los Angeles', 'New York', 'San Jose', 'Seattle', 'Austin', 'New Jersey']
 
@@ -204,6 +205,9 @@ export default function Home({ onShowAuth }) {
                 </div>
               ))}
             </div>
+          </div>
+          <div className="about-photo">
+            <img src={ourStoryImg} alt="Shruti and Vamsi" />
           </div>
         </div>
       </section>
