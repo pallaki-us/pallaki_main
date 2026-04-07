@@ -35,7 +35,7 @@ jobs:
         run: npm run build
         working-directory: pallaki-app
         env:
-          VITE_BASE_PATH: /pallaki-claude/staging/
+          VITE_BASE_PATH: /pallaki_main/staging/
 
       - name: Add 404.html for SPA routing
         run: cp pallaki-app/dist/index.html pallaki-app/dist/404.html
