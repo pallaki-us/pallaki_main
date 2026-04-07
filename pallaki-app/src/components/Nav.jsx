@@ -5,6 +5,11 @@ import PalanquinProcession from './PalanquinProcession'
 
 export default function Nav({ onShowAuth, onShowVendorListing }) {
   const { user, userType, signOut } = useAuth()
+
+  async function handleSignOut() {
+    await signOut()
+    navigate('/')
+  }
   const navigate = useNavigate()
   const name = user?.user_metadata?.name || user?.email?.split('@')[0] || ''
 
@@ -53,7 +58,7 @@ export default function Nav({ onShowAuth, onShowVendorListing }) {
                 🔍 See Your Listing
               </div>
               <div className="nav-user-dd-div" />
-              <div className="nav-user-dd-item danger" onClick={signOut}>
+              <div className="nav-user-dd-item danger" onClick={handleSignOut}>
                 ← Sign Out
               </div>
             </div>
@@ -70,7 +75,7 @@ export default function Nav({ onShowAuth, onShowVendorListing }) {
                 🔍 Browse Vendors
               </div>
               <div className="nav-user-dd-div" />
-              <div className="nav-user-dd-item danger" onClick={signOut}>
+              <div className="nav-user-dd-item danger" onClick={handleSignOut}>
                 ← Sign Out
               </div>
             </div>

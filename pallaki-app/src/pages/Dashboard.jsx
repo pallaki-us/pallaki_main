@@ -18,6 +18,11 @@ const SERVICES = ['Weddings','Engagements','Mehndi Night','Sangeet','Pre-Wedding
 
 export default function Dashboard({ activePage, onShowVendorListing }) {
   const { user, signOut } = useAuth()
+
+  async function handleSignOut() {
+    await signOut()
+    navigate('/')
+  }
   const navigate = useNavigate()
   const { profile, saving, saveProfile } = useVendorProfile()
   const { inquiries, updateStatus } = useVendorInquiries(profile?.id)
@@ -143,7 +148,7 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
         <p style={{ fontSize: '.85rem', color: 'var(--tl)', lineHeight: 1.7, marginBottom: '2rem', fontWeight: 300 }}>
           You'll receive an email once your profile is live on Pallaki.
         </p>
-        <button className="btn-o" onClick={signOut}>Sign Out</button>
+        <button className="btn-o" onClick={handleSignOut}>Sign Out</button>
       </div>
     </div>
   )
