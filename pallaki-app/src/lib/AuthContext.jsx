@@ -109,7 +109,7 @@ export function AuthProvider({ children }) {
     sessionStorage.setItem('pallaki_oauth_type', 'planner')
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: window.location.origin + import.meta.env.BASE_URL },
+      options: { redirectTo: window.location.origin + (import.meta.env.VITE_BASE_PATH || '/') },
     })
     return { error }
   }
