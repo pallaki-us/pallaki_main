@@ -165,18 +165,6 @@ export default function Home({ onShowAuth }) {
 
       <TrendingSection onShowAuth={onShowAuth} />
 
-      {/* ── FEATURED CITIES ── */}
-      <section className="cities-section">
-        <div className="cities-inner">
-          <span className="cities-label">Vendors available across</span>
-          <div className="cities-row">
-            {(citySuggestions.length > 0 ? citySuggestions : DEMO_CITIES).map(c => (
-              <span key={c} className="city-chip" onClick={() => { if (!user) { onShowAuth('planner'); return } navigate(`/vendors?city=${encodeURIComponent(c)}`) }}>📍 {c}</span>
-            ))}
-          </div>
-        </div>
-      </section>
-
       <div className="sec-divider"><span>◆ ◇ ◆</span></div>
 
       <HowItWorksSection />
