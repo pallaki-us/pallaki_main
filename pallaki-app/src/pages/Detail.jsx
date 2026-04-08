@@ -108,8 +108,8 @@ export default function Detail({ onShowAuth }) {
                   <div className="ov-meta-val">{v.events}</div>
                 </div>
                 <div className="ov-meta-item">
-                  <div className="ov-meta-label">Service Area</div>
-                  <div className="ov-meta-val">{(v.loc.split(',')[1] || v.loc).trim()} area</div>
+                  <div className="ov-meta-label">Based In</div>
+                  <div className="ov-meta-val">{v.loc}</div>
                 </div>
                 {(v.languages || []).length > 0 && (
                   <div className="ov-meta-item">
@@ -118,6 +118,19 @@ export default function Detail({ onShowAuth }) {
                   </div>
                 )}
               </div>
+
+              {(v.service_areas || []).length > 0 && (
+                <div style={{ marginTop: '1.5rem' }}>
+                  <h4 style={{ fontSize: '.72rem', textTransform: 'uppercase', letterSpacing: '.08em', color: 'var(--tl)', fontWeight: 500, marginBottom: '.75rem' }}>📍 Areas Served</h4>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.4rem' }}>
+                    {v.service_areas.map((area, i) => (
+                      <span key={i} style={{ padding: '.3rem .8rem', background: 'var(--vf)', border: '1px solid var(--br)', borderRadius: 100, fontSize: '.78rem', color: 'var(--tm)' }}>
+                        📍 {area}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
             {userType !== 'vendor' && (
               <div className="cc-card">

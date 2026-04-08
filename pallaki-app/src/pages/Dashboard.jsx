@@ -47,6 +47,8 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
   const [isAvailable, setIsAvailable] = useState(true)
   const [availabilityNote, setAvailabilityNote] = useState('')
   const [languages, setLanguages] = useState([])
+  const [serviceAreas, setServiceAreas] = useState([])
+  const [newArea, setNewArea] = useState('')
 
   const LANGUAGES = ['English','Hindi','Punjabi','Telugu','Tamil','Kannada','Malayalam','Gujarati','Marathi','Bengali','Urdu']
 
@@ -69,6 +71,7 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
     setIsAvailable(profile.is_available ?? true)
     setAvailabilityNote(profile.availability_note || '')
     setLanguages(profile.languages || [])
+    setServiceAreas(profile.service_areas || [])
   }, [profile])
 
   async function addTestimonial() {
@@ -119,6 +122,7 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
       is_available: isAvailable,
       availability_note: availabilityNote,
       languages,
+      service_areas: serviceAreas,
     })
     if (error) showToast('Error saving: ' + error.message)
     else showToast('Profile saved! ✨')
@@ -276,13 +280,39 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
                     <input value={availabilityNote} onChange={e => setAvailabilityNote(e.target.value)} placeholder="e.g. Booking for Fall 2025 & 2026" />
                   </div>
                 </div>
-                <div>
+                <div style={{ marginBottom: '1.25rem' }}>
                   <p style={{ fontSize: '.72rem', textTransform: 'uppercase', letterSpacing: '.08em', color: 'var(--tl)', fontWeight: 500, marginBottom: '.6rem' }}>Languages Spoken</p>
                   <div className="multi-sel">
                     {LANGUAGES.map(l => (
                       <div key={l} className={`ms-chip${languages.includes(l) ? ' sel' : ''}`} onClick={() => toggleLanguage(l)}>{l}</div>
                     ))}
                   </div>
+                </div>
+
+                <div>
+                  <p style={{ fontSize: '.72rem', textTransform: 'uppercase', letterSpacing: '.08em', color: 'var(--tl)', fontWeight: 500, marginBottom: '.6rem' }}>Service Areas</p>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.4rem', marginBottom: '.75rem' }}>
+                    {serviceAreas.map((area, i) => (
+                      <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: '.35rem', padding: '.28rem .75rem', background: 'var(--vf)', border: '1px solid var(--br)', borderRadius: 100, fontSize: '.78rem', color: 'var(--tm)' }}>
+                        📍 {area}
+                        <span onClick={() => setServiceAreas(p => p.filter((_, j) => j !== i))} style={{ cursor: 'pointer', color: 'var(--tl)', fontSize: '.8rem', lineHeight: 1 }}>×</span>
+                      </span>
+                    ))}
+                  </div>
+                  <div style={{ display: 'flex', gap: '.5rem' }}>
+                    <input
+                      value={newArea}
+                      onChange={e => setNewArea(e.target.value)}
+                      onKeyDown={e => { if (e.key === 'Enter' && newArea.trim()) { setServiceAreas(p => [...p, newArea.trim()]); setNewArea('') } }}
+                      placeholder="e.g. Edison, NJ"
+                      style={{ flex: 1, padding: '.65rem .9rem', border: '1.5px solid var(--br)', borderRadius: 10, fontFamily: "'Cormorant Garamond',serif", fontSize: '.88rem', outline: 'none', background: 'var(--cr)' }}
+                    />
+                    <button className="dash-btn dash-btn-out" style={{ flexShrink: 0 }}
+                      onClick={() => { if (newArea.trim()) { setServiceAreas(p => [...p, newArea.trim()]); setNewArea('') } }}>
+                      + Add
+                    </button>
+                  </div>
+                  <p style={{ fontSize: '.68rem', color: 'var(--tl)', marginTop: '.4rem' }}>Press Enter or click Add. Remember to Save Changes.</p>
                 </div>
               </div>
             </div>

@@ -119,6 +119,7 @@ export function useVendor(id) {
           availability_note: data.availability_note || '',
           languages: data.languages || [],
           testimonials: data.testimonials || [],
+          service_areas: data.service_areas || [],
         })
       }
       setLoading(false)
