@@ -32,7 +32,7 @@ export default function Home({ onShowAuth }) {
 
   useEffect(() => {
     fetchCities()
-    if (IS_PROD) fetchStats()
+    fetchStats()
   }, [])
 
   async function fetchCities() {
@@ -51,15 +51,19 @@ export default function Home({ onShowAuth }) {
     if (!supabase) return
     try {
       const [vendorsRes, plannersRes] = await Promise.all([
-        supabase.from('vendors').select('city', { count: 'exact' }),
-        supabase.from('planner_profiles').select('id', { count: 'exact' }),
+        supabase.from('vendors').select('city, category', { count: 'exact' }),
+        supabase.from('profiles').select('id', { count: 'exact' }).eq('user_type', 'planner'),
       ])
       if (vendorsRes.error) throw vendorsRes.error
       const vendorCount = vendorsRes.count || 0
       const cities = vendorsRes.data
         ? new Set(vendorsRes.data.map(v => v.city?.toLowerCase()).filter(Boolean)).size
         : 0
-      setStats({ vendors: vendorCount, cities, categories: 10, planners: plannersRes.count || 0 })
+      const categories = vendorsRes.data
+        ? new Set(vendorsRes.data.map(v => v.category).filter(Boolean)).size
+        : 0
+      const planners = plannersRes.count || 0
+      setStats({ vendors: vendorCount, cities, categories: categories || 10, planners })
     } catch (err) {
       console.error('Failed to fetch stats:', err)
     }
@@ -185,10 +189,10 @@ export default function Home({ onShowAuth }) {
             <p>Our goal is simple — to remove the hassle, bring everything together, and make wedding planning a more seamless experience. Welcome — this space was built for you.</p>
             <div className="stats-mini" style={{ marginTop: '2rem' }}>
               {[
-                [IS_PROD ? (stats.vendors > 0 ? `${stats.vendors}+` : '—') : '100+', 'Verified Vendors'],
-                [IS_PROD ? (stats.cities > 0 ? `${stats.cities}` : '—') : '9', 'Cities Covered'],
-                [stats.categories, 'Categories'],
-                [IS_PROD ? (stats.planners > 0 ? `${stats.planners}+` : '—') : '200+', 'Happy Families'],
+                [stats.vendors > 0 ? `${stats.vendors}+` : '—', 'Verified Vendors'],
+                [stats.cities > 0 ? `${stats.cities}` : '—', 'Cities Covered'],
+                [stats.categories > 0 ? `${stats.categories}` : '—', 'Categories'],
+                [stats.planners > 0 ? `${stats.planners * 2}+` : '—', 'Happy Families'],
               ].map(([n, l]) => (
                 <div key={l} className="smi">
                   <div className="smi-n">{n}</div>
