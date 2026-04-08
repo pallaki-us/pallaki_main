@@ -43,6 +43,8 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
   const [website, setWebsite] = useState('')
   const [description, setDescription] = useState('')
 
+  const [newTestimonial, setNewTestimonial] = useState({ name: '', event_type: '', quote: '' })
+
   // Populate form when profile loads
   useEffect(() => {
     if (!profile) return
@@ -56,6 +58,18 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
     setSelServices(profile.services || ['Weddings','Engagements'])
     setAvatarUrl(profile.avatar_url || '')
   }, [profile])
+
+  async function addTestimonial() {
+    if (!newTestimonial.name.trim() || !newTestimonial.quote.trim()) return showToast('Please fill in the name and quote.')
+    const updated = [...(profile?.testimonials || []), { ...newTestimonial }]
+    const { error } = await saveProfile({ testimonials: updated })
+    if (!error) { setNewTestimonial({ name: '', event_type: '', quote: '' }); showToast('Testimonial added!') }
+  }
+
+  async function removeTestimonial(index) {
+    const updated = (profile?.testimonials || []).filter((_, i) => i !== index)
+    await saveProfile({ testimonials: updated })
+  }
 
   async function handleAvatarUpload(e) {
     const file = e.target.files?.[0]
@@ -259,6 +273,39 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
                       />
                     </div>
                   </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Testimonials */}
+            <div className="dash-card">
+              <div className="dash-card-head">
+                <h3>🌟 Client Testimonials</h3>
+                <span style={{ fontSize: '.72rem', color: 'var(--tl)' }}>Shown on your public listing</span>
+              </div>
+              <div className="dash-card-body">
+                {/* Existing testimonials */}
+                {(profile?.testimonials || []).length > 0 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '.65rem', marginBottom: '1.5rem' }}>
+                    {(profile.testimonials).map((t, i) => (
+                      <div key={i} style={{ padding: '.85rem 1rem', background: 'var(--vf)', border: '1px solid var(--br)', borderRadius: 12, position: 'relative' }}>
+                        <div style={{ fontSize: '.82rem', fontStyle: 'italic', color: 'var(--tm)', lineHeight: 1.7, marginBottom: '.4rem' }}>"{t.quote}"</div>
+                        <div style={{ fontSize: '.72rem', color: 'var(--tl)', fontWeight: 500 }}>— {t.name}{t.event_type ? ` · ${t.event_type}` : ''}</div>
+                        <button onClick={() => removeTestimonial(i)} style={{ position: 'absolute', top: '.6rem', right: '.75rem', background: 'none', border: 'none', color: 'var(--tl)', cursor: 'pointer', fontSize: '.75rem' }}>✕</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Add new */}
+                <div style={{ borderTop: (profile?.testimonials || []).length > 0 ? '1px solid var(--br)' : 'none', paddingTop: (profile?.testimonials || []).length > 0 ? '1.25rem' : 0 }}>
+                  <p style={{ fontSize: '.72rem', textTransform: 'uppercase', letterSpacing: '.08em', color: 'var(--tl)', fontWeight: 500, marginBottom: '.75rem' }}>Add a Testimonial</p>
+                  <div className="details-form">
+                    <div className="df"><label>Client Name</label><input value={newTestimonial.name} onChange={e => setNewTestimonial(p => ({ ...p, name: e.target.value }))} placeholder="e.g. Priya & Rohan" /></div>
+                    <div className="df"><label>Event Type</label><input value={newTestimonial.event_type} onChange={e => setNewTestimonial(p => ({ ...p, event_type: e.target.value }))} placeholder="e.g. Wedding, Mehndi Night" /></div>
+                    <div className="df full"><label>Quote</label><textarea value={newTestimonial.quote} onChange={e => setNewTestimonial(p => ({ ...p, quote: e.target.value }))} placeholder="What did they say about your work?" style={{ resize: 'vertical', minHeight: 80 }} /></div>
+                  </div>
+                  <button className="dash-btn dash-btn-gold" style={{ marginTop: '1rem' }} onClick={addTestimonial}>+ Add Testimonial</button>
                 </div>
               </div>
             </div>

@@ -201,6 +201,21 @@ export default function Detail({ onShowAuth }) {
               </div>
             ))}
           </div>
+
+          {/* Vendor-added testimonials */}
+          {(v.testimonials || []).length > 0 && (
+            <div style={{ marginTop: '2rem' }}>
+              <h4 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '1.05rem', color: 'var(--vx)', fontWeight: 500, marginBottom: '1rem', letterSpacing: '.04em' }}>Words from Our Clients</h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
+                {v.testimonials.map((t, i) => (
+                  <div key={i} style={{ padding: '1rem 1.2rem', background: 'var(--vf)', border: '1px solid var(--br)', borderRadius: 14 }}>
+                    <div style={{ fontSize: '.88rem', fontStyle: 'italic', color: 'var(--tm)', lineHeight: 1.8, marginBottom: '.5rem' }}>"{t.quote}"</div>
+                    <div style={{ fontSize: '.76rem', color: 'var(--tl)', fontWeight: 500 }}>— {t.name}{t.event_type ? ` · ${t.event_type}` : ''}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
