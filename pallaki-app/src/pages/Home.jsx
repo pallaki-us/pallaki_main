@@ -173,6 +173,9 @@ export default function Home({ onShowAuth }) {
       <section className="about-section" id="our-story">
         <h2 className="how-title" style={{ marginBottom: '2.5rem' }}>Our Story</h2>
         <div className="about-inner">
+          <div className="about-photo" style={{ marginBottom: '2rem' }}>
+            <img src={ourStoryImg} alt="Shruti and Vamsi" />
+          </div>
           <div className="about-text">
             <p>Hi, we're Shruti and Vamsi — the founders of Pallaki — and a couple who have been through this journey ourselves.</p>
             <p>When we started planning our wedding in the U.S., one of the biggest challenges we faced wasn't finding vendors — it was finding them easily. Most of our search happened through endless scrolling on Instagram, jumping between pages, sending DMs, and waiting for responses. Everything felt scattered, and there was no single place to explore options in a structured way.</p>
@@ -193,9 +196,6 @@ export default function Home({ onShowAuth }) {
                 </div>
               ))}
             </div>
-          </div>
-          <div className="about-photo">
-            <img src={ourStoryImg} alt="Shruti and Vamsi" />
           </div>
         </div>
       </section>
