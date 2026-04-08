@@ -97,6 +97,7 @@ export default function Listing({ onShowAuth }) {
                   {v.icon}
                   {v.badge === 'featured' && <div className="vcbdg bdg-f">Featured</div>}
                   {v.badge === 'top' && <div className="vcbdg bdg-t">Top Rated</div>}
+                  {v.is_available === true && <div className="vcbdg bdg-av">Available</div>}
                 </div>
                 <div className="vc-body">
                   <div className="vc-meta">

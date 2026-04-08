@@ -6,7 +6,7 @@ import { VENDORS } from '../data/vendors'
 const PAGE_SIZE = 9
 
 // Columns needed for listing cards — excludes heavy fields like portfolio_urls
-const LISTING_COLS = 'id, name, category, city, state, icon, bg, rating, review_count, badge, description, services, events_covered, is_verified'
+const LISTING_COLS = 'id, name, category, city, state, icon, bg, rating, review_count, badge, description, services, events_covered, is_verified, is_available'
 
 export function useVendors(category = 'All', city = '', page = 1, topRated = false) {
   const [vendors, setVendors] = useState([])
@@ -66,6 +66,7 @@ export function useVendors(category = 'All', city = '', page = 1, topRated = fal
         events: v.events_covered,
         bg: v.bg,
         is_verified: v.is_verified,
+        is_available: v.is_available,
       })))
       setLoading(false)
     }
