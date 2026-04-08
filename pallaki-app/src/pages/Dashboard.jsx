@@ -44,6 +44,15 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
   const [description, setDescription] = useState('')
 
   const [newTestimonial, setNewTestimonial] = useState({ name: '', event_type: '', quote: '' })
+  const [isAvailable, setIsAvailable] = useState(true)
+  const [availabilityNote, setAvailabilityNote] = useState('')
+  const [languages, setLanguages] = useState([])
+
+  const LANGUAGES = ['English','Hindi','Punjabi','Telugu','Tamil','Kannada','Malayalam','Gujarati','Marathi','Bengali','Urdu']
+
+  function toggleLanguage(lang) {
+    setLanguages(prev => prev.includes(lang) ? prev.filter(l => l !== lang) : [...prev, lang])
+  }
 
   // Populate form when profile loads
   useEffect(() => {
@@ -57,6 +66,9 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
     setDescription(profile.description || '')
     setSelServices(profile.services || ['Weddings','Engagements'])
     setAvatarUrl(profile.avatar_url || '')
+    setIsAvailable(profile.is_available ?? true)
+    setAvailabilityNote(profile.availability_note || '')
+    setLanguages(profile.languages || [])
   }, [profile])
 
   async function addTestimonial() {
@@ -104,6 +116,9 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
       website,
       description,
       services: selServices,
+      is_available: isAvailable,
+      availability_note: availabilityNote,
+      languages,
     })
     if (error) showToast('Error saving: ' + error.message)
     else showToast('Profile saved! ✨')
@@ -230,6 +245,42 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
                   <div className="multi-sel">
                     {SERVICES.map(s => (
                       <div key={s} className={`ms-chip${selServices.includes(s) ? ' sel' : ''}`} onClick={() => toggleService(s)}>{s}</div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Availability & Languages */}
+            <div className="dash-card">
+              <div className="dash-card-head">
+                <h3>📅 Availability & Languages</h3>
+                <button className="dash-btn dash-btn-out" style={{ color: 'var(--v)', borderColor: 'var(--br)' }} onClick={handleSave} disabled={saving}>
+                  {saving ? 'Saving…' : 'Save Changes'}
+                </button>
+              </div>
+              <div className="dash-card-body">
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem', background: isAvailable ? 'rgba(90,160,90,.08)' : 'var(--cd)', border: `1px solid ${isAvailable ? 'rgba(90,160,90,.3)' : 'var(--br)'}`, borderRadius: 12, marginBottom: '1rem' }}>
+                  <div>
+                    <div style={{ fontSize: '.88rem', fontWeight: 500, color: 'var(--vx)' }}>{isAvailable ? '✅ Currently Available' : '⏸ Not Currently Available'}</div>
+                    <div style={{ fontSize: '.74rem', color: 'var(--tl)', marginTop: '.2rem' }}>Shown as a badge on your listing</div>
+                  </div>
+                  <label className="pp-toggle" style={{ flexShrink: 0 }}>
+                    <input type="checkbox" checked={isAvailable} onChange={e => setIsAvailable(e.target.checked)} />
+                    <span className="pp-toggle-slider" />
+                  </label>
+                </div>
+                <div className="details-form" style={{ marginBottom: '1.25rem' }}>
+                  <div className="df full">
+                    <label>Availability Note <span style={{ fontWeight: 300, textTransform: 'none', letterSpacing: 0 }}>(optional)</span></label>
+                    <input value={availabilityNote} onChange={e => setAvailabilityNote(e.target.value)} placeholder="e.g. Booking for Fall 2025 & 2026" />
+                  </div>
+                </div>
+                <div>
+                  <p style={{ fontSize: '.72rem', textTransform: 'uppercase', letterSpacing: '.08em', color: 'var(--tl)', fontWeight: 500, marginBottom: '.6rem' }}>Languages Spoken</p>
+                  <div className="multi-sel">
+                    {LANGUAGES.map(l => (
+                      <div key={l} className={`ms-chip${languages.includes(l) ? ' sel' : ''}`} onClick={() => toggleLanguage(l)}>{l}</div>
                     ))}
                   </div>
                 </div>

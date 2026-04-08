@@ -60,7 +60,15 @@ export default function Detail({ onShowAuth }) {
             <div className="dh-tags">
               <span className="dh-tag">{v.cat}</span>
               <span className="dh-tag">📍 {v.loc}</span>
+              {v.is_available !== undefined && (
+                <span className="dh-tag" style={{ background: v.is_available ? 'rgba(90,160,90,.15)' : 'rgba(150,150,150,.15)', color: v.is_available ? '#3a7a3a' : '#888', border: `1px solid ${v.is_available ? 'rgba(90,160,90,.3)' : 'rgba(150,150,150,.3)'}` }}>
+                  {v.is_available ? '✅ Available' : '⏸ Unavailable'}
+                </span>
+              )}
             </div>
+            {v.availability_note && (
+              <div style={{ fontSize: '.76rem', color: 'var(--tl)', marginTop: '.3rem', fontStyle: 'italic' }}>📅 {v.availability_note}</div>
+            )}
             <div className="dh-r">
               <span className="dh-rating">{'★'.repeat(Math.round(parseFloat(v.rating) || 0))}{'☆'.repeat(5 - Math.round(parseFloat(v.rating) || 0))} {v.rating}</span>
               <span className="dh-rev">({v.reviews} reviews)</span>
@@ -103,6 +111,12 @@ export default function Detail({ onShowAuth }) {
                   <div className="ov-meta-label">Service Area</div>
                   <div className="ov-meta-val">{(v.loc.split(',')[1] || v.loc).trim()} area</div>
                 </div>
+                {(v.languages || []).length > 0 && (
+                  <div className="ov-meta-item">
+                    <div className="ov-meta-label">Languages</div>
+                    <div className="ov-meta-val">{v.languages.join(', ')}</div>
+                  </div>
+                )}
               </div>
             </div>
             {userType !== 'vendor' && (
