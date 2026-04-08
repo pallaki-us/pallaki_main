@@ -114,6 +114,10 @@ export function useVendor(id) {
           is_verified: data.is_verified,
           portfolio_urls: data.portfolio_urls || [],
           featured_urls: data.featured_urls || [],
+          is_available: data.is_available,
+          availability_note: data.availability_note || '',
+          languages: data.languages || [],
+          testimonials: data.testimonials || [],
         })
       }
       setLoading(false)
