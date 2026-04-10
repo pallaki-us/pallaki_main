@@ -8,9 +8,13 @@ export function AuthProvider({ children }) {
   const [userType, setUserType] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  // Read user_type from JWT app_metadata (server-stamped, not client-writable)
-  function resolveUserType(user) {
-    return user?.app_metadata?.user_type || 'planner'
+  async function fetchUserType(userId) {
+    const { data: vendorRow } = await supabase
+      .from('vendors')
+      .select('id')
+      .eq('profile_id', userId)
+      .maybeSingle()
+    setUserType(vendorRow ? 'vendor' : 'planner')
   }
 
   useEffect(() => {
@@ -18,7 +22,7 @@ export function AuthProvider({ children }) {
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
-      if (session?.user) setUserType(resolveUserType(session.user))
+      if (session?.user) fetchUserType(session.user.id)
       setLoading(false)
     })
 
@@ -40,7 +44,7 @@ export function AuthProvider({ children }) {
             { onConflict: 'id' }
           )
         }
-        setUserType(resolveUserType(session.user))
+        fetchUserType(session.user.id)
       } else {
         setUserType(null)
       }
@@ -65,13 +69,8 @@ export function AuthProvider({ children }) {
     })
     if (error) return { error }
 
-    // Trigger is the source of truth — refresh session to get app_metadata JWT claim
-    if (data.session) {
-      const { data: refreshed } = await supabase.auth.refreshSession()
-      if (refreshed?.user) {
-        setUser(refreshed.user)
-        setUserType(resolveUserType(refreshed.user))
-      }
+    if (data.session?.user) {
+      await fetchUserType(data.session.user.id)
     }
 
     return { data, error: null }
@@ -94,8 +93,12 @@ export function AuthProvider({ children }) {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) return { error, actualType: null }
 
-    // Read user_type from JWT app_metadata (stamped by DB trigger, server-only)
-    const actualType = resolveUserType(data.user)
+    const { data: vendorRow } = await supabase
+      .from('vendors')
+      .select('id')
+      .eq('profile_id', data.user.id)
+      .maybeSingle()
+    const actualType = vendorRow ? 'vendor' : 'planner'
     setUserType(actualType)
     return { data, error: null, actualType }
   }
