@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/AuthContext'
+import { supabase } from '../lib/supabase'
 import { showToast } from '../lib/toast'
 import AnimatedLogo from './AnimatedLogo'
 
 export default function AuthModal({ open, onClose, defaultType = 'planner', onSuccess, vendorOnly = false, directSignup = false, directLogin = false }) {
   const navigate = useNavigate()
-  const { signIn, signUp, signInWithGoogle, setUserType } = useAuth()
+  const { signIn, signUp, signInWithGoogle, signOut, setUserType } = useAuth()
   const [type, setType] = useState(defaultType)
   const [screen, setScreen] = useState(() => {
     if (directSignup && defaultType === 'vendor') return 'vendor-signup'
@@ -52,8 +53,16 @@ export default function AuthModal({ open, onClose, defaultType = 'planner', onSu
 
   async function handlePlannerLogin() {
     if (!email || !password) return showToast('Please enter your email and password.')
-    const { error } = await signIn(email, password)
+    if (supabase) {
+      const { data: exists } = await supabase.rpc('check_email_exists', { check_email: email, check_type: 'planner' })
+      if (!exists) return showToast('No account found. Please create an account first.')
+    }
+    const { error, actualType } = await signIn(email, password)
     if (error) return showToast(error.message)
+    if (actualType === 'vendor') {
+      await signOut()
+      return showToast('This email is registered as a vendor. Please use the vendor sign in.')
+    }
     onClose()
     onSuccess('planner')
   }
@@ -70,8 +79,16 @@ export default function AuthModal({ open, onClose, defaultType = 'planner', onSu
 
   async function handleVendorLogin() {
     if (!email || !password) return showToast('Please enter your email and password.')
-    const { error } = await signIn(email, password)
+    if (supabase) {
+      const { data: exists } = await supabase.rpc('check_email_exists', { check_email: email, check_type: 'vendor' })
+      if (!exists) return showToast('No account found. Please create an account first.')
+    }
+    const { error, actualType } = await signIn(email, password)
     if (error) return showToast(error.message)
+    if (actualType === 'planner') {
+      await signOut()
+      return showToast('This email is registered as a planner. Please use the planner sign in.')
+    }
     onClose()
     onSuccess('vendor')
   }
@@ -130,7 +147,7 @@ export default function AuthModal({ open, onClose, defaultType = 'planner', onSu
             <div className="modal-form">
               <div className="modal-field"><label>First Name</label><input value={fname} onChange={e => setFname(e.target.value)} placeholder="Priya" /></div>
               <div className="modal-field"><label>Email</label><input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="priya@email.com" /></div>
-              <div className="modal-field"><label>Password</label><input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Min. 8 characters" /></div>
+              <div className="modal-field"><label>Password</label><input type="password" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === 'Enter' && handlePlannerSignup()} placeholder="Min. 8 characters" /></div>
               <p style={{ fontSize: '.72rem', color: 'var(--tl)', textAlign: 'center', lineHeight: 1.6 }}>
                 By signing up you agree to our{' '}
                 <span style={{ color: 'var(--v)', cursor: 'pointer', textDecoration: 'underline' }} onClick={() => { onClose(); navigate('/terms') }}>Terms & Conditions</span>
@@ -156,7 +173,7 @@ export default function AuthModal({ open, onClose, defaultType = 'planner', onSu
               </button>
               <div className="auth-divider"><span>or</span></div>
               <div className="modal-field"><label>Email</label><input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="priya@email.com" /></div>
-              <div className="modal-field"><label>Password</label><input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Your password" /></div>
+              <div className="modal-field"><label>Password</label><input type="password" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === 'Enter' && handlePlannerLogin()} placeholder="Your password" /></div>
               <button className="modal-submit" onClick={handlePlannerLogin}>Sign In →</button>
               <button className="modal-back" onClick={() => goScreen('planner-choice')}>← Back</button>
             </div>
@@ -181,7 +198,7 @@ export default function AuthModal({ open, onClose, defaultType = 'planner', onSu
             <div className="modal-form">
               <div className="modal-field"><label>Business Name</label><input value={bizName} onChange={e => setBizName(e.target.value)} placeholder="e.g. Riya Kapoor Photography" /></div>
               <div className="modal-field"><label>Business Email</label><input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@business.com" /></div>
-              <div className="modal-field"><label>Password</label><input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Min. 8 characters" /></div>
+              <div className="modal-field"><label>Password</label><input type="password" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleVendorSignup()} placeholder="Min. 8 characters" /></div>
               <button className="modal-submit" onClick={handleVendorSignup}>Create Vendor Account →</button>
               <p style={{ fontSize: '.72rem', color: 'var(--tl)', textAlign: 'center', lineHeight: 1.6 }}>
                 By signing up you agree to our{' '}
@@ -197,7 +214,7 @@ export default function AuthModal({ open, onClose, defaultType = 'planner', onSu
           {screen === 'vendor-login' && (
             <div className="modal-form">
               <div className="modal-field"><label>Email</label><input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@business.com" /></div>
-              <div className="modal-field"><label>Password</label><input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Your password" /></div>
+              <div className="modal-field"><label>Password</label><input type="password" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleVendorLogin()} placeholder="Your password" /></div>
               <button className="modal-submit" onClick={handleVendorLogin}>Log In →</button>
               <button className="modal-back" onClick={() => goScreen('vendor-choice')}>← Back</button>
             </div>

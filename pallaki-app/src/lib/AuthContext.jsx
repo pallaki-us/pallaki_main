@@ -8,58 +8,39 @@ export function AuthProvider({ children }) {
   const [userType, setUserType] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  // Fetch user_type from profiles table, fall back to user_metadata
-  async function fetchProfile(userId, userMeta) {
-    if (!supabase) return
-    const { data } = await supabase
-      .from('profiles')
-      .select('user_type, name')
-      .eq('id', userId)
-      .single()
-    if (data?.user_type) {
-      setUserType(data.user_type)
-    } else if (userMeta?.user_type) {
-      // fallback to metadata set at signup
-      setUserType(userMeta.user_type)
-    }
+  // Read user_type from JWT app_metadata (server-stamped, not client-writable)
+  function resolveUserType(user) {
+    return user?.app_metadata?.user_type || 'planner'
   }
 
   useEffect(() => {
     if (!supabase) { setLoading(false); return }
 
-    // Get existing session on mount
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
-      if (session?.user) fetchProfile(session.user.id, session.user.user_metadata)
+      if (session?.user) setUserType(resolveUserType(session.user))
       setLoading(false)
     })
 
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (_event === 'SIGNED_IN' && window.location.hash.includes('type=signup')) {
-        // Email just verified — sign them out so they must log in manually
         window.history.replaceState(null, '', window.location.pathname)
         await supabase.auth.signOut()
         setUser(null)
-        setUserType('__verified__') // signal to App to show sign-in modal
+        setUserType('__verified__')
         return
       }
       setUser(session?.user ?? null)
       if (session?.user) {
-        const provider = session.user.app_metadata?.provider
-        if (provider === 'google') {
-          const { data: profile } = await supabase.from('profiles').select('user_type').eq('id', session.user.id).single()
+        // Google OAuth: create planner profile if none exists
+        if (session.user.app_metadata?.provider === 'google') {
           const name = session.user.user_metadata?.full_name || session.user.user_metadata?.name || ''
-          await supabase.from('profiles').upsert({
-            id: session.user.id,
-            user_type: profile?.user_type || 'planner',
-            name: profile?.name || name,
-            email: session.user.email,
-          })
-          setUserType(profile?.user_type || 'planner')
-        } else {
-          fetchProfile(session.user.id, session.user.user_metadata)
+          await supabase.from('profiles').upsert(
+            { id: session.user.id, user_type: 'planner', name, email: session.user.email },
+            { onConflict: 'id' }
+          )
         }
+        setUserType(resolveUserType(session.user))
       } else {
         setUserType(null)
       }
@@ -82,32 +63,45 @@ export function AuthProvider({ children }) {
         emailRedirectTo: `${window.location.origin}`,
       },
     })
-    return { data, error }
+    if (error) return { error }
+
+    // Trigger is the source of truth — refresh session to get app_metadata JWT claim
+    if (data.session) {
+      const { data: refreshed } = await supabase.auth.refreshSession()
+      if (refreshed?.user) {
+        setUser(refreshed.user)
+        setUserType(resolveUserType(refreshed.user))
+      }
+    }
+
+    return { data, error: null }
   }
 
   async function signIn(email, password) {
     if (!supabase) {
-      // demo credentials
       if (email === 'test@pallaki.com' && password === 'test123') {
         setUser({ email, user_metadata: { name: 'Ria' } })
         setUserType('planner')
-        return { error: null }
+        return { error: null, actualType: 'planner' }
       }
       if (email === 'vendor@pallaki.com' && password === 'test123') {
         setUser({ email, user_metadata: { name: 'KJF Artistry' } })
         setUserType('vendor')
-        return { error: null }
+        return { error: null, actualType: 'vendor' }
       }
-      return { error: { message: 'Incorrect email or password.' } }
+      return { error: { message: 'Incorrect email or password.' }, actualType: null }
     }
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-    if (!error && data.user) await fetchProfile(data.user.id, data.user.user_metadata)
-    return { data, error }
+    if (error) return { error, actualType: null }
+
+    // Read user_type from JWT app_metadata (stamped by DB trigger, server-only)
+    const actualType = resolveUserType(data.user)
+    setUserType(actualType)
+    return { data, error: null, actualType }
   }
 
   async function signInWithGoogle() {
     if (!supabase) return { error: { message: 'Not available in demo' } }
-    sessionStorage.setItem('pallaki_oauth_type', 'planner')
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: window.location.origin + (import.meta.env.VITE_BASE_PATH || '/') },
