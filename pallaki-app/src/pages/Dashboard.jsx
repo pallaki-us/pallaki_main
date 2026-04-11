@@ -170,6 +170,12 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
 
   const name = user?.user_metadata?.name || 'Vendor'
 
+  // Onboarding not complete — redirect
+  if (profile && !profile.category) {
+    navigate('/onboarding', { replace: true })
+    return null
+  }
+
   // Pending approval state
   if (profile && !profile.is_verified) return (
     <div style={{ paddingTop: 64, minHeight: '100vh', background: 'var(--cr)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
