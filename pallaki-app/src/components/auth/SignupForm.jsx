@@ -32,7 +32,7 @@ export default function SignupForm({ role }) {
   // Redirect already-logged-in users away from auth pages
   useEffect(() => {
     if (user && userType && userType !== '__verified__') {
-      navigate(userType === 'vendor' ? '/dashboard' : '/profile', { replace: true })
+      navigate(userType === 'vendor' ? '/onboarding' : '/profile', { replace: true })
     }
   }, [user, userType])
 
