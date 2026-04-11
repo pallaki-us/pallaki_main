@@ -17,6 +17,14 @@ export default function Detail() {
   const [inquiryOpen, setInquiryOpen] = useState(false)
   const [reviews, setReviews] = useState([])
 
+  // Track profile view — only for logged-in planners, only on non-own listings
+  useEffect(() => {
+    if (!vendorId || !supabase) return
+    if (!user || userType !== 'planner') return
+    if (isOwnListing) return
+    supabase.from('profile_views').insert({ vendor_id: vendorId, viewer_id: user.id })
+  }, [vendorId, user?.id, userType, isOwnListing])
+
   useEffect(() => {
     if (!vendorId || !supabase) return
     supabase
