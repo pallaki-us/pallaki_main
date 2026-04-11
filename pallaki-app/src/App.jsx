@@ -62,9 +62,8 @@ function AppInner() {
       return
     }
 
-    // 3. Vendor landing on planner-only pages
-    const vendorOnlyPaths = ['/', '/profile']
-    if (userType === 'vendor' && vendorOnlyPaths.includes(location.pathname)) {
+    // 3. Vendor landing on planner-only page
+    if (userType === 'vendor' && location.pathname === '/profile') {
       navigate('/dashboard', { replace: true })
     }
   }, [userType, location.pathname])
