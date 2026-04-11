@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/AuthContext'
 import { supabase } from '../lib/supabase'
@@ -17,6 +17,13 @@ export default function VendorOnboarding() {
   const [step, setStep] = useState(0)
   const [saving, setSaving] = useState(false)
   const [done, setDone] = useState(false)
+
+  // Pre-populate business name from signup
+  useEffect(() => {
+    if (!user || !supabase) return
+    supabase.from('vendors').select('name').eq('profile_id', user.id).maybeSingle()
+      .then(({ data }) => { if (data?.name) setBizName(data.name) })
+  }, [user])
 
   // Step 1
   const [bizName, setBizName] = useState('')
@@ -58,7 +65,7 @@ export default function VendorOnboarding() {
   }
 
   async function handleSubmit() {
-    if (!user || !supabase) { navigate('/dashboard'); return }
+    if (!user || !supabase) { navigate('/vendor/login'); return }
     setSaving(true)
 
     const { error } = await supabase.from('vendors').upsert({

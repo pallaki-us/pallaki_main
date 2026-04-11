@@ -3,15 +3,15 @@ import { useAuth } from '../lib/AuthContext'
 import AnimatedLogo from './AnimatedLogo'
 import PalanquinProcession from './PalanquinProcession'
 
-export default function Nav({ onShowAuth, onShowVendorListing }) {
+export default function Nav({ onShowVendorListing }) {
   const { user, userType, signOut } = useAuth()
+  const navigate = useNavigate()
+  const name = user?.user_metadata?.name || user?.email?.split('@')[0] || ''
 
   async function handleSignOut() {
     await signOut()
     navigate('/')
   }
-  const navigate = useNavigate()
-  const name = user?.user_metadata?.name || user?.email?.split('@')[0] || ''
 
   function goHome() {
     if (userType === 'vendor') navigate('/dashboard')
@@ -36,10 +36,10 @@ export default function Nav({ onShowAuth, onShowVendorListing }) {
       <div className="nav-r">
         {!user ? (
           <>
-            <button className="nl nav-vendor" onClick={() => onShowAuth('vendor')}>
+            <button className="nl nav-vendor" onClick={() => navigate('/vendor/signup')}>
               List Your Business
             </button>
-            <button className="nl nav-login" onClick={() => onShowAuth('planner')}>
+            <button className="nl nav-login" onClick={() => navigate('/planner/login')}>
               Sign In
             </button>
           </>

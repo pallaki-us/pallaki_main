@@ -6,7 +6,7 @@ import { showToast } from '../lib/toast'
 import { supabase } from '../lib/supabase'
 import InquiryModal from '../components/InquiryModal'
 
-export default function Detail({ onShowAuth }) {
+export default function Detail() {
   const { id: vendorId } = useParams()
   const [searchParams] = useSearchParams()
   const isOwnListing = searchParams.get('own') === 'true'
@@ -43,7 +43,7 @@ export default function Detail({ onShowAuth }) {
   if (!v) return null
 
   async function sendInquiry() {
-    if (!user) { onShowAuth('planner'); return }
+    if (!user) { navigate('/planner/login'); return }
     if (userType === 'vendor') { showToast('Vendor accounts cannot send inquiries.'); return }
     setInquiryOpen(true)
   }
@@ -285,7 +285,6 @@ export default function Detail({ onShowAuth }) {
         open={inquiryOpen}
         onClose={() => setInquiryOpen(false)}
         vendor={v}
-        onShowAuth={onShowAuth}
       />
     </div>
   )

@@ -118,8 +118,16 @@ export function AuthProvider({ children }) {
     setUserType(null)
   }
 
+  async function resetPassword(email) {
+    if (!supabase) return { error: { message: 'Not available in demo mode.' } }
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    })
+    return { error }
+  }
+
   return (
-    <AuthContext.Provider value={{ user, userType, setUserType, loading, signUp, signIn, signInWithGoogle, signOut }}>
+    <AuthContext.Provider value={{ user, userType, setUserType, loading, signUp, signIn, signInWithGoogle, signOut, resetPassword }}>
       {!loading && children}
     </AuthContext.Provider>
   )

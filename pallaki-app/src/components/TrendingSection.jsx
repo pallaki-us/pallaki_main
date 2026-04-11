@@ -20,7 +20,7 @@ function renderStars(rating) {
   return '★'.repeat(n) + '☆'.repeat(5 - n)
 }
 
-export default function TrendingSection({ onShowAuth }) {
+export default function TrendingSection() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const [activeCat, setActiveCat] = useState('Photography')
@@ -97,7 +97,7 @@ export default function TrendingSection({ onShowAuth }) {
           <button className="tv-arr" onClick={prevCat}>‹</button>
           <div className="tv-track" id="tv-track">
             {vendors.map((v, i) => (
-              <div key={v.id ?? i} className="tv-card" onClick={() => user ? navigate(`/vendor/${v.id}`) : onShowAuth('planner')}>
+              <div key={v.id ?? i} className="tv-card" onClick={() => user ? navigate(`/vendor/${v.id}`) : navigate('/planner/login')}>
                 <div className="tv-card-img" style={{ background: v.bg }}>
                   <div className="tv-card-rank">#{i + 1}</div>
                   {v.icon}

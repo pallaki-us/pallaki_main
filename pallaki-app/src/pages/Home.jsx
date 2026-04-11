@@ -20,7 +20,7 @@ const EVENT_TYPES = [
   { icon: '🍼', label: 'Baby Shower' },
 ]
 
-export default function Home({ onShowAuth }) {
+export default function Home() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const [selEvent, setSelEvent] = useState('Wedding')
@@ -75,7 +75,7 @@ export default function Home({ onShowAuth }) {
   }
 
   function doSearch() {
-    if (!user) { onShowAuth('planner'); return }
+    if (!user) { navigate('/planner/login'); return }
     const params = new URLSearchParams()
     if (cat) params.set('cat', cat)
     if (city) params.set('city', city)
@@ -167,7 +167,7 @@ export default function Home({ onShowAuth }) {
         </div>
       </section>
 
-      <TrendingSection onShowAuth={onShowAuth} />
+      <TrendingSection />
 
       <div className="sec-divider"><span>◆ ◇ ◆</span></div>
 
@@ -262,7 +262,7 @@ export default function Home({ onShowAuth }) {
           <div className="fc">
             <h4>Company</h4>
             <a style={{ cursor: 'pointer' }} onClick={() => document.getElementById('our-story')?.scrollIntoView({ behavior: 'smooth' })}>About Us</a>
-            <a style={{ cursor: 'pointer' }} onClick={() => onShowAuth('vendor', true)}>For Vendors</a>
+            <a style={{ cursor: 'pointer' }} onClick={() => navigate('/vendor/signup')}>For Vendors</a>
             <a style={{ cursor: 'pointer' }} onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}>How It Works</a>
             <a style={{ cursor: 'pointer' }} onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}>Contact</a>
           </div>
