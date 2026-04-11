@@ -5,12 +5,7 @@ import { showToast } from '../lib/toast'
 import ImageUpload from '../components/ImageUpload'
 import { useVendorProfile } from '../lib/useVendorProfile'
 import { useVendorInquiries } from '../lib/useInquiries'
-
-const AN_DATA = {
-  30:  { views: 127,  inquiries: 8,  bookings: 2,  rating: '4.9', rate: '11.8%', viewTrend: '↑ 14%', inqTrend: '↑ 3',  bkTrend: '↑ 1', contacts: [2,3,1,4,3,2,5,4,3,6,4,8],  profileViews: [12,15,10,18,14,11,22,19,14,26,18,28] },
-  180: { views: 641,  inquiries: 31, bookings: 6,  rating: '4.9', rate: '11.4%', viewTrend: '↑ 22%', inqTrend: '↑ 9',  bkTrend: '↑ 3', contacts: [4,5,3,7,8,6,9,8,6,10,9,12], profileViews: [30,38,25,48,52,44,61,58,44,72,64,85] },
-  365: { views: 1284, inquiries: 64, bookings: 12, rating: '4.9', rate: '11.2%', viewTrend: '↑ 38%', inqTrend: '↑ 22%', bkTrend: '↑ 4', contacts: [4,6,5,8,12,18,22,19,25,31,28,34], profileViews: [18,22,20,28,38,55,61,58,72,88,81,95] },
-}
+import { useVendorAnalytics } from '../lib/useVendorAnalytics'
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 
@@ -26,6 +21,7 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
   const navigate = useNavigate()
   const { profile, saving, saveProfile } = useVendorProfile()
   const { inquiries, updateStatus, saveReply, archiveInquiry } = useVendorInquiries(profile?.id)
+  const { data: anData } = useVendorAnalytics(profile?.id, period)
   const [replyingTo, setReplyingTo] = useState(null)
   const [replyText, setReplyText] = useState('')
   const [showArchived, setShowArchived] = useState(false)
@@ -130,12 +126,13 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
   const chartRef = useRef(null)
   const chartInstance = useRef(null)
 
-  const d = AN_DATA[period]
-
-  // Draw chart when analytics tab is active
+  // Draw chart when analytics tab is active or real data arrives
   useEffect(() => {
     if (activePage !== 'analytics') return
     if (!chartRef.current) return
+
+    const monthlyViews = anData?.monthlyViews || Array(12).fill(0)
+    const monthlyInquiries = anData?.monthlyInquiries || Array(12).fill(0)
 
     const draw = () => {
       if (!window.Chart) return
@@ -145,8 +142,8 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
         data: {
           labels: MONTHS,
           datasets: [
-            { label: 'Inquiries', data: d.contacts, borderColor: '#C4848C', backgroundColor: 'rgba(196,132,140,0.08)', tension: .4, pointBackgroundColor: '#C4848C', pointRadius: 3 },
-            { label: 'Profile Views', data: d.profileViews, borderColor: '#C49A3C', backgroundColor: 'rgba(196,154,60,0.08)', tension: .4, pointBackgroundColor: '#C49A3C', pointRadius: 3 },
+            { label: 'Inquiries', data: monthlyInquiries, borderColor: '#C4848C', backgroundColor: 'rgba(196,132,140,0.08)', tension: .4, pointBackgroundColor: '#C4848C', pointRadius: 3 },
+            { label: 'Profile Views', data: monthlyViews, borderColor: '#C49A3C', backgroundColor: 'rgba(196,154,60,0.08)', tension: .4, pointBackgroundColor: '#C49A3C', pointRadius: 3 },
           ],
         },
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { font: { family: 'Cormorant Garamond', size: 11 }, boxWidth: 12 } } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { family: 'Cormorant Garamond', size: 10 } } }, x: { grid: { display: false }, ticks: { font: { family: 'Cormorant Garamond', size: 10 } } } } },
@@ -162,7 +159,7 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
     }
 
     return () => { if (chartInstance.current) chartInstance.current.destroy() }
-  }, [activePage, period])
+  }, [activePage, period, anData])
 
   function toggleService(s) {
     setSelServices(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s])
@@ -428,18 +425,14 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
 
           <div className="an-body">
             {/* KPIs */}
-            <div className="stat-row" style={{ gridTemplateColumns: 'repeat(5,1fr)' }}>
+            <div className="stat-row" style={{ gridTemplateColumns: 'repeat(2,1fr)' }}>
               {[
-                { id: 'views', n: d.views.toLocaleString(), l: 'Profile Views', t: d.viewTrend },
-                { id: 'inq',   n: d.inquiries,              l: 'Inquiries',     t: d.inqTrend },
-                { id: 'book',  n: d.bookings,               l: 'Bookings',      t: d.bkTrend },
-                { id: 'rat',   n: d.rating,                 l: 'Avg Rating',    t: '↑ 0.2' },
-                { id: 'rate',  n: d.rate,                   l: 'Inquiry Rate',  t: '↑ 4.1%' },
+                { id: 'views', n: (anData?.views ?? '—').toLocaleString?.() ?? '—', l: 'Profile Views' },
+                { id: 'inq',   n: anData?.inquiries ?? '—',                          l: 'Inquiries' },
               ].map(k => (
                 <div key={k.id} className="stat-c">
                   <div className="sn">{k.n}</div>
                   <div className="sl">{k.l}</div>
-                  <div className="sd up">{k.t}</div>
                 </div>
               ))}
             </div>
@@ -462,22 +455,25 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
               <div className="an-card-head"><h3>🔄 Conversion Funnel</h3></div>
               <div className="an-card-body">
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
-                  {[
-                    { label: 'Profile Views',      n: d.views.toLocaleString(), pct: '100%', color: 'var(--v)' },
-                    { label: 'Gallery Clicks',     n: Math.round(d.views * .32).toLocaleString(), pct: '32%', color: 'var(--v)' },
-                    { label: 'Inquiries Sent',     n: d.inquiries, pct: '5%', color: 'var(--v)' },
-                    { label: 'Bookings Confirmed', n: d.bookings,  pct: '0.9%', color: 'var(--g)' },
-                  ].map(row => (
-                    <div key={row.label}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '.8rem', color: 'var(--tm)', marginBottom: '.4rem' }}>
-                        <span>{row.label}</span>
-                        <span style={{ fontWeight: 600, color: 'var(--vx)' }}>{row.n}</span>
+                  {(() => {
+                    const views = anData?.views ?? 0
+                    const inqs = anData?.inquiries ?? 0
+                    const inqPct = views > 0 ? Math.min(100, Math.round((inqs / views) * 100)) : 0
+                    return [
+                      { label: 'Profile Views', n: views.toLocaleString(), pct: '100%', color: 'var(--v)' },
+                      { label: 'Inquiries Sent', n: inqs, pct: `${inqPct}%`, color: 'var(--v)' },
+                    ].map(row => (
+                      <div key={row.label}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '.8rem', color: 'var(--tm)', marginBottom: '.4rem' }}>
+                          <span>{row.label}</span>
+                          <span style={{ fontWeight: 600, color: 'var(--vx)' }}>{row.n}</span>
+                        </div>
+                        <div style={{ height: 10, background: 'rgba(196,132,140,.1)', borderRadius: 6, overflow: 'hidden' }}>
+                          <div style={{ height: '100%', width: row.pct, background: `linear-gradient(90deg,${row.color},var(--vl))`, borderRadius: 6 }} />
+                        </div>
                       </div>
-                      <div style={{ height: 10, background: 'rgba(196,132,140,.1)', borderRadius: 6, overflow: 'hidden' }}>
-                        <div style={{ height: '100%', width: row.pct, background: `linear-gradient(90deg,${row.color},var(--vl))`, borderRadius: 6 }} />
-                      </div>
-                    </div>
-                  ))}
+                    ))
+                  })()}
                 </div>
               </div>
             </div>
