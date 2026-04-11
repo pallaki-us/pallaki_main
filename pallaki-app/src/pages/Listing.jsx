@@ -4,7 +4,7 @@ import { EVENT_CATS } from '../data/vendors'
 import { useVendors } from '../lib/useVendors'
 import { useAuth } from '../lib/AuthContext'
 
-export default function Listing({ onShowAuth }) {
+export default function Listing() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
@@ -24,7 +24,7 @@ export default function Listing({ onShowAuth }) {
   function switchCat(cat) { setActiveCat(cat); setPage(1) }
 
   function handleVendorClick(id) {
-    if (!user) { onShowAuth('planner'); return }
+    if (!user) { navigate('/planner/login'); return }
     navigate(`/vendor/${id}`)
   }
 
@@ -97,6 +97,7 @@ export default function Listing({ onShowAuth }) {
                   {v.icon}
                   {v.badge === 'featured' && <div className="vcbdg bdg-f">Featured</div>}
                   {v.badge === 'top' && <div className="vcbdg bdg-t">Top Rated</div>}
+                  {v.is_available === true && <div className="vcbdg bdg-av">Available</div>}
                 </div>
                 <div className="vc-body">
                   <div className="vc-meta">

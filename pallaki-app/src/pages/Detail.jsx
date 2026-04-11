@@ -6,7 +6,7 @@ import { showToast } from '../lib/toast'
 import { supabase } from '../lib/supabase'
 import InquiryModal from '../components/InquiryModal'
 
-export default function Detail({ onShowAuth }) {
+export default function Detail() {
   const { id: vendorId } = useParams()
   const [searchParams] = useSearchParams()
   const isOwnListing = searchParams.get('own') === 'true'
@@ -43,7 +43,7 @@ export default function Detail({ onShowAuth }) {
   if (!v) return null
 
   async function sendInquiry() {
-    if (!user) { onShowAuth('planner'); return }
+    if (!user) { navigate('/planner/login'); return }
     if (userType === 'vendor') { showToast('Vendor accounts cannot send inquiries.'); return }
     setInquiryOpen(true)
   }
@@ -60,7 +60,15 @@ export default function Detail({ onShowAuth }) {
             <div className="dh-tags">
               <span className="dh-tag">{v.cat}</span>
               <span className="dh-tag">📍 {v.loc}</span>
+              {v.is_available !== undefined && (
+                <span className="dh-tag" style={{ background: v.is_available ? 'rgba(90,160,90,.15)' : 'rgba(150,150,150,.15)', color: v.is_available ? '#3a7a3a' : '#888', border: `1px solid ${v.is_available ? 'rgba(90,160,90,.3)' : 'rgba(150,150,150,.3)'}` }}>
+                  {v.is_available ? '✅ Available' : '⏸ Unavailable'}
+                </span>
+              )}
             </div>
+            {v.availability_note && (
+              <div style={{ fontSize: '.76rem', color: 'var(--tl)', marginTop: '.3rem', fontStyle: 'italic' }}>📅 {v.availability_note}</div>
+            )}
             <div className="dh-r">
               <span className="dh-rating">{'★'.repeat(Math.round(parseFloat(v.rating) || 0))}{'☆'.repeat(5 - Math.round(parseFloat(v.rating) || 0))} {v.rating}</span>
               <span className="dh-rev">({v.reviews} reviews)</span>
@@ -100,10 +108,29 @@ export default function Detail({ onShowAuth }) {
                   <div className="ov-meta-val">{v.events}</div>
                 </div>
                 <div className="ov-meta-item">
-                  <div className="ov-meta-label">Service Area</div>
-                  <div className="ov-meta-val">{(v.loc.split(',')[1] || v.loc).trim()} area</div>
+                  <div className="ov-meta-label">Based In</div>
+                  <div className="ov-meta-val">{v.loc}</div>
                 </div>
+                {(v.languages || []).length > 0 && (
+                  <div className="ov-meta-item">
+                    <div className="ov-meta-label">Languages</div>
+                    <div className="ov-meta-val">{v.languages.join(', ')}</div>
+                  </div>
+                )}
               </div>
+
+              {(v.service_areas || []).length > 0 && (
+                <div style={{ marginTop: '1.5rem' }}>
+                  <h4 style={{ fontSize: '.72rem', textTransform: 'uppercase', letterSpacing: '.08em', color: 'var(--tl)', fontWeight: 500, marginBottom: '.75rem' }}>📍 Areas Served</h4>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.4rem' }}>
+                    {v.service_areas.map((area, i) => (
+                      <span key={i} style={{ padding: '.3rem .8rem', background: 'var(--vf)', border: '1px solid var(--br)', borderRadius: 100, fontSize: '.78rem', color: 'var(--tm)' }}>
+                        📍 {area}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
             {userType !== 'vendor' && (
               <div className="cc-card">
@@ -201,6 +228,21 @@ export default function Detail({ onShowAuth }) {
               </div>
             ))}
           </div>
+
+          {/* Vendor-added testimonials */}
+          {(v.testimonials || []).length > 0 && (
+            <div style={{ marginTop: '2rem' }}>
+              <h4 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '1.05rem', color: 'var(--vx)', fontWeight: 500, marginBottom: '1rem', letterSpacing: '.04em' }}>Words from Our Clients</h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
+                {v.testimonials.map((t, i) => (
+                  <div key={i} style={{ padding: '1rem 1.2rem', background: 'var(--vf)', border: '1px solid var(--br)', borderRadius: 14 }}>
+                    <div style={{ fontSize: '.88rem', fontStyle: 'italic', color: 'var(--tm)', lineHeight: 1.8, marginBottom: '.5rem' }}>"{t.quote}"</div>
+                    <div style={{ fontSize: '.76rem', color: 'var(--tl)', fontWeight: 500 }}>— {t.name}{t.event_type ? ` · ${t.event_type}` : ''}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -243,7 +285,6 @@ export default function Detail({ onShowAuth }) {
         open={inquiryOpen}
         onClose={() => setInquiryOpen(false)}
         vendor={v}
-        onShowAuth={onShowAuth}
       />
     </div>
   )

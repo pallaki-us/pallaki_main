@@ -1,9 +1,8 @@
-import { useState, useEffect } from 'react'
-import { Routes, Route, useNavigate, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
+import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom'
 import { AuthProvider, useAuth } from './lib/AuthContext'
 import { supabase } from './lib/supabase'
 import Nav from './components/Nav'
-import AuthModal from './components/AuthModal'
 import './index.css'
 
 import Home from './pages/Home'
@@ -14,114 +13,86 @@ import PlannerProfile from './pages/PlannerProfile'
 import VendorOnboarding from './pages/VendorOnboarding'
 import Privacy from './pages/Privacy'
 import Terms from './pages/Terms'
+import ForgotPassword from './pages/ForgotPassword'
+import PlannerLogin from './pages/planner/Login'
+import PlannerSignup from './pages/planner/Signup'
+import VendorLogin from './pages/vendor/Login'
+import VendorSignup from './pages/vendor/Signup'
+
+// Redirects unauthenticated users to login, and wrong-role users to their correct page
+function RequireAuth({ children, role }) {
+  const { user, userType, loading } = useAuth()
+  if (loading) return null
+  if (!user) return <Navigate to={`/${role}/login`} replace />
+  if (userType && userType !== '__verified__' && userType !== role) {
+    return <Navigate to={userType === 'vendor' ? '/dashboard' : '/profile'} replace />
+  }
+  return children
+}
 
 function AppInner() {
   const { user, userType } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
 
-  const [authOpen, setAuthOpen] = useState(false)
-  const [authType, setAuthType] = useState('planner')
-  const [authDirectSignup, setAuthDirectSignup] = useState(false)
-  const [authDirectLogin, setAuthDirectLogin] = useState(false)
-
-  // Detect post-verification: show sign-in modal
+  // Post-email-verification: redirect to login with verified banner
   useEffect(() => {
     if (userType === '__verified__') {
-      setAuthType('planner')
-      setAuthDirectSignup(false)
-      setAuthDirectLogin(true)
-      setAuthOpen(true)
+      navigate('/planner/login?verified=true', { replace: true })
     }
   }, [userType])
+
+  // Google OAuth: redirect planner after sign-in
+  useEffect(() => {
+    const oauthType = sessionStorage.getItem('pallaki_oauth_type')
+    if (oauthType && user && userType === 'planner') {
+      sessionStorage.removeItem('pallaki_oauth_type')
+      navigate('/profile')
+    }
+  }, [user, userType])
 
   // Scroll to top on every route change
   useEffect(() => { window.scrollTo({ top: 0 }) }, [location.pathname])
 
-  // When a vendor lands on a non-vendor page, redirect to dashboard
-  const browsePaths = ['/', '/vendors', '/vendor']
-  const isVendorBrowsing = userType === 'vendor' && browsePaths.some(p => location.pathname.startsWith(p))
+  // Vendor on home or planner-only pages → redirect to dashboard
   useEffect(() => {
-    const onVendorPage = location.pathname === '/' || location.pathname === '/profile'
-    if (userType === 'vendor' && onVendorPage && !isVendorBrowsing) {
+    const vendorOnlyPaths = ['/', '/profile']
+    if (userType === 'vendor' && vendorOnlyPaths.includes(location.pathname)) {
       navigate('/dashboard')
     }
-  }, [userType])
-
-  function showAuth(type = 'planner', directSignup = false) {
-    setAuthType(type)
-    setAuthDirectSignup(directSignup)
-    setAuthOpen(true)
-  }
+  }, [userType, location.pathname])
 
   async function showVendorListing() {
     if (!supabase) return
     const { data: { session } } = await supabase.auth.getSession()
     if (!session?.user) return
     const { data } = await supabase
-      .from('vendors')
-      .select('id')
-      .eq('profile_id', session.user.id)
-      .single()
+      .from('vendors').select('id')
+      .eq('profile_id', session.user.id).single()
     if (data) navigate(`/vendor/${data.id}?own=true`)
   }
 
-  async function onAuthSuccess(type) {
-    if (!supabase) {
-      if (type === 'vendor') navigate('/onboarding')
-      else navigate('/vendors')
-      return
-    }
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session?.user) return
-
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('user_type')
-      .eq('id', session.user.id)
-      .single()
-
-    const resolvedType = profile?.user_type || type
-
-    if (resolvedType === 'vendor') {
-      const { data: vendorRow } = await supabase
-        .from('vendors')
-        .select('id')
-        .eq('profile_id', session.user.id)
-        .single()
-      navigate(vendorRow ? '/dashboard' : '/onboarding')
-    } else {
-      navigate('/profile')
-    }
-  }
+  const authPaths = ['/planner/login', '/planner/signup', '/vendor/login', '/vendor/signup', '/forgot-password']
+  const isAuthPage = authPaths.includes(location.pathname)
 
   return (
     <>
-      <Nav
-        onShowAuth={showAuth}
-        onShowVendorListing={showVendorListing}
-      />
-
-      <AuthModal
-        open={authOpen}
-        onClose={() => { setAuthOpen(false); setAuthDirectLogin(false) }}
-        defaultType={authType}
-        vendorOnly={authType === 'vendor'}
-        directSignup={authDirectSignup}
-        directLogin={authDirectLogin}
-        onSuccess={onAuthSuccess}
-      />
-
+      {!isAuthPage && <Nav onShowVendorListing={showVendorListing} />}
       <Routes>
-        <Route path="/" element={<Home onShowAuth={showAuth} />} />
-        <Route path="/vendors" element={<Listing onShowAuth={showAuth} />} />
-        <Route path="/vendor/:id" element={<Detail onShowAuth={showAuth} />} />
-        <Route path="/onboarding" element={<VendorOnboarding />} />
-        <Route path="/dashboard" element={<Dashboard activePage="dashboard" onShowVendorListing={showVendorListing} />} />
-        <Route path="/analytics" element={<Dashboard activePage="analytics" onShowVendorListing={showVendorListing} />} />
-        <Route path="/profile" element={<PlannerProfile />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/vendors" element={<Listing />} />
+        <Route path="/vendor/:id" element={<Detail />} />
+        <Route path="/onboarding" element={<RequireAuth role="vendor"><VendorOnboarding /></RequireAuth>} />
+        <Route path="/dashboard" element={<RequireAuth role="vendor"><Dashboard activePage="dashboard" onShowVendorListing={showVendorListing} /></RequireAuth>} />
+        <Route path="/analytics" element={<RequireAuth role="vendor"><Dashboard activePage="analytics" onShowVendorListing={showVendorListing} /></RequireAuth>} />
+        <Route path="/profile" element={<RequireAuth role="planner"><PlannerProfile /></RequireAuth>} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/terms" element={<Terms />} />
+        <Route path="/planner/login" element={<PlannerLogin />} />
+        <Route path="/planner/signup" element={<PlannerSignup />} />
+        <Route path="/vendor/login" element={<VendorLogin />} />
+        <Route path="/vendor/signup" element={<VendorSignup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
       </Routes>
     </>
   )

@@ -1,10 +1,12 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/AuthContext'
 import { sendInquiry } from '../lib/useInquiries'
 import { showToast } from '../lib/toast'
 
-export default function InquiryModal({ open, onClose, vendor, onShowAuth }) {
+export default function InquiryModal({ open, onClose, vendor }) {
   const { user, userType } = useAuth()
+  const navigate = useNavigate()
   const [message, setMessage] = useState('')
   const [eventDate, setEventDate] = useState('')
   const [sending, setSending] = useState(false)
@@ -13,7 +15,7 @@ export default function InquiryModal({ open, onClose, vendor, onShowAuth }) {
   if (!open) return null
 
   async function handleSend() {
-    if (!user) { onClose(); onShowAuth('planner'); return }
+    if (!user) { onClose(); navigate('/planner/login'); return }
     if (userType === 'vendor') { showToast('Vendor accounts cannot send inquiries.'); return }
     if (!message.trim()) { showToast('Please write a message.'); return }
 

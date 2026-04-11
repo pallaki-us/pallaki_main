@@ -8,6 +8,7 @@ import TrendingSection from '../components/TrendingSection'
 import HowItWorksSection from '../components/HowItWorksSection'
 import TestimonialsSection from '../components/TestimonialsSection'
 import ContactSection from '../components/ContactSection'
+import ourStoryImg from '../assets/our story.jpg'
 
 const DEMO_CITIES = ['Dallas', 'Chicago', 'Atlanta', 'Houston', 'Los Angeles', 'New York', 'San Jose', 'Seattle', 'Austin', 'New Jersey']
 
@@ -19,7 +20,7 @@ const EVENT_TYPES = [
   { icon: '🍼', label: 'Baby Shower' },
 ]
 
-export default function Home({ onShowAuth }) {
+export default function Home() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const [selEvent, setSelEvent] = useState('Wedding')
@@ -31,7 +32,7 @@ export default function Home({ onShowAuth }) {
 
   useEffect(() => {
     fetchCities()
-    if (IS_PROD) fetchStats()
+    fetchStats()
   }, [])
 
   async function fetchCities() {
@@ -50,15 +51,19 @@ export default function Home({ onShowAuth }) {
     if (!supabase) return
     try {
       const [vendorsRes, plannersRes] = await Promise.all([
-        supabase.from('vendors').select('city', { count: 'exact' }),
-        supabase.from('planner_profiles').select('id', { count: 'exact' }),
+        supabase.from('vendors').select('city, category', { count: 'exact' }),
+        supabase.from('profiles').select('id', { count: 'exact' }).eq('user_type', 'planner'),
       ])
       if (vendorsRes.error) throw vendorsRes.error
       const vendorCount = vendorsRes.count || 0
       const cities = vendorsRes.data
         ? new Set(vendorsRes.data.map(v => v.city?.toLowerCase()).filter(Boolean)).size
         : 0
-      setStats({ vendors: vendorCount, cities, categories: 10, planners: plannersRes.count || 0 })
+      const categories = vendorsRes.data
+        ? new Set(vendorsRes.data.map(v => v.category).filter(Boolean)).size
+        : 0
+      const planners = plannersRes.count || 0
+      setStats({ vendors: vendorCount, cities, categories: categories || 10, planners })
     } catch (err) {
       console.error('Failed to fetch stats:', err)
     }
@@ -70,7 +75,7 @@ export default function Home({ onShowAuth }) {
   }
 
   function doSearch() {
-    if (!user) { onShowAuth('planner'); return }
+    if (!user) { navigate('/planner/login'); return }
     const params = new URLSearchParams()
     if (cat) params.set('cat', cat)
     if (city) params.set('city', city)
@@ -162,19 +167,7 @@ export default function Home({ onShowAuth }) {
         </div>
       </section>
 
-      <TrendingSection onShowAuth={onShowAuth} />
-
-      {/* ── FEATURED CITIES ── */}
-      <section className="cities-section">
-        <div className="cities-inner">
-          <span className="cities-label">Vendors available across</span>
-          <div className="cities-row">
-            {(citySuggestions.length > 0 ? citySuggestions : DEMO_CITIES).map(c => (
-              <span key={c} className="city-chip" onClick={() => { if (!user) { onShowAuth('planner'); return } navigate(`/vendors?city=${encodeURIComponent(c)}`) }}>📍 {c}</span>
-            ))}
-          </div>
-        </div>
-      </section>
+      <TrendingSection />
 
       <div className="sec-divider"><span>◆ ◇ ◆</span></div>
 
@@ -184,6 +177,9 @@ export default function Home({ onShowAuth }) {
       <section className="about-section" id="our-story">
         <h2 className="how-title" style={{ marginBottom: '2.5rem' }}>Our Story</h2>
         <div className="about-inner">
+          <div className="about-photo" style={{ marginBottom: '2rem' }}>
+            <img src={ourStoryImg} alt="Shruti and Vamsi" />
+          </div>
           <div className="about-text">
             <p>Hi, we're Shruti and Vamsi — the founders of Pallaki — and a couple who have been through this journey ourselves.</p>
             <p>When we started planning our wedding in the U.S., one of the biggest challenges we faced wasn't finding vendors — it was finding them easily. Most of our search happened through endless scrolling on Instagram, jumping between pages, sending DMs, and waiting for responses. Everything felt scattered, and there was no single place to explore options in a structured way.</p>
@@ -193,10 +189,10 @@ export default function Home({ onShowAuth }) {
             <p>Our goal is simple — to remove the hassle, bring everything together, and make wedding planning a more seamless experience. Welcome — this space was built for you.</p>
             <div className="stats-mini" style={{ marginTop: '2rem' }}>
               {[
-                [IS_PROD ? (stats.vendors > 0 ? `${stats.vendors}+` : '—') : '100+', 'Verified Vendors'],
-                [IS_PROD ? (stats.cities > 0 ? `${stats.cities}` : '—') : '9', 'Cities Covered'],
-                [stats.categories, 'Categories'],
-                [IS_PROD ? (stats.planners > 0 ? `${stats.planners}+` : '—') : '200+', 'Happy Families'],
+                [stats.vendors > 0 ? `${stats.vendors}+` : '—', 'Verified Vendors'],
+                [stats.cities > 0 ? `${stats.cities}` : '—', 'Cities Covered'],
+                [stats.categories > 0 ? `${stats.categories}` : '—', 'Categories'],
+                [stats.planners > 0 ? `${stats.planners * 2}+` : '—', 'Happy Families'],
               ].map(([n, l]) => (
                 <div key={l} className="smi">
                   <div className="smi-n">{n}</div>
@@ -266,7 +262,7 @@ export default function Home({ onShowAuth }) {
           <div className="fc">
             <h4>Company</h4>
             <a style={{ cursor: 'pointer' }} onClick={() => document.getElementById('our-story')?.scrollIntoView({ behavior: 'smooth' })}>About Us</a>
-            <a style={{ cursor: 'pointer' }} onClick={() => onShowAuth('vendor', true)}>For Vendors</a>
+            <a style={{ cursor: 'pointer' }} onClick={() => navigate('/vendor/signup')}>For Vendors</a>
             <a style={{ cursor: 'pointer' }} onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}>How It Works</a>
             <a style={{ cursor: 'pointer' }} onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}>Contact</a>
           </div>

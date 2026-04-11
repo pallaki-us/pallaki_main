@@ -18,9 +18,17 @@ const SERVICES = ['Weddings','Engagements','Mehndi Night','Sangeet','Pre-Wedding
 
 export default function Dashboard({ activePage, onShowVendorListing }) {
   const { user, signOut } = useAuth()
+
+  async function handleSignOut() {
+    await signOut()
+    navigate('/')
+  }
   const navigate = useNavigate()
   const { profile, saving, saveProfile } = useVendorProfile()
-  const { inquiries, updateStatus } = useVendorInquiries(profile?.id)
+  const { inquiries, updateStatus, saveReply, archiveInquiry } = useVendorInquiries(profile?.id)
+  const [replyingTo, setReplyingTo] = useState(null)
+  const [replyText, setReplyText] = useState('')
+  const [showArchived, setShowArchived] = useState(false)
   const [period, setPeriod] = useState(365)
   const [selServices, setSelServices] = useState(['Weddings','Engagements'])
   const [avatarUrl, setAvatarUrl] = useState('')
@@ -35,6 +43,19 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
   const [website, setWebsite] = useState('')
   const [description, setDescription] = useState('')
 
+  const [newTestimonial, setNewTestimonial] = useState({ name: '', event_type: '', quote: '' })
+  const [isAvailable, setIsAvailable] = useState(true)
+  const [availabilityNote, setAvailabilityNote] = useState('')
+  const [languages, setLanguages] = useState([])
+  const [serviceAreas, setServiceAreas] = useState([])
+  const [newArea, setNewArea] = useState('')
+
+  const LANGUAGES = ['English','Hindi','Punjabi','Telugu','Tamil','Kannada','Malayalam','Gujarati','Marathi','Bengali','Urdu']
+
+  function toggleLanguage(lang) {
+    setLanguages(prev => prev.includes(lang) ? prev.filter(l => l !== lang) : [...prev, lang])
+  }
+
   // Populate form when profile loads
   useEffect(() => {
     if (!profile) return
@@ -47,7 +68,23 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
     setDescription(profile.description || '')
     setSelServices(profile.services || ['Weddings','Engagements'])
     setAvatarUrl(profile.avatar_url || '')
+    setIsAvailable(profile.is_available ?? true)
+    setAvailabilityNote(profile.availability_note || '')
+    setLanguages(profile.languages || [])
+    setServiceAreas(profile.service_areas || [])
   }, [profile])
+
+  async function addTestimonial() {
+    if (!newTestimonial.name.trim() || !newTestimonial.quote.trim()) return showToast('Please fill in the name and quote.')
+    const updated = [...(profile?.testimonials || []), { ...newTestimonial }]
+    const { error } = await saveProfile({ testimonials: updated })
+    if (!error) { setNewTestimonial({ name: '', event_type: '', quote: '' }); showToast('Testimonial added!') }
+  }
+
+  async function removeTestimonial(index) {
+    const updated = (profile?.testimonials || []).filter((_, i) => i !== index)
+    await saveProfile({ testimonials: updated })
+  }
 
   async function handleAvatarUpload(e) {
     const file = e.target.files?.[0]
@@ -82,6 +119,10 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
       website,
       description,
       services: selServices,
+      is_available: isAvailable,
+      availability_note: availabilityNote,
+      languages,
+      service_areas: serviceAreas,
     })
     if (error) showToast('Error saving: ' + error.message)
     else showToast('Profile saved! ✨')
@@ -143,7 +184,7 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
         <p style={{ fontSize: '.85rem', color: 'var(--tl)', lineHeight: 1.7, marginBottom: '2rem', fontWeight: 300 }}>
           You'll receive an email once your profile is live on Pallaki.
         </p>
-        <button className="btn-o" onClick={signOut}>Sign Out</button>
+        <button className="btn-o" onClick={handleSignOut}>Sign Out</button>
       </div>
     </div>
   )
@@ -214,6 +255,68 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
               </div>
             </div>
 
+            {/* Availability & Languages */}
+            <div className="dash-card">
+              <div className="dash-card-head">
+                <h3>📅 Availability & Languages</h3>
+                <button className="dash-btn dash-btn-out" style={{ color: 'var(--v)', borderColor: 'var(--br)' }} onClick={handleSave} disabled={saving}>
+                  {saving ? 'Saving…' : 'Save Changes'}
+                </button>
+              </div>
+              <div className="dash-card-body">
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem', background: isAvailable ? 'rgba(90,160,90,.08)' : 'var(--cd)', border: `1px solid ${isAvailable ? 'rgba(90,160,90,.3)' : 'var(--br)'}`, borderRadius: 12, marginBottom: '1rem' }}>
+                  <div>
+                    <div style={{ fontSize: '.88rem', fontWeight: 500, color: 'var(--vx)' }}>{isAvailable ? '✅ Currently Available' : '⏸ Not Currently Available'}</div>
+                    <div style={{ fontSize: '.74rem', color: 'var(--tl)', marginTop: '.2rem' }}>Shown as a badge on your listing</div>
+                  </div>
+                  <label className="pp-toggle" style={{ flexShrink: 0 }}>
+                    <input type="checkbox" checked={isAvailable} onChange={e => setIsAvailable(e.target.checked)} />
+                    <span className="pp-toggle-slider" />
+                  </label>
+                </div>
+                <div className="details-form" style={{ marginBottom: '1.25rem' }}>
+                  <div className="df full">
+                    <label>Availability Note <span style={{ fontWeight: 300, textTransform: 'none', letterSpacing: 0 }}>(optional)</span></label>
+                    <input value={availabilityNote} onChange={e => setAvailabilityNote(e.target.value)} placeholder="e.g. Booking for Fall 2025 & 2026" />
+                  </div>
+                </div>
+                <div style={{ marginBottom: '1.25rem' }}>
+                  <p style={{ fontSize: '.72rem', textTransform: 'uppercase', letterSpacing: '.08em', color: 'var(--tl)', fontWeight: 500, marginBottom: '.6rem' }}>Languages Spoken</p>
+                  <div className="multi-sel">
+                    {LANGUAGES.map(l => (
+                      <div key={l} className={`ms-chip${languages.includes(l) ? ' sel' : ''}`} onClick={() => toggleLanguage(l)}>{l}</div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <p style={{ fontSize: '.72rem', textTransform: 'uppercase', letterSpacing: '.08em', color: 'var(--tl)', fontWeight: 500, marginBottom: '.6rem' }}>Service Areas</p>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.4rem', marginBottom: '.75rem' }}>
+                    {serviceAreas.map((area, i) => (
+                      <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: '.35rem', padding: '.28rem .75rem', background: 'var(--vf)', border: '1px solid var(--br)', borderRadius: 100, fontSize: '.78rem', color: 'var(--tm)' }}>
+                        📍 {area}
+                        <span onClick={() => setServiceAreas(p => p.filter((_, j) => j !== i))} style={{ cursor: 'pointer', color: 'var(--tl)', fontSize: '.8rem', lineHeight: 1 }}>×</span>
+                      </span>
+                    ))}
+                  </div>
+                  <div style={{ display: 'flex', gap: '.5rem' }}>
+                    <input
+                      value={newArea}
+                      onChange={e => setNewArea(e.target.value)}
+                      onKeyDown={e => { if (e.key === 'Enter' && newArea.trim()) { setServiceAreas(p => [...p, newArea.trim()]); setNewArea('') } }}
+                      placeholder="e.g. Edison, NJ"
+                      style={{ flex: 1, padding: '.65rem .9rem', border: '1.5px solid var(--br)', borderRadius: 10, fontFamily: "'Cormorant Garamond',serif", fontSize: '.88rem', outline: 'none', background: 'var(--cr)' }}
+                    />
+                    <button className="dash-btn dash-btn-out" style={{ flexShrink: 0 }}
+                      onClick={() => { if (newArea.trim()) { setServiceAreas(p => [...p, newArea.trim()]); setNewArea('') } }}>
+                      + Add
+                    </button>
+                  </div>
+                  <p style={{ fontSize: '.68rem', color: 'var(--tl)', marginTop: '.4rem' }}>Press Enter or click Add. Remember to Save Changes.</p>
+                </div>
+              </div>
+            </div>
+
             {/* Photo Gallery */}
             <div className="dash-card">
               <div className="dash-card-head"><h3>Photo Gallery</h3></div>
@@ -251,6 +354,39 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
                       />
                     </div>
                   </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Testimonials */}
+            <div className="dash-card">
+              <div className="dash-card-head">
+                <h3>🌟 Client Testimonials</h3>
+                <span style={{ fontSize: '.72rem', color: 'var(--tl)' }}>Shown on your public listing</span>
+              </div>
+              <div className="dash-card-body">
+                {/* Existing testimonials */}
+                {(profile?.testimonials || []).length > 0 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '.65rem', marginBottom: '1.5rem' }}>
+                    {(profile.testimonials).map((t, i) => (
+                      <div key={i} style={{ padding: '.85rem 1rem', background: 'var(--vf)', border: '1px solid var(--br)', borderRadius: 12, position: 'relative' }}>
+                        <div style={{ fontSize: '.82rem', fontStyle: 'italic', color: 'var(--tm)', lineHeight: 1.7, marginBottom: '.4rem' }}>"{t.quote}"</div>
+                        <div style={{ fontSize: '.72rem', color: 'var(--tl)', fontWeight: 500 }}>— {t.name}{t.event_type ? ` · ${t.event_type}` : ''}</div>
+                        <button onClick={() => removeTestimonial(i)} style={{ position: 'absolute', top: '.6rem', right: '.75rem', background: 'none', border: 'none', color: 'var(--tl)', cursor: 'pointer', fontSize: '.75rem' }}>✕</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Add new */}
+                <div style={{ borderTop: (profile?.testimonials || []).length > 0 ? '1px solid var(--br)' : 'none', paddingTop: (profile?.testimonials || []).length > 0 ? '1.25rem' : 0 }}>
+                  <p style={{ fontSize: '.72rem', textTransform: 'uppercase', letterSpacing: '.08em', color: 'var(--tl)', fontWeight: 500, marginBottom: '.75rem' }}>Add a Testimonial</p>
+                  <div className="details-form">
+                    <div className="df"><label>Client Name</label><input value={newTestimonial.name} onChange={e => setNewTestimonial(p => ({ ...p, name: e.target.value }))} placeholder="e.g. Priya & Rohan" /></div>
+                    <div className="df"><label>Event Type</label><input value={newTestimonial.event_type} onChange={e => setNewTestimonial(p => ({ ...p, event_type: e.target.value }))} placeholder="e.g. Wedding, Mehndi Night" /></div>
+                    <div className="df full"><label>Quote</label><textarea value={newTestimonial.quote} onChange={e => setNewTestimonial(p => ({ ...p, quote: e.target.value }))} placeholder="What did they say about your work?" style={{ resize: 'vertical', minHeight: 80 }} /></div>
+                  </div>
+                  <button className="dash-btn dash-btn-gold" style={{ marginTop: '1rem' }} onClick={addTestimonial}>+ Add Testimonial</button>
                 </div>
               </div>
             </div>
@@ -340,41 +476,104 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
               </div>
             </div>
 
-            {/* Recent inquiries */}
+            {/* Inquiries */}
             <div className="an-card">
               <div className="an-card-head">
-                <h3>💌 Recent Inquiries</h3>
-                <span style={{ fontSize: '.7rem', color: 'var(--v)', fontWeight: 500 }}>{inquiries.filter(i => i.status === 'pending').length} new</span>
+                <h3>💌 Inquiries</h3>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem' }}>
+                  {inquiries.filter(i => i.status === 'pending').length > 0 && (
+                    <span style={{ fontSize: '.7rem', color: 'var(--v)', fontWeight: 500 }}>{inquiries.filter(i => i.status === 'pending').length} new</span>
+                  )}
+                  <button style={{ fontSize: '.7rem', color: 'var(--tl)', background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Cormorant Garamond',serif" }}
+                    onClick={() => setShowArchived(p => !p)}>
+                    {showArchived ? 'Hide Archived' : 'Show Archived'}
+                  </button>
+                </div>
               </div>
-              <div className="an-card-body" style={{ display: 'flex', flexDirection: 'column', gap: '.65rem' }}>
-                {inquiries.length === 0 ? (
-                  <p style={{ fontSize: '.88rem', color: 'var(--tl)', textAlign: 'center', padding: '2rem', fontStyle: 'italic' }}>No inquiries yet — your listing is live and families can find you!</p>
-                ) : inquiries.slice(0, 5).map(inq => (
-                  <div key={inq.id} style={{ display: 'grid', gridTemplateColumns: '2.5rem 1fr auto', alignItems: 'flex-start', gap: '.85rem', padding: '.9rem', background: inq.status === 'pending' ? 'var(--vf)' : 'var(--wh)', border: `1px solid ${inq.status === 'pending' ? 'rgba(196,132,140,.3)' : 'var(--br)'}`, borderRadius: 12 }}>
-                    <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'var(--v)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: '#fff', fontSize: '.9rem' }}>
-                      {(inq.profiles?.name || inq.profiles?.email || '?').charAt(0).toUpperCase()}
-                    </div>
-                    <div>
-                      <div style={{ fontSize: '.86rem', fontWeight: 500, color: 'var(--vx)' }}>
-                        {inq.profiles?.name || inq.profiles?.email} · <span style={{ fontWeight: 300 }}>{inq.profiles?.event_type || 'Event'}</span>
+              <div className="an-card-body" style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
+                {inquiries.filter(i => showArchived ? i.status === 'archived' : i.status !== 'archived').length === 0 ? (
+                  <p style={{ fontSize: '.88rem', color: 'var(--tl)', textAlign: 'center', padding: '2rem', fontStyle: 'italic' }}>
+                    {showArchived ? 'No archived inquiries.' : 'No inquiries yet — your listing is live and families can find you!'}
+                  </p>
+                ) : inquiries.filter(i => showArchived ? i.status === 'archived' : i.status !== 'archived').map(inq => (
+                  <div key={inq.id} style={{ padding: '1rem', background: inq.status === 'pending' ? 'var(--vf)' : 'var(--wh)', border: `1px solid ${inq.status === 'pending' ? 'rgba(196,132,140,.3)' : 'var(--br)'}`, borderRadius: 12 }}>
+                    {/* Header row */}
+                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '.75rem', marginBottom: '.6rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem' }}>
+                        <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--v)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: '#fff', fontSize: '.88rem', flexShrink: 0 }}>
+                          {(inq.profiles?.name || inq.profiles?.email || '?').charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '.86rem', fontWeight: 500, color: 'var(--vx)' }}>
+                            {inq.profiles?.name || inq.profiles?.email}
+                            {inq.profiles?.event_type && <span style={{ fontWeight: 300, color: 'var(--tm)' }}> · {inq.profiles.event_type}</span>}
+                          </div>
+                          <div style={{ fontSize: '.72rem', color: 'var(--tl)', marginTop: '.15rem', display: 'flex', gap: '.75rem', flexWrap: 'wrap' }}>
+                            {inq.profiles?.email && <span>✉ {inq.profiles.email}</span>}
+                            {inq.profiles?.phone && <span>📞 {inq.profiles.phone}</span>}
+                            {inq.profiles?.city && <span>📍 {inq.profiles.city}{inq.profiles.state ? `, ${inq.profiles.state}` : ''}</span>}
+                          </div>
+                        </div>
                       </div>
-                      <div style={{ fontSize: '.8rem', color: 'var(--tm)', marginTop: '.3rem', fontStyle: 'italic' }}>"{inq.message}"</div>
-                      <div style={{ marginTop: '.5rem', display: 'flex', gap: '.5rem' }}>
-                        {inq.status === 'pending' && (
-                          <button style={{ fontSize: '.7rem', padding: '.3rem .8rem', background: 'var(--v)', color: '#fff', border: 'none', borderRadius: 20, cursor: 'pointer', fontFamily: "'Cormorant Garamond',serif" }}
-                            onClick={() => updateStatus(inq.id, 'replied')}>
-                            Mark Replied ✓
+                      <div style={{ fontSize: '.68rem', color: 'var(--tl)', whiteSpace: 'nowrap', textAlign: 'right', flexShrink: 0 }}>
+                        {new Date(inq.created_at).toLocaleDateString()}
+                        {inq.status === 'pending' && <div style={{ color: 'var(--v)', fontWeight: 600, marginTop: 2 }}>New</div>}
+                        {inq.status === 'replied' && <div style={{ color: 'var(--sage)', fontWeight: 500, marginTop: 2 }}>Replied</div>}
+                        {inq.status === 'archived' && <div style={{ color: 'var(--tl)', marginTop: 2 }}>Archived</div>}
+                      </div>
+                    </div>
+
+                    {/* Message */}
+                    {inq.event_date && (
+                      <div style={{ fontSize: '.72rem', color: 'var(--tm)', marginBottom: '.35rem' }}>📅 Event date: {new Date(inq.event_date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</div>
+                    )}
+                    <div style={{ fontSize: '.84rem', color: 'var(--tm)', fontStyle: 'italic', marginBottom: '.6rem', lineHeight: 1.6 }}>"{inq.message}"</div>
+
+                    {/* Vendor reply (if exists) */}
+                    {inq.vendor_reply && (
+                      <div style={{ background: 'var(--cd)', border: '1px solid var(--br)', borderRadius: 8, padding: '.6rem .8rem', marginBottom: '.6rem' }}>
+                        <div style={{ fontSize: '.68rem', color: 'var(--tl)', marginBottom: '.25rem', textTransform: 'uppercase', letterSpacing: '.06em' }}>Your reply</div>
+                        <div style={{ fontSize: '.82rem', color: 'var(--tm)', lineHeight: 1.6 }}>{inq.vendor_reply}</div>
+                      </div>
+                    )}
+
+                    {/* Reply box */}
+                    {replyingTo === inq.id && (
+                      <div style={{ marginBottom: '.6rem' }}>
+                        <textarea
+                          value={replyText}
+                          onChange={e => setReplyText(e.target.value)}
+                          placeholder="Write your reply…"
+                          style={{ width: '100%', padding: '.65rem .8rem', border: '1.5px solid var(--v)', borderRadius: 8, fontFamily: "'Cormorant Garamond',serif", fontSize: '.84rem', resize: 'vertical', minHeight: 80, outline: 'none', background: 'var(--cr)', boxSizing: 'border-box' }}
+                        />
+                        <div style={{ display: 'flex', gap: '.5rem', marginTop: '.4rem' }}>
+                          <button style={{ fontSize: '.75rem', padding: '.35rem .9rem', background: 'var(--v)', color: '#fff', border: 'none', borderRadius: 20, cursor: 'pointer', fontFamily: "'Cormorant Garamond',serif" }}
+                            onClick={async () => { if (!replyText.trim()) return; await saveReply(inq.id, replyText); setReplyingTo(null); setReplyText('') }}>
+                            Send Reply ✓
+                          </button>
+                          <button style={{ fontSize: '.75rem', padding: '.35rem .9rem', background: 'none', color: 'var(--tl)', border: '1px solid var(--br)', borderRadius: 20, cursor: 'pointer', fontFamily: "'Cormorant Garamond',serif" }}
+                            onClick={() => { setReplyingTo(null); setReplyText('') }}>
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Actions */}
+                    {inq.status !== 'archived' && (
+                      <div style={{ display: 'flex', gap: '.5rem', flexWrap: 'wrap' }}>
+                        {replyingTo !== inq.id && (
+                          <button style={{ fontSize: '.72rem', padding: '.3rem .85rem', background: 'var(--v)', color: '#fff', border: 'none', borderRadius: 20, cursor: 'pointer', fontFamily: "'Cormorant Garamond',serif" }}
+                            onClick={() => { setReplyingTo(inq.id); setReplyText(inq.vendor_reply || '') }}>
+                            {inq.vendor_reply ? 'Edit Reply' : 'Reply'}
                           </button>
                         )}
-                        {inq.status === 'replied' && (
-                          <span style={{ fontSize: '.7rem', color: 'var(--sage)', fontWeight: 500 }}>✓ Replied</span>
-                        )}
+                        <button style={{ fontSize: '.72rem', padding: '.3rem .85rem', background: 'none', color: 'var(--tl)', border: '1px solid var(--br)', borderRadius: 20, cursor: 'pointer', fontFamily: "'Cormorant Garamond',serif" }}
+                          onClick={() => archiveInquiry(inq.id)}>
+                          Archive
+                        </button>
                       </div>
-                    </div>
-                    <div style={{ fontSize: '.68rem', color: 'var(--tl)', whiteSpace: 'nowrap', textAlign: 'right' }}>
-                      {new Date(inq.created_at).toLocaleDateString()}
-                      {inq.status === 'pending' && <div style={{ color: 'var(--v)', fontWeight: 500, marginTop: 2 }}>New</div>}
-                    </div>
+                    )}
                   </div>
                 ))}
               </div>

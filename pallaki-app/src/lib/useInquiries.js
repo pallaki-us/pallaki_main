@@ -22,16 +22,13 @@ export function useVendorInquiries(vendorId) {
 
   useEffect(() => {
     if (!vendorId || !supabase) { setLoading(false); return }
-    fetch()
+    fetchAll()
   }, [vendorId])
 
-  async function fetch() {
+  async function fetchAll() {
     const { data } = await supabase
       .from('inquiries')
-      .select(`
-        *,
-        profiles (name, email, city, state, event_type)
-      `)
+      .select(`*, profiles (name, email, phone, city, state, event_type)`)
       .eq('vendor_id', vendorId)
       .order('created_at', { ascending: false })
     setInquiries(data || [])
@@ -41,8 +38,24 @@ export function useVendorInquiries(vendorId) {
   async function updateStatus(id, status) {
     if (!supabase) return
     await supabase.from('inquiries').update({ status }).eq('id', id)
-    await fetch()
+    await fetchAll()
   }
 
-  return { inquiries, loading, updateStatus, refetch: fetch }
+  async function saveReply(id, reply) {
+    if (!supabase) return
+    await supabase.from('inquiries').update({
+      vendor_reply: reply,
+      replied_at: new Date().toISOString(),
+      status: 'replied',
+    }).eq('id', id)
+    await fetchAll()
+  }
+
+  async function archiveInquiry(id) {
+    if (!supabase) return
+    await supabase.from('inquiries').update({ status: 'archived' }).eq('id', id)
+    await fetchAll()
+  }
+
+  return { inquiries, loading, updateStatus, saveReply, archiveInquiry, refetch: fetchAll }
 }

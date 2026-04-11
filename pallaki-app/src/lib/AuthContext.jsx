@@ -8,45 +8,46 @@ export function AuthProvider({ children }) {
   const [userType, setUserType] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  // Fetch user_type from profiles table, fall back to user_metadata
-  async function fetchProfile(userId, userMeta) {
-    if (!supabase) return
-    const { data } = await supabase
-      .from('profiles')
-      .select('user_type, name')
-      .eq('id', userId)
-      .single()
-    if (data?.user_type) {
-      setUserType(data.user_type)
-    } else if (userMeta?.user_type) {
-      // fallback to metadata set at signup
-      setUserType(userMeta.user_type)
-    }
+  async function fetchUserType(userId) {
+    const { data: vendorRow } = await supabase
+      .from('vendors')
+      .select('id')
+      .eq('profile_id', userId)
+      .maybeSingle()
+    setUserType(vendorRow ? 'vendor' : 'planner')
   }
 
   useEffect(() => {
     if (!supabase) { setLoading(false); return }
 
-    // Get existing session on mount
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
-      if (session?.user) fetchProfile(session.user.id, session.user.user_metadata)
+      if (session?.user) fetchUserType(session.user.id)
       setLoading(false)
     })
 
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (_event === 'SIGNED_IN' && window.location.hash.includes('type=signup')) {
-        // Email just verified — sign them out so they must log in manually
         window.history.replaceState(null, '', window.location.pathname)
         await supabase.auth.signOut()
         setUser(null)
-        setUserType('__verified__') // signal to App to show sign-in modal
+        setUserType('__verified__')
         return
       }
       setUser(session?.user ?? null)
-      if (session?.user) fetchProfile(session.user.id, session.user.user_metadata)
-      else setUserType(null)
+      if (session?.user) {
+        // Google OAuth: create planner profile if none exists
+        if (session.user.app_metadata?.provider === 'google') {
+          const name = session.user.user_metadata?.full_name || session.user.user_metadata?.name || ''
+          await supabase.from('profiles').upsert(
+            { id: session.user.id, user_type: 'planner', name, email: session.user.email },
+            { onConflict: 'id' }
+          )
+        }
+        fetchUserType(session.user.id)
+      } else {
+        setUserType(null)
+      }
     })
 
     return () => subscription.unsubscribe()
@@ -66,27 +67,49 @@ export function AuthProvider({ children }) {
         emailRedirectTo: `${window.location.origin}`,
       },
     })
-    return { data, error }
+    if (error) return { error }
+
+    if (data.session?.user) {
+      await fetchUserType(data.session.user.id)
+    }
+
+    return { data, error: null }
   }
 
   async function signIn(email, password) {
     if (!supabase) {
-      // demo credentials
       if (email === 'test@pallaki.com' && password === 'test123') {
         setUser({ email, user_metadata: { name: 'Ria' } })
         setUserType('planner')
-        return { error: null }
+        return { error: null, actualType: 'planner' }
       }
       if (email === 'vendor@pallaki.com' && password === 'test123') {
         setUser({ email, user_metadata: { name: 'KJF Artistry' } })
         setUserType('vendor')
-        return { error: null }
+        return { error: null, actualType: 'vendor' }
       }
-      return { error: { message: 'Incorrect email or password.' } }
+      return { error: { message: 'Incorrect email or password.' }, actualType: null }
     }
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-    if (!error && data.user) await fetchProfile(data.user.id, data.user.user_metadata)
-    return { data, error }
+    if (error) return { error, actualType: null }
+
+    const { data: vendorRow } = await supabase
+      .from('vendors')
+      .select('id')
+      .eq('profile_id', data.user.id)
+      .maybeSingle()
+    const actualType = vendorRow ? 'vendor' : 'planner'
+    setUserType(actualType)
+    return { data, error: null, actualType }
+  }
+
+  async function signInWithGoogle() {
+    if (!supabase) return { error: { message: 'Not available in demo' } }
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.origin + (import.meta.env.VITE_BASE_PATH || '/') },
+    })
+    return { error }
   }
 
   async function signOut() {
@@ -95,8 +118,16 @@ export function AuthProvider({ children }) {
     setUserType(null)
   }
 
+  async function resetPassword(email) {
+    if (!supabase) return { error: { message: 'Not available in demo mode.' } }
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    })
+    return { error }
+  }
+
   return (
-    <AuthContext.Provider value={{ user, userType, setUserType, loading, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, userType, setUserType, loading, signUp, signIn, signInWithGoogle, signOut, resetPassword }}>
       {!loading && children}
     </AuthContext.Provider>
   )

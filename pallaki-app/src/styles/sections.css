@@ -45,6 +45,8 @@
 .about-section { padding: 4rem 4rem; }
 .about-inner { max-width: 680px; margin: 0 auto; }
 .about-text p { font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: var(--tm); line-height: 1.9; margin-bottom: 1rem; font-weight: 300; }
+.about-photo { margin-top: 2.5rem; border-radius: 16px; overflow: hidden; }
+.about-photo img { width: 100%; height: auto; display: block; border-radius: 16px; }
 .aq { position: relative; padding: 1.8rem 2rem 1.5rem 2.5rem; margin-bottom: 1.8rem; }
 .aq::before { content: '\201C'; position: absolute; top: -.5rem; left: .2rem; font-family: 'Cormorant Garamond', serif; font-size: 6rem; color: rgba(196,132,140,.2); line-height: 1; font-style: italic; }
 .aq p { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-style: italic; color: var(--vx); line-height: 1.65; font-weight: 400; }
