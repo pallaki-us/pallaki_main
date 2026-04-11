@@ -35,37 +35,37 @@ function AppInner() {
   const navigate = useNavigate()
   const location = useLocation()
 
-  // Post-email-verification: redirect to login with verified banner
+  // Scroll to top on every route change
+  useEffect(() => { window.scrollTo({ top: 0 }) }, [location.pathname])
+
+  // Single effect handles all auth-driven redirects in priority order
   useEffect(() => {
+    if (!userType) return
+
+    // 1. Post-email-verification
     if (userType === '__verified__') {
       navigate('/planner/login?verified=true', { replace: true })
+      return
     }
-  }, [userType])
 
-  // Google OAuth: redirect after sign-in, or show error if wrong portal
-  useEffect(() => {
+    // 2. Google OAuth — must run before vendor redirect to avoid race
     const oauthIntended = sessionStorage.getItem('pallaki_oauth_type')
-    if (oauthIntended && user && userType && userType !== '__verified__') {
+    if (oauthIntended) {
       sessionStorage.removeItem('pallaki_oauth_type')
       if (userType !== oauthIntended) {
-        // Signed in via wrong portal — sign out and show error on login page
         signOut().then(() => {
           navigate(`/${oauthIntended}/login?wrongrole=${userType}`, { replace: true })
         })
       } else {
-        navigate(userType === 'vendor' ? '/dashboard' : '/profile')
+        navigate(userType === 'vendor' ? '/dashboard' : '/profile', { replace: true })
       }
+      return
     }
-  }, [user, userType])
 
-  // Scroll to top on every route change
-  useEffect(() => { window.scrollTo({ top: 0 }) }, [location.pathname])
-
-  // Vendor on home or planner-only pages → redirect to dashboard
-  useEffect(() => {
+    // 3. Vendor landing on planner-only pages
     const vendorOnlyPaths = ['/', '/profile']
     if (userType === 'vendor' && vendorOnlyPaths.includes(location.pathname)) {
-      navigate('/dashboard')
+      navigate('/dashboard', { replace: true })
     }
   }, [userType, location.pathname])
 
