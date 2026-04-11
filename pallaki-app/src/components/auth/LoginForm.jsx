@@ -26,6 +26,7 @@ export default function LoginForm({ role }) {
 
   const isVendor = role === 'vendor'
   const justVerified = searchParams.get('verified') === 'true'
+  const wrongRole = searchParams.get('wrongrole')
 
   // Redirect already-logged-in users away from auth pages
   useEffect(() => {
@@ -123,6 +124,12 @@ export default function LoginForm({ role }) {
       {justVerified && (
         <div className="auth-banner auth-banner-success">
           ✓ Email verified! You can now sign in.
+        </div>
+      )}
+
+      {wrongRole && !formError && (
+        <div className="auth-banner auth-banner-error">
+          This email is registered as a {wrongRole}. Please sign in at the {wrongRole} portal.
         </div>
       )}
 

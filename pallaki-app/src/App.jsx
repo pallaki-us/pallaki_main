@@ -31,7 +31,7 @@ function RequireAuth({ children, role }) {
 }
 
 function AppInner() {
-  const { user, userType } = useAuth()
+  const { user, userType, signOut } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -42,12 +42,19 @@ function AppInner() {
     }
   }, [userType])
 
-  // Google OAuth: redirect planner after sign-in
+  // Google OAuth: redirect after sign-in, or show error if wrong portal
   useEffect(() => {
-    const oauthType = sessionStorage.getItem('pallaki_oauth_type')
-    if (oauthType && user && userType === 'planner') {
+    const oauthIntended = sessionStorage.getItem('pallaki_oauth_type')
+    if (oauthIntended && user && userType && userType !== '__verified__') {
       sessionStorage.removeItem('pallaki_oauth_type')
-      navigate('/profile')
+      if (userType !== oauthIntended) {
+        // Signed in via wrong portal — sign out and show error on login page
+        signOut().then(() => {
+          navigate(`/${oauthIntended}/login?wrongrole=${userType}`, { replace: true })
+        })
+      } else {
+        navigate(userType === 'vendor' ? '/dashboard' : '/profile')
+      }
     }
   }, [user, userType])
 
