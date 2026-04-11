@@ -16,6 +16,15 @@ export default function Detail() {
   const [activeTab, setActiveTab] = useState('overview')
   const [inquiryOpen, setInquiryOpen] = useState(false)
   const [reviews, setReviews] = useState([])
+  const [portfolioUrls, setPortfolioUrls] = useState(null)
+  const [featuredUrls, setFeaturedUrls] = useState(null)
+
+  // Sync local URL state when vendor loads
+  useEffect(() => {
+    if (!v) return
+    setPortfolioUrls(v.portfolio_urls || [])
+    setFeaturedUrls(v.featured_urls || [])
+  }, [v?.id])
 
   // Track profile view — only for logged-in planners, only on non-own listings
   useEffect(() => {
@@ -49,6 +58,16 @@ export default function Detail() {
   )
 
   if (!v) return null
+
+  async function removePhoto(field, url) {
+    const current = field === 'portfolio_urls' ? portfolioUrls : featuredUrls
+    const updated = current.filter(u => u !== url)
+    const { error } = await supabase.from('vendors').update({ [field]: updated }).eq('id', vendorId)
+    if (error) { showToast('Failed to remove photo.'); return }
+    if (field === 'portfolio_urls') setPortfolioUrls(updated)
+    else setFeaturedUrls(updated)
+    showToast('Photo removed.')
+  }
 
   async function sendInquiry() {
     if (!user) { navigate('/planner/login'); return }
@@ -156,27 +175,33 @@ export default function Detail() {
       {/* Gallery */}
       {activeTab === 'gallery' && (
         <div className="tc active">
-          {v.portfolio_urls?.length > 0 || v.featured_urls?.length > 0 ? (
+          {(portfolioUrls?.length > 0 || featuredUrls?.length > 0) ? (
             <div>
-              {v.portfolio_urls?.length > 0 && (
+              {portfolioUrls?.length > 0 && (
                 <div>
                   <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '1rem', color: 'var(--vx)', marginBottom: '1rem', fontWeight: 400 }}>Portfolio</p>
                   <div className="gal-grid" style={{ marginBottom: '2rem' }}>
-                    {v.portfolio_urls.map((url, i) => (
-                      <div key={i} className="gal-item" style={{ background: 'var(--cd)', padding: 0, overflow: 'hidden' }}>
+                    {portfolioUrls.map((url, i) => (
+                      <div key={i} className="gal-item" style={{ background: 'var(--cd)', padding: 0, overflow: 'hidden', position: 'relative' }}>
                         <img src={url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        {isOwnListing && (
+                          <button onClick={() => removePhoto('portfolio_urls', url)} style={{ position: 'absolute', top: 6, right: 6, background: 'rgba(0,0,0,.55)', color: '#fff', border: 'none', borderRadius: '50%', width: 26, height: 26, cursor: 'pointer', fontSize: '.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+                        )}
                       </div>
                     ))}
                   </div>
                 </div>
               )}
-              {v.featured_urls?.length > 0 && (
+              {featuredUrls?.length > 0 && (
                 <div>
                   <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '1rem', color: 'var(--vx)', marginBottom: '1rem', fontWeight: 400 }}>Featured Work</p>
                   <div className="gal-grid">
-                    {v.featured_urls.map((url, i) => (
-                      <div key={i} className="gal-item" style={{ background: 'var(--cd)', padding: 0, overflow: 'hidden' }}>
+                    {featuredUrls.map((url, i) => (
+                      <div key={i} className="gal-item" style={{ background: 'var(--cd)', padding: 0, overflow: 'hidden', position: 'relative' }}>
                         <img src={url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        {isOwnListing && (
+                          <button onClick={() => removePhoto('featured_urls', url)} style={{ position: 'absolute', top: 6, right: 6, background: 'rgba(0,0,0,.55)', color: '#fff', border: 'none', borderRadius: '50%', width: 26, height: 26, cursor: 'pointer', fontSize: '.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+                        )}
                       </div>
                     ))}
                   </div>
