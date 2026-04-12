@@ -6,6 +6,7 @@ import ImageUpload from '../components/ImageUpload'
 import { useVendorProfile } from '../lib/useVendorProfile'
 import { useVendorInquiries } from '../lib/useInquiries'
 import { useVendorAnalytics } from '../lib/useVendorAnalytics'
+import { supabase } from '../lib/supabase'
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 
@@ -322,8 +323,9 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
                         maxFiles={12}
                         existingUrls={profile?.portfolio_urls || []}
                         onUploadComplete={async urls => {
-                          await saveProfile({ portfolio_urls: urls })
-                          showToast(`Portfolio updated — ${urls.length} photos`)
+                          const { error } = await supabase.rpc('update_vendor_photos', { p_field: 'portfolio_urls', p_urls: urls })
+                          if (error) showToast('Error saving photos: ' + error.message)
+                          else showToast(`Portfolio updated — ${urls.length} photos`)
                         }}
                       />
                     </div>
@@ -338,8 +340,9 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
                         maxFiles={4}
                         existingUrls={profile?.featured_urls || []}
                         onUploadComplete={async urls => {
-                          await saveProfile({ featured_urls: urls })
-                          showToast(`Featured work updated — ${urls.length} photos`)
+                          const { error } = await supabase.rpc('update_vendor_photos', { p_field: 'featured_urls', p_urls: urls })
+                          if (error) showToast('Error saving photos: ' + error.message)
+                          else showToast(`Featured work updated — ${urls.length} photos`)
                         }}
                       />
                     </div>
