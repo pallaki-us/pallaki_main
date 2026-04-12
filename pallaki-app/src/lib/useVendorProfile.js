@@ -27,19 +27,9 @@ export function useVendorProfile() {
     if (!user || !supabase) { return { error: null } }
     setSaving(true)
 
-    let result
-    if (profile) {
-      // Update existing
-      result = await supabase
-        .from('vendors')
-        .update(fields)
-        .eq('profile_id', user.id)
-    } else {
-      // Insert new
-      result = await supabase
-        .from('vendors')
-        .insert({ ...fields, profile_id: user.id })
-    }
+    const result = await supabase
+      .from('vendors')
+      .upsert({ ...fields, profile_id: user.id }, { onConflict: 'profile_id' })
 
     if (!result.error) await fetchProfile()
     setSaving(false)
