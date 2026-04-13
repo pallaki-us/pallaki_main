@@ -89,7 +89,10 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
     const { data } = supabase.storage.from(BUCKET).getPublicUrl(path)
     const url = data.publicUrl + '?t=' + Date.now()
     setAvatarUrl(url)
-    const { error: saveError } = await saveProfile({ avatar_url: url })
+    const { error: saveError } = await supabase
+      .from('vendors')
+      .update({ avatar_url: url })
+      .eq('profile_id', user.id)
     if (saveError) showToast('Photo uploaded but failed to save: ' + saveError.message)
     else showToast('Profile photo updated ✨')
   }

@@ -29,10 +29,11 @@ export function useVendorProfile() {
 
     const result = await supabase
       .from('vendors')
-      .upsert({ ...fields, profile_id: user.id }, { onConflict: 'profile_id' })
+      .update(fields)
+      .eq('profile_id', user.id)
 
     if (result.error) {
-      console.error('[saveProfile] upsert failed', result.error)
+      console.error('[saveProfile] update failed', result.error)
     } else {
       await fetchProfile()
     }
