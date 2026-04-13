@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/AuthContext'
 import AnimatedLogo from './AnimatedLogo'
 import PalanquinProcession from './PalanquinProcession'
+import NotificationBell from './NotificationBell'
 
 export default function Nav({ onShowVendorListing }) {
   const { user, userType, signOut } = useAuth()
@@ -34,6 +35,7 @@ export default function Nav({ onShowVendorListing }) {
         />
       </div>
       <div className="nav-r">
+        {user && <NotificationBell userType={userType} />}
         {!user ? (
           <>
             <button className="nl nav-vendor" onClick={() => navigate('/vendor/signup')}>

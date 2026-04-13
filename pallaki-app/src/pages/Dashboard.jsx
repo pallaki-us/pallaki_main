@@ -512,7 +512,7 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
                         />
                         <div style={{ display: 'flex', gap: '.5rem', marginTop: '.4rem' }}>
                           <button style={{ fontSize: '.75rem', padding: '.35rem .9rem', background: 'var(--v)', color: '#fff', border: 'none', borderRadius: 20, cursor: 'pointer', fontFamily: "'Cormorant Garamond',serif" }}
-                            onClick={async () => { if (!replyText.trim()) return; await saveReply(inq.id, replyText); setReplyingTo(null); setReplyText('') }}>
+                            onClick={async () => { if (!replyText.trim()) return; await saveReply(inq.id, replyText, inq.profiles?.email, inq.profiles?.name, profile?.name); setReplyingTo(null); setReplyText('') }}>
                             Send Reply ✓
                           </button>
                           <button style={{ fontSize: '.75rem', padding: '.35rem .9rem', background: 'none', color: 'var(--tl)', border: '1px solid var(--br)', borderRadius: 20, cursor: 'pointer', fontFamily: "'Cormorant Garamond',serif" }}

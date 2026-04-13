@@ -3,7 +3,7 @@ import { supabase } from './supabase'
 import { useAuth } from './AuthContext'
 
 // For planners — send an inquiry
-export async function sendInquiry({ vendorId, plannerId, message, eventDate }) {
+export async function sendInquiry({ vendorId, plannerId, message, eventDate, plannerName, vendorEmail, vendorName }) {
   if (!supabase) return { error: null }
   const payload = {
     vendor_id: vendorId,
@@ -12,7 +12,13 @@ export async function sendInquiry({ vendorId, plannerId, message, eventDate }) {
     event_date: eventDate ? `${eventDate}-01` : null,
     status: 'pending',
   }
-  return supabase.from('inquiries').insert(payload)
+  const result = await supabase.from('inquiries').insert(payload)
+  if (!result.error && vendorEmail) {
+    supabase.functions.invoke('send-notification-email', {
+      body: { type: 'new_inquiry', recipientEmail: vendorEmail, recipientName: vendorName, actorName: plannerName, inquiryMessage: message },
+    }).catch(() => {})
+  }
+  return result
 }
 
 // For vendors — fetch their incoming inquiries
@@ -41,13 +47,18 @@ export function useVendorInquiries(vendorId) {
     await fetchAll()
   }
 
-  async function saveReply(id, reply) {
+  async function saveReply(id, reply, plannerEmail, plannerName, vendorName) {
     if (!supabase) return
     await supabase.from('inquiries').update({
       vendor_reply: reply,
       replied_at: new Date().toISOString(),
       status: 'replied',
     }).eq('id', id)
+    if (plannerEmail) {
+      supabase.functions.invoke('send-notification-email', {
+        body: { type: 'inquiry_reply', recipientEmail: plannerEmail, recipientName: plannerName, actorName: vendorName, inquiryMessage: reply },
+      }).catch(() => {})
+    }
     await fetchAll()
   }
 
