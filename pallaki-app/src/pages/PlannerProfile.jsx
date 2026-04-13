@@ -89,7 +89,7 @@ export default function PlannerProfile() {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--cd)', paddingTop: 64 }}>
       {/* Sticky action bar */}
-      <div style={{ position: 'sticky', top: 64, zIndex: 100, background: 'var(--cr)', borderBottom: '1px solid var(--br)', padding: '.75rem 2.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ position: 'sticky', top: 64, zIndex: 100, background: 'var(--cr)', borderBottom: '1px solid var(--br)', padding: '.75rem 1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '.5rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem' }}>
           <button className="btn-o" style={{ padding: '.45rem 1rem', fontSize: '.78rem' }} onClick={() => navigate('/')}>← Back</button>
           <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '1rem', color: 'var(--vx)', fontWeight: 400 }}>Edit My Profile</span>
@@ -181,7 +181,7 @@ export default function PlannerProfile() {
         <div className="dash-card">
           <div className="dash-card-head"><h3>👁️ Vendor Visibility</h3></div>
           <div className="dash-card-body">
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1.5rem', padding: '1rem', background: 'var(--vf)', border: '1px solid var(--br)', borderRadius: 12, marginBottom: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', padding: '1rem', background: 'var(--vf)', border: '1px solid var(--br)', borderRadius: 12, marginBottom: '1rem' }}>
               <div>
                 <p style={{ fontSize: '.88rem', fontWeight: 500, color: 'var(--vx)', marginBottom: '.3rem' }}>Allow vendors to find & contact me</p>
                 <p style={{ fontSize: '.78rem', color: 'var(--tl)', fontWeight: 300, lineHeight: 1.6 }}>Verified vendors matching your event can send you an introductory message.</p>

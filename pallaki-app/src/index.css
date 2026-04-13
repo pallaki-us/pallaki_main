@@ -202,6 +202,13 @@ nav {
 @media (max-width: 480px) {
   nav { padding: 0 .75rem; }
   .nav-vendor { display: none; }
+  .auth-right { padding: 1.5rem 1rem; }
+  .toast { font-size: .78rem; padding: .65rem 1.2rem; white-space: normal; text-align: center; max-width: 90vw; }
+}
+
+/* ── UPLOAD SLOT MOBILE ── */
+@media (max-width: 480px) {
+  .upload-slot { width: 100% !important; height: 64px !important; }
 }
 
 /* ── INQUIRY MODAL ── */

@@ -44,7 +44,17 @@
   .l-filters { padding: .6rem 1.4rem; }
   .lb { padding: 1.4rem; }
   .lg { grid-template-columns: 1fr 1fr; gap: .8rem; }
+  .other-loc-wrap input { width: 100px; }
 }
 @media (max-width: 480px) {
-  .lg { grid-template-columns: 1fr; }
+  .lh { padding: 1.2rem 1rem 1rem; }
+  .lh-title { font-size: 1.4rem; }
+  .cat-tabs { padding: 0 .75rem; }
+  .l-filters { padding: .5rem 1rem; gap: .4rem; }
+  .lb { padding: 1rem; }
+  .lg { grid-template-columns: 1fr 1fr; gap: .6rem; }
+  .vc-img { height: 130px; font-size: 2.4rem; }
+  .vc-body { padding: .75rem; }
+  .vc-name { font-size: 1rem; }
+  .vc-desc { font-size: .76rem; }
 }

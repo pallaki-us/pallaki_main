@@ -63,4 +63,19 @@
   .tc { padding: 1.4rem; }
   .ov-grid { grid-template-columns: 1fr; }
   .ctab-grid { grid-template-columns: 1fr; }
+  .ov-meta { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 480px) {
+  .dh { padding: 1.2rem 1rem; }
+  .dh-row { gap: 1rem; }
+  .dh-av { width: 60px; height: 60px; font-size: 1.8rem; }
+  .dh-info h1 { font-size: 1.2rem; }
+  .tabs-bar { padding: 0 .75rem; }
+  .tab-btn { padding: .75rem .9rem; font-size: .74rem; }
+  .tc { padding: 1rem; }
+  .ov-meta { grid-template-columns: 1fr; }
+  .gal-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+  .rv-sum { grid-template-columns: 1fr; text-align: center; }
+  .cc-card { padding: 1rem; }
 }

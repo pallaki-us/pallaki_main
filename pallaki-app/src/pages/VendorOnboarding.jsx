@@ -144,7 +144,7 @@ export default function VendorOnboarding() {
                   {CATEGORIES.map(c => <option key={c}>{c}</option>)}
                 </select>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div className="details-form" style={{ marginTop: 0 }}>
                 <div className="df"><label>City *</label><input value={city} onChange={e => setCity(e.target.value)} placeholder="e.g. Edison" /></div>
                 <div className="df"><label>State *</label>
                   <select value={state} onChange={e => setState(e.target.value)}>
