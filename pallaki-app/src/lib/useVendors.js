@@ -113,6 +113,7 @@ export function useVendor(id) {
           events: data.events_covered,
           bg: data.bg,
           is_verified: data.is_verified,
+          avatar_url: data.avatar_url || null,
           portfolio_urls: data.portfolio_urls || [],
           featured_urls: data.featured_urls || [],
           is_available: data.is_available,

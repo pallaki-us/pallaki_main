@@ -81,7 +81,11 @@ export default function Detail() {
       <div className="dh">
         <button className="dh-back" onClick={() => navigate(isOwnListing ? '/dashboard' : '/vendors')}>{isOwnListing ? '← Back to Profile' : '← Back to Results'}</button>
         <div className="dh-row">
-          <div className="dh-av">{v.icon}</div>
+          <div className="dh-av">
+            {v.avatar_url
+              ? <img src={v.avatar_url} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'inherit' }} />
+              : v.icon}
+          </div>
           <div className="dh-info">
             <h1>{v.name}</h1>
             <div className="dh-tags">
