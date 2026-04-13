@@ -40,63 +40,63 @@ export default function InquiryModal({ open, onClose, vendor }) {
   }
 
   return (
-    <div className="auth-modal-overlay open" onClick={e => e.target === e.currentTarget && handleClose()}>
-      <div className="auth-modal">
-        <div className="auth-modal-head">
-          <button className="auth-modal-close" onClick={handleClose}>✕</button>
-          <span className="auth-modal-logo">पल्लकी</span>
-          <h3>{sent ? 'Inquiry Sent!' : `Contact ${vendor?.name}`}</h3>
+    <div className="modal-overlay" onClick={e => e.target === e.currentTarget && handleClose()}>
+      <div className="modal-dialog">
+
+        <div className="modal-dialog-head">
+          <h3>{sent ? '🌸 Inquiry Sent!' : `Contact ${vendor?.name}`}</h3>
+          <button className="modal-dialog-close" onClick={handleClose}>✕</button>
         </div>
 
-        <div className="auth-modal-body">
+        <div className="modal-dialog-body">
           {sent ? (
-            <div style={{ textAlign: 'center', padding: '1rem 0' }}>
-              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🌸</div>
-              <p style={{ fontSize: '.88rem', color: 'var(--tm)', lineHeight: 1.7, marginBottom: '1.5rem', fontWeight: 300 }}>
-                Your inquiry has been sent to <strong style={{ color: 'var(--vx)' }}>{vendor?.name}</strong>. They typically respond within 24 hours.
+            <div className="modal-success">
+              <div className="modal-success-icon">🌸</div>
+              <p className="modal-success-text">
+                Your inquiry has been sent to <strong style={{ color: 'var(--vx)' }}>{vendor?.name}</strong>.
+                They typically respond within 24 hours.
               </p>
-              <button className="modal-submit" onClick={handleClose}>Done →</button>
+              <button className="modal-send-btn" onClick={handleClose}>Done →</button>
             </div>
           ) : (
-            <div className="modal-form">
-              <div style={{ background: 'var(--vf)', border: '1px solid var(--br)', borderRadius: 10, padding: '.85rem 1rem', display: 'flex', alignItems: 'center', gap: '.75rem', marginBottom: '.5rem' }}>
-                <span style={{ fontSize: '1.5rem' }}>{vendor?.icon}</span>
+            <>
+              <div className="modal-vendor-card">
+                <span className="mvc-icon">{vendor?.icon}</span>
                 <div>
-                  <div style={{ fontSize: '.88rem', fontWeight: 500, color: 'var(--vx)' }}>{vendor?.name}</div>
-                  <div style={{ fontSize: '.74rem', color: 'var(--tl)' }}>📍 {vendor?.loc} · ★ {vendor?.rating}</div>
+                  <div className="mvc-name">{vendor?.name}</div>
+                  <div className="mvc-meta">📍 {vendor?.loc} · ★ {vendor?.rating}</div>
                 </div>
               </div>
 
-              <div className="modal-field">
-                <label>Your Event Date</label>
+              <div>
+                <label className="modal-label">Event Date <span style={{ textTransform: 'none', letterSpacing: 0, fontWeight: 300 }}>(optional)</span></label>
                 <input
                   type="month"
+                  className="modal-input"
                   value={eventDate}
                   onChange={e => setEventDate(e.target.value)}
-                  style={{ padding: '.75rem .9rem', border: '1.5px solid var(--br)', borderRadius: 10, fontFamily: "'Cormorant Garamond',serif", fontSize: '.88rem', outline: 'none', background: 'var(--cr)' }}
                 />
               </div>
 
-              <div className="modal-field">
-                <label>Message</label>
+              <div>
+                <label className="modal-label">Message *</label>
                 <textarea
+                  className="modal-input modal-textarea"
                   value={message}
                   onChange={e => setMessage(e.target.value.slice(0, 500))}
                   placeholder="Tell them about your event — date, location, what you're looking for…"
-                  style={{ padding: '.75rem .9rem', border: '1.5px solid var(--br)', borderRadius: 10, fontFamily: "'Cormorant Garamond',serif", fontSize: '.88rem', outline: 'none', resize: 'vertical', minHeight: 110, background: 'var(--cr)', width: '100%' }}
                 />
-                <div style={{ fontSize: '.68rem', color: 'var(--tl)', textAlign: 'right' }}>{message.length}/500</div>
+                <div className="modal-char-count">{message.length}/500</div>
               </div>
 
-              <button className="modal-submit" onClick={handleSend} disabled={sending}>
+              <button className="modal-send-btn" onClick={handleSend} disabled={sending}>
                 {sending ? 'Sending…' : 'Send Inquiry →'}
               </button>
-              <p style={{ fontSize: '.72rem', color: 'var(--tl)', textAlign: 'center', marginTop: '.3rem' }}>
-                ✓ Verified vendor · Responds within 24 hours
-              </p>
-            </div>
+              <p className="modal-footer-note">✓ Verified vendor · Responds within 24 hours</p>
+            </>
           )}
         </div>
+
       </div>
     </div>
   )
