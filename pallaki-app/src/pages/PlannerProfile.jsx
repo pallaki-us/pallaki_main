@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/AuthContext'
 import { usePlannerProfile } from '../lib/usePlannerProfile'
+import { usePlannerInquiries } from '../lib/useInquiries'
 import { showToast } from '../lib/toast'
 
 const SERVICES = ['📷 Photography','🪷 Mehndi Artist','🎥 Videography','💄 Bridal Makeup','🍛 Catering','🌸 Mandap & Decor','🎵 Music & DJ','🛕 Priest / Pandit','👗 Bridal Lehenga','🏛️ Wedding Venue']
@@ -14,6 +15,7 @@ export default function PlannerProfile() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const { profile, saving, saveProfile } = usePlannerProfile()
+  const { inquiries } = usePlannerInquiries()
 
   const [fname, setFname] = useState('')
   const [lname, setLname] = useState('')
@@ -194,6 +196,68 @@ export default function PlannerProfile() {
                 <strong style={{ color: 'var(--vx)' }}>Your privacy matters.</strong> We only share your details with vendors you choose to contact.
               </p>
             </div>
+          </div>
+        </div>
+
+        {/* My Inquiries */}
+        <div className="dash-card">
+          <div className="dash-card-head">
+            <h3>💌 My Inquiries</h3>
+            {inquiries.filter(i => i.status === 'replied').length > 0 && (
+              <span style={{ fontSize: '.72rem', background: 'var(--vf)', border: '1px solid var(--v)', color: 'var(--v)', borderRadius: 20, padding: '.2rem .7rem', fontWeight: 500 }}>
+                {inquiries.filter(i => i.status === 'replied').length} replied
+              </span>
+            )}
+          </div>
+          <div className="dash-card-body" style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
+            {inquiries.length === 0 ? (
+              <p style={{ fontSize: '.88rem', color: 'var(--tl)', textAlign: 'center', padding: '2rem', fontStyle: 'italic' }}>
+                No inquiries sent yet — <a href="/vendors" style={{ color: 'var(--v)' }}>browse vendors</a> to get started.
+              </p>
+            ) : inquiries.map(inq => {
+              const v = inq.vendors
+              const hasReply = !!inq.vendor_reply
+              return (
+                <div key={inq.id} style={{ padding: '1rem', background: hasReply ? 'var(--vf)' : 'var(--wh)', border: `1px solid ${hasReply ? 'rgba(196,132,140,.3)' : 'var(--br)'}`, borderRadius: 12 }}>
+                  {/* Vendor info */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '.6rem', gap: '.75rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '.65rem' }}>
+                      <div style={{ width: 38, height: 38, borderRadius: 10, background: 'var(--vp)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', flexShrink: 0, overflow: 'hidden' }}>
+                        {v?.avatar_url
+                          ? <img src={v.avatar_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          : v?.icon || '🌸'}
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '.88rem', fontWeight: 500, color: 'var(--vx)' }}>{v?.name || 'Vendor'}</div>
+                        <div style={{ fontSize: '.72rem', color: 'var(--tl)' }}>{v?.category} · {v?.city}, {v?.state}</div>
+                      </div>
+                    </div>
+                    <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                      <div style={{ fontSize: '.68rem', color: 'var(--tl)' }}>{new Date(inq.created_at).toLocaleDateString()}</div>
+                      <div style={{ fontSize: '.68rem', marginTop: 2, fontWeight: 500,
+                        color: inq.status === 'replied' ? '#3a7a3a' : inq.status === 'archived' ? 'var(--tl)' : 'var(--v)' }}>
+                        {inq.status === 'replied' ? '✓ Replied' : inq.status === 'archived' ? 'Archived' : 'Awaiting reply'}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Original message */}
+                  <div style={{ fontSize: '.83rem', color: 'var(--tm)', fontStyle: 'italic', lineHeight: 1.6, marginBottom: hasReply ? '.75rem' : 0 }}>
+                    "{inq.message}"
+                  </div>
+
+                  {/* Vendor reply */}
+                  {hasReply && (
+                    <div style={{ background: 'var(--cr)', border: '1px solid var(--br)', borderRadius: 8, padding: '.7rem .9rem' }}>
+                      <div style={{ fontSize: '.65rem', textTransform: 'uppercase', letterSpacing: '.08em', color: 'var(--tl)', marginBottom: '.3rem', fontWeight: 500 }}>
+                        {v?.name || 'Vendor'} replied {inq.replied_at ? `· ${new Date(inq.replied_at).toLocaleDateString()}` : ''}
+                      </div>
+                      <div style={{ fontSize: '.84rem', color: 'var(--vx)', lineHeight: 1.65 }}>{inq.vendor_reply}</div>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
           </div>
         </div>
 

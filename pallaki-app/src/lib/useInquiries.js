@@ -59,3 +59,27 @@ export function useVendorInquiries(vendorId) {
 
   return { inquiries, loading, updateStatus, saveReply, archiveInquiry, refetch: fetchAll }
 }
+
+// For planners — fetch their sent inquiries with vendor info
+export function usePlannerInquiries() {
+  const { user } = useAuth()
+  const [inquiries, setInquiries] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (!user || !supabase) { setLoading(false); return }
+    fetchAll()
+  }, [user])
+
+  async function fetchAll() {
+    const { data } = await supabase
+      .from('inquiries')
+      .select(`*, vendors (id, name, category, city, state, icon, avatar_url)`)
+      .eq('planner_id', user.id)
+      .order('created_at', { ascending: false })
+    setInquiries(data || [])
+    setLoading(false)
+  }
+
+  return { inquiries, loading }
+}
