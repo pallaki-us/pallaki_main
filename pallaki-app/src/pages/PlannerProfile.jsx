@@ -5,7 +5,7 @@ import { usePlannerProfile } from '../lib/usePlannerProfile'
 import { showToast } from '../lib/toast'
 
 const SERVICES = ['📷 Photography','🪷 Mehndi Artist','🎥 Videography','💄 Bridal Makeup','🍛 Catering','🌸 Mandap & Decor','🎵 Music & DJ','🛕 Priest / Pandit','👗 Bridal Lehenga','🏛️ Wedding Venue']
-const STATES = ['California','Georgia','Illinois','Maryland','New Jersey','New York','Texas','Virginia','Washington']
+const STATES = ['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming']
 const TRADITIONS = ['Hindu (North Indian)','Hindu (South Indian)','Muslim / Nikah','Sikh','Christian','Jain','Mixed / Fusion','Other']
 const GUEST_OPTIONS = ['Under 50','50 - 100','100 - 200','200 - 400','400+']
 const BUDGET_OPTIONS = ['Under $2,000','$2,000 - $5,000','$5,000 - $10,000','$10,000 - $25,000','$25,000 - $50,000','$50,000+','Prefer not to say']
