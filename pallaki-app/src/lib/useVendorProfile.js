@@ -31,10 +31,14 @@ export function useVendorProfile() {
       .from('vendors')
       .upsert({ ...fields, profile_id: user.id }, { onConflict: 'profile_id' })
 
-    if (!result.error) await fetchProfile()
+    if (result.error) {
+      console.error('[saveProfile] upsert failed', result.error)
+    } else {
+      await fetchProfile()
+    }
     setSaving(false)
     return result
   }
 
-  return { profile, loading, saving, saveProfile }
+  return { profile, loading, saving, saveProfile, fetchProfile }
 }

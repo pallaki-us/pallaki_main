@@ -20,7 +20,7 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
     navigate('/')
   }
   const navigate = useNavigate()
-  const { profile, saving, saveProfile } = useVendorProfile()
+  const { profile, saving, saveProfile, fetchProfile } = useVendorProfile()
   const { inquiries, updateStatus, saveReply, archiveInquiry } = useVendorInquiries(profile?.id)
   const [replyingTo, setReplyingTo] = useState(null)
   const [replyText, setReplyText] = useState('')
@@ -89,8 +89,9 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
     const { data } = supabase.storage.from(BUCKET).getPublicUrl(path)
     const url = data.publicUrl + '?t=' + Date.now()
     setAvatarUrl(url)
-    await saveProfile({ avatar_url: url })
-    showToast('Profile photo updated ✨')
+    const { error: saveError } = await saveProfile({ avatar_url: url })
+    if (saveError) showToast('Photo uploaded but failed to save: ' + saveError.message)
+    else showToast('Profile photo updated ✨')
   }
 
   async function handleSave() {
@@ -325,7 +326,7 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
                         onUploadComplete={async urls => {
                           const { error } = await supabase.rpc('update_vendor_photos', { p_field: 'portfolio_urls', p_urls: urls })
                           if (error) showToast('Error saving photos: ' + error.message)
-                          else showToast(`Portfolio updated — ${urls.length} photos`)
+                          else { showToast(`Portfolio updated — ${urls.length} photos`); await fetchProfile() }
                         }}
                       />
                     </div>
@@ -342,7 +343,7 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
                         onUploadComplete={async urls => {
                           const { error } = await supabase.rpc('update_vendor_photos', { p_field: 'featured_urls', p_urls: urls })
                           if (error) showToast('Error saving photos: ' + error.message)
-                          else showToast(`Featured work updated — ${urls.length} photos`)
+                          else { showToast(`Featured work updated — ${urls.length} photos`); await fetchProfile() }
                         }}
                       />
                     </div>
