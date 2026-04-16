@@ -25,7 +25,7 @@ const INTAKE_STEPS = [
   },
   {
     id: 'budget',
-    question: 'What's your approximate budget for this service?',
+    question: "What's your approximate budget for this service?",
     options: ['Under $2,000', '$2,000–$5,000', '$5,000–$10,000', '$10,000–$25,000', '$25,000+', 'Prefer not to say'],
   },
 ]
