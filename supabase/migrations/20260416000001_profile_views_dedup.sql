@@ -41,8 +41,11 @@ CREATE OR REPLACE FUNCTION public.record_profile_view(p_vendor_id uuid, p_viewer
 RETURNS void
 LANGUAGE sql
 SECURITY DEFINER
+SET search_path = public
 AS $$
   INSERT INTO public.profile_views (vendor_id, viewer_id, view_date, viewed_at)
   VALUES (p_vendor_id, p_viewer_id, CURRENT_DATE, now())
   ON CONFLICT (vendor_id, viewer_id, view_date) DO NOTHING;
 $$;
+
+GRANT EXECUTE ON FUNCTION public.record_profile_view(uuid, uuid) TO authenticated;

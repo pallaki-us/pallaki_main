@@ -34,6 +34,7 @@ export default function Detail() {
     if (!user || userType !== 'planner') return
     if (isOwnListing) return
     supabase.rpc('record_profile_view', { p_vendor_id: vendorId, p_viewer_id: user.id })
+      .then(({ error }) => { if (error) console.error('profile_view error:', error) })
   }, [vendorId, user?.id, userType, isOwnListing])
 
   useEffect(() => {
