@@ -447,21 +447,8 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
                       <div key={pid} style={{ padding: '1rem', background: hasNew ? 'var(--vf)' : 'var(--wh)', border: `1px solid ${hasNew ? 'rgba(196,132,140,.3)' : 'var(--br)'}`, borderRadius: 12 }}>
                         {/* Planner header */}
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '.75rem', marginBottom: '.75rem' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem' }}>
-                            <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--v)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: '#fff', fontSize: '.88rem', flexShrink: 0 }}>
-                              {(profile?.name || profile?.email || '?').charAt(0).toUpperCase()}
-                            </div>
-                            <div>
-                              <div style={{ fontSize: '.86rem', fontWeight: 500, color: 'var(--vx)' }}>
-                                {profile?.name || profile?.email}
-                                {profile?.event_type && <span style={{ fontWeight: 300, color: 'var(--tm)' }}> · {profile.event_type}</span>}
-                              </div>
-                              <div style={{ fontSize: '.72rem', color: 'var(--tl)', marginTop: '.15rem', display: 'flex', gap: '.75rem', flexWrap: 'wrap' }}>
-                                {profile?.email && <span>✉ {profile.email}</span>}
-                                {profile?.phone && <span>📞 {profile.phone}</span>}
-                                {profile?.city && <span>📍 {profile.city}{profile.state ? `, ${profile.state}` : ''}</span>}
-                              </div>
-                            </div>
+                          <div style={{ fontSize: '.9rem', fontWeight: 600, color: 'var(--vx)' }}>
+                            {profile?.name || profile?.email || 'Unknown Planner'}
                           </div>
                           {hasNew && <span style={{ fontSize: '.68rem', color: 'var(--v)', fontWeight: 600, flexShrink: 0 }}>New</span>}
                         </div>
