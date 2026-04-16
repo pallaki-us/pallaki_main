@@ -36,8 +36,6 @@ ${services ? `- Services offered: ${services}` : ''}
 ${vendor.events ? `- Events covered: ${vendor.events}` : ''}
 ${languages ? `- Languages spoken: ${languages}` : ''}
 ${areas ? `- Service areas: ${areas}` : ''}
-${vendor.is_available !== undefined ? `- Currently available: ${vendor.is_available ? 'Yes' : 'No'}` : ''}
-${vendor.availability_note ? `- Availability note: ${vendor.availability_note}` : ''}
 
 Your role:
 - Answer questions warmly and helpfully as if you are part of ${vendor.name}'s team
