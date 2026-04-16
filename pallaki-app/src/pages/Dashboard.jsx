@@ -448,7 +448,7 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
                         {/* Planner header */}
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '.75rem', marginBottom: '.75rem' }}>
                           <div style={{ fontSize: '.9rem', fontWeight: 600, color: 'var(--vx)' }}>
-                            {profile?.name || profile?.email || 'Unknown Planner'}
+                            {profile?.name || profile?.email || items[0]?.intake_data?.contactEmail || 'Planner'}
                           </div>
                           {hasNew && <span style={{ fontSize: '.68rem', color: 'var(--v)', fontWeight: 600, flexShrink: 0 }}>New</span>}
                         </div>
