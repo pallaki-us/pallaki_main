@@ -234,7 +234,7 @@ export default function VendorChat({ open, onClose, vendor }) {
                   type="text"
                   value={contactName}
                   onChange={e => setContactName(e.target.value)}
-                  placeholder="First and last name"
+                  placeholder=""
                   style={{ marginBottom: 0 }}
                 />
               </div>
@@ -245,7 +245,7 @@ export default function VendorChat({ open, onClose, vendor }) {
                   type="email"
                   value={contactEmail}
                   onChange={e => setContactEmail(e.target.value)}
-                  placeholder="your@email.com"
+                  placeholder=""
                   style={{ marginBottom: 0 }}
                 />
               </div>
@@ -256,7 +256,7 @@ export default function VendorChat({ open, onClose, vendor }) {
                   type="tel"
                   value={contactPhone}
                   onChange={e => setContactPhone(e.target.value)}
-                  placeholder="+1 (555) 000-0000"
+                  placeholder=""
                   style={{ marginBottom: 0 }}
                 />
               </div>

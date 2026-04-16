@@ -105,10 +105,10 @@ export default function PlannerProfile() {
           <div className="dash-card-head"><h3>👤 Contact Information</h3><span style={{ fontSize: '.72rem', color: 'var(--tl)' }}>Shared with vendors only when you send an inquiry</span></div>
           <div className="dash-card-body">
             <div className="details-form">
-              <div className="df"><label>First Name</label><input value={fname} onChange={e => setFname(e.target.value)} placeholder="Priya" /></div>
-              <div className="df"><label>Last Name</label><input value={lname} onChange={e => setLname(e.target.value)} placeholder="Sharma" /></div>
+              <div className="df"><label>First Name</label><input value={fname} onChange={e => setFname(e.target.value)} /></div>
+              <div className="df"><label>Last Name</label><input value={lname} onChange={e => setLname(e.target.value)} /></div>
               <div className="df"><label>Email Address</label><input type="email" value={user?.email || ''} disabled style={{ opacity: .6 }} /></div>
-              <div className="df"><label>Phone / WhatsApp</label><input type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+1 (555) 000-0000" /></div>
+              <div className="df"><label>Phone / WhatsApp</label><input type="tel" value={phone} onChange={e => setPhone(e.target.value)} /></div>
             </div>
           </div>
         </div>
@@ -118,15 +118,15 @@ export default function PlannerProfile() {
           <div className="dash-card-head"><h3>📍 Location</h3></div>
           <div className="dash-card-body">
             <div className="details-form">
-              <div className="df"><label>Your City</label><input value={city} onChange={e => setCity(e.target.value)} placeholder="e.g. Edison" /></div>
+              <div className="df"><label>Your City</label><input value={city} onChange={e => setCity(e.target.value)} /></div>
               <div className="df"><label>State</label>
                 <select value={state} onChange={e => setState(e.target.value)}>
                   <option value="">Select state...</option>
                   {STATES.map(s => <option key={s}>{s}</option>)}
                 </select>
               </div>
-              <div className="df"><label>ZIP Code</label><input value={zip} onChange={e => setZip(e.target.value)} placeholder="e.g. 08817" maxLength={10} /></div>
-              <div className="df"><label>Event Venue City</label><input value={venueCity} onChange={e => setVenueCity(e.target.value)} placeholder="e.g. New York, NY" /></div>
+              <div className="df"><label>ZIP Code</label><input value={zip} onChange={e => setZip(e.target.value)} maxLength={10} /></div>
+              <div className="df"><label>Event Venue City</label><input value={venueCity} onChange={e => setVenueCity(e.target.value)} /></div>
             </div>
           </div>
         </div>
@@ -159,7 +159,7 @@ export default function PlannerProfile() {
                 </select>
               </div>
               <div className="df full"><label>Special Notes for Vendors</label>
-                <textarea value={notes} onChange={e => setNotes(e.target.value)} style={{ resize: 'vertical', minHeight: 100 }} placeholder="e.g. Outdoor ceremony, vegetarian catering only, need someone who understands Telugu rituals..." />
+                <textarea value={notes} onChange={e => setNotes(e.target.value)} style={{ resize: 'vertical', minHeight: 100 }} />
               </div>
             </div>
           </div>

@@ -154,7 +154,7 @@ export default function LoginForm({ role }) {
           type="email"
           value={email}
           onChange={e => { setEmail(e.target.value); setFieldErrors(p => ({ ...p, email: '' })) }}
-          placeholder="you@example.com"
+          placeholder=""
           autoComplete="email"
           className={fieldErrors.email ? 'err' : ''}
         />
@@ -172,7 +172,7 @@ export default function LoginForm({ role }) {
             type={showPw ? 'text' : 'password'}
             value={password}
             onChange={e => { setPassword(e.target.value); setFieldErrors(p => ({ ...p, password: '' })) }}
-            placeholder="Your password"
+            placeholder=""
             autoComplete="current-password"
             className={fieldErrors.password ? 'err' : ''}
           />

@@ -117,7 +117,7 @@ export default function SignupForm({ role }) {
           type="text"
           value={name}
           onChange={e => { setName(e.target.value); setFieldErrors(p => ({ ...p, name: '' })) }}
-          placeholder={isVendor ? 'e.g. Riya Kapoor Photography' : 'Priya'}
+          placeholder=""
           autoComplete={isVendor ? 'organization' : 'given-name'}
           className={fieldErrors.name ? 'err' : ''}
         />
@@ -131,7 +131,7 @@ export default function SignupForm({ role }) {
           type="email"
           value={email}
           onChange={e => { setEmail(e.target.value); setFieldErrors(p => ({ ...p, email: '' })) }}
-          placeholder={isVendor ? 'you@business.com' : 'you@example.com'}
+          placeholder=""
           autoComplete="email"
           className={fieldErrors.email ? 'err' : ''}
         />
@@ -146,7 +146,7 @@ export default function SignupForm({ role }) {
             type={showPw ? 'text' : 'password'}
             value={password}
             onChange={e => { setPassword(e.target.value); setFieldErrors(p => ({ ...p, password: '' })) }}
-            placeholder="Min. 8 characters"
+            placeholder=""
             autoComplete="new-password"
             className={fieldErrors.password ? 'err' : ''}
           />

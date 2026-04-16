@@ -215,21 +215,21 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
                   </div>
                 </div>
                 <div className="details-form" style={{ marginTop: '1.5rem' }}>
-                  <div className="df"><label>Business Name</label><input type="text" value={bizName} onChange={e => setBizName(e.target.value)} placeholder="e.g. Riya Kapoor Photography" /></div>
+                  <div className="df"><label>Business Name</label><input type="text" value={bizName} onChange={e => setBizName(e.target.value)} /></div>
                   <div className="df"><label>Category</label>
                     <select value={category} onChange={e => setCategory(e.target.value)}>
                       {['Photography','Videography','Mehndi Artist','Bridal Makeup','Catering','Mandap & Decor','Music & DJ','Priests & Pandits'].map(c => <option key={c}>{c}</option>)}
                     </select>
                   </div>
-                  <div className="df"><label>City</label><input type="text" value={city} onChange={e => setCity(e.target.value)} placeholder="New York" /></div>
+                  <div className="df"><label>City</label><input type="text" value={city} onChange={e => setCity(e.target.value)} /></div>
                   <div className="df"><label>State</label>
                     <select value={state} onChange={e => setState(e.target.value)}>
                       {['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming'].map(s => <option key={s}>{s}</option>)}
                     </select>
                   </div>
-                  <div className="df"><label>Phone</label><input type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+1 (555) 000-0000" /></div>
-                  <div className="df"><label>Website / Instagram</label><input type="url" value={website} onChange={e => setWebsite(e.target.value)} placeholder="instagram.com/yourbusiness" /></div>
-                  <div className="df full"><label>Business Description</label><textarea style={{ resize: 'vertical', minHeight: 100 }} value={description} onChange={e => setDescription(e.target.value)} placeholder="Tell families what makes your services special…" /></div>
+                  <div className="df"><label>Phone</label><input type="tel" value={phone} onChange={e => setPhone(e.target.value)} /></div>
+                  <div className="df"><label>Website / Instagram</label><input type="url" value={website} onChange={e => setWebsite(e.target.value)} /></div>
+                  <div className="df full"><label>Business Description</label><textarea style={{ resize: 'vertical', minHeight: 100 }} value={description} onChange={e => setDescription(e.target.value)} /></div>
                 </div>
                 <div style={{ marginTop: '1rem' }}>
                   <p style={{ fontSize: '.72rem', textTransform: 'uppercase', letterSpacing: '.08em', color: 'var(--tl)', fontWeight: 500, marginBottom: '.6rem' }}>Services Offered</p>
@@ -275,7 +275,7 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
                       value={newArea}
                       onChange={e => setNewArea(e.target.value)}
                       onKeyDown={e => { if (e.key === 'Enter' && newArea.trim()) { setServiceAreas(p => [...p, newArea.trim()]); setNewArea('') } }}
-                      placeholder="e.g. Edison, NJ"
+                      placeholder=""
                       style={{ flex: 1, padding: '.65rem .9rem', border: '1.5px solid var(--br)', borderRadius: 10, fontFamily: "'Cormorant Garamond',serif", fontSize: '.88rem', outline: 'none', background: 'var(--cr)' }}
                     />
                     <button className="dash-btn dash-btn-out" style={{ flexShrink: 0 }}

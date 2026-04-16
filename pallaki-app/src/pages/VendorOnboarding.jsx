@@ -138,21 +138,21 @@ export default function VendorOnboarding() {
             <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '1.6rem', color: 'var(--vx)', marginBottom: '.4rem', fontWeight: 400 }}>Tell us about your business</h2>
             <p style={{ fontSize: '.88rem', color: 'var(--tl)', marginBottom: '2rem', fontWeight: 300 }}>This is what families will see first when they find you on Pallaki.</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
-              <div className="df"><label>Business Name *</label><input value={bizName} onChange={e => setBizName(e.target.value)} placeholder="e.g. Riya Kapoor Photography" /></div>
+              <div className="df"><label>Business Name *</label><input value={bizName} onChange={e => setBizName(e.target.value)} /></div>
               <div className="df"><label>Category *</label>
                 <select value={category} onChange={e => setCategory(e.target.value)}>
                   {CATEGORIES.map(c => <option key={c}>{c}</option>)}
                 </select>
               </div>
               <div className="details-form" style={{ marginTop: 0 }}>
-                <div className="df"><label>City *</label><input value={city} onChange={e => setCity(e.target.value)} placeholder="e.g. Edison" /></div>
+                <div className="df"><label>City *</label><input value={city} onChange={e => setCity(e.target.value)} /></div>
                 <div className="df"><label>State *</label>
                   <select value={state} onChange={e => setState(e.target.value)}>
                     {STATES.map(s => <option key={s}>{s}</option>)}
                   </select>
                 </div>
               </div>
-              <div className="df"><label>Phone Number</label><input type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+1 (555) 000-0000" /></div>
+              <div className="df"><label>Phone Number</label><input type="tel" value={phone} onChange={e => setPhone(e.target.value)} /></div>
             </div>
           </div>
         )}
@@ -168,7 +168,7 @@ export default function VendorOnboarding() {
                 <textarea
                   value={description}
                   onChange={e => setDescription(e.target.value.slice(0, 500))}
-                  placeholder="Describe your services, experience, and what makes you unique for South Asian events…"
+                  placeholder=""
                   style={{ resize: 'vertical', minHeight: 120 }}
                 />
                 <div style={{ fontSize: '.68rem', color: 'var(--tl)', textAlign: 'right' }}>{description.length}/500</div>
@@ -181,8 +181,8 @@ export default function VendorOnboarding() {
                   ))}
                 </div>
               </div>
-              <div className="df"><label>Website</label><input type="url" value={website} onChange={e => setWebsite(e.target.value)} placeholder="https://yourwebsite.com" /></div>
-              <div className="df"><label>Instagram</label><input value={instagram} onChange={e => setInstagram(e.target.value)} placeholder="@yourbusiness" /></div>
+              <div className="df"><label>Website</label><input type="url" value={website} onChange={e => setWebsite(e.target.value)} /></div>
+              <div className="df"><label>Instagram</label><input value={instagram} onChange={e => setInstagram(e.target.value)} /></div>
             </div>
           </div>
         )}
