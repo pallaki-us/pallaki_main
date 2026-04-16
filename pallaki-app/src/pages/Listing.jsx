@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { EVENT_CATS } from '../data/vendors'
 import { useVendors } from '../lib/useVendors'
 import { useAuth } from '../lib/AuthContext'
+import { trackSearch } from '../lib/analytics'
 
 export default function Listing() {
   const { user } = useAuth()
@@ -21,7 +22,7 @@ export default function Listing() {
   const totalPages = Math.ceil(total / 9)
   const tabs = EVENT_CATS['Wedding']
 
-  function switchCat(cat) { setActiveCat(cat); setPage(1) }
+  function switchCat(cat) { setActiveCat(cat); setPage(1); trackSearch('', cat, city) }
 
   function handleVendorClick(id) {
     if (!user) { navigate('/planner/login'); return }

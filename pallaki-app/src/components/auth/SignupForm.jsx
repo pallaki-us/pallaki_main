@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../../lib/AuthContext'
 import RoleToggle from './RoleToggle'
+import { trackSignup } from '../../lib/analytics'
 
 function validate(name, email, password, isVendor) {
   const errs = {}
@@ -57,6 +58,7 @@ export default function SignupForm({ role }) {
       return
     }
 
+    trackSignup(role)
     setVerifyEmail(email.toLowerCase().trim())
   }
 

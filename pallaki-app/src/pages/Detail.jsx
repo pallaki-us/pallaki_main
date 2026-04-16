@@ -6,6 +6,7 @@ import { showToast } from '../lib/toast'
 import { supabase } from '../lib/supabase'
 import InquiryModal from '../components/InquiryModal'
 import VendorChat from '../components/VendorChat'
+import { trackVendorProfileView, trackBookingStarted, trackChatOpened } from '../lib/analytics'
 
 export default function Detail() {
   const { id: vendorId } = useParams()
@@ -21,11 +22,12 @@ export default function Detail() {
   const [portfolioUrls, setPortfolioUrls] = useState(null)
   const [featuredUrls, setFeaturedUrls] = useState(null)
 
-  // Sync local URL state when vendor loads
+  // Sync local URL state when vendor loads + fire GA4 profile view
   useEffect(() => {
     if (!v) return
     setPortfolioUrls(v.portfolio_urls || [])
     setFeaturedUrls(v.featured_urls || [])
+    if (!isOwnListing) trackVendorProfileView(v.id, v.name, v.category)
   }, [v?.id])
 
   // Track profile view — fires once user identity is confirmed, skips own listing
@@ -167,7 +169,7 @@ export default function Detail() {
                 <h3>Contact this Vendor</h3>
                 <div className="cc-row">📍 <span>{v.loc}</span></div>
                 <div className="cc-row">✓ Identity verified by Pallaki</div>
-                <button className="inq-btn chat-now-btn" onClick={() => setChatOpen(true)}>💬 Chat Now — Instant answers</button>
+                <button className="inq-btn chat-now-btn" onClick={() => { setChatOpen(true); trackChatOpened(v.id, v.name) }}>💬 Chat Now — Instant answers</button>
               </div>
             )}
           </div>
@@ -301,7 +303,7 @@ export default function Detail() {
                 <h3>Contact this Vendor</h3>
                 <div className="cc-row">📍 <span>{v.loc}</span></div>
                 <div className="cc-row">✓ Identity verified by Pallaki</div>
-                <button className="inq-btn chat-now-btn" onClick={() => setChatOpen(true)}>💬 Chat Now — Instant answers</button>
+                <button className="inq-btn chat-now-btn" onClick={() => { setChatOpen(true); trackChatOpened(v.id, v.name) }}>💬 Chat Now — Instant answers</button>
               </div>
               <div className="gr-plug">
                 <span className="gr-logo">⭐</span>

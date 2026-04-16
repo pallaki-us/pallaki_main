@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/AuthContext'
 import { sendInquiry } from '../lib/useInquiries'
 import { showToast } from '../lib/toast'
+import { trackBookingStarted, trackBookingCompleted } from '../lib/analytics'
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
@@ -89,6 +90,7 @@ export default function VendorChat({ open, onClose, vendor }) {
       setStep(s => s + 1)
     } else {
       setMode('contact')
+      trackBookingStarted(vendor?.id, vendor?.name)
     }
   }
 
@@ -106,6 +108,7 @@ export default function VendorChat({ open, onClose, vendor }) {
     })
     setSubmitting(false)
     if (error) { showToast('Something went wrong. Try again.'); return }
+    trackBookingCompleted(vendor?.id, vendor?.name)
     setMode('done')
   }
 
