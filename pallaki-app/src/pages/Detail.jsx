@@ -28,14 +28,18 @@ export default function Detail() {
     setFeaturedUrls(v.featured_urls || [])
   }, [v?.id])
 
-  // Track profile view — only for logged-in planners, only on non-own listings
+  // Track profile view — fires once user identity is confirmed, skips own listing
   useEffect(() => {
-    if (!vendorId || !supabase) return
-    if (!user || userType !== 'planner') return
+    if (!vendorId || !supabase || !user) return
     if (isOwnListing) return
-    supabase.rpc('record_profile_view', { p_vendor_id: vendorId, p_viewer_id: user.id })
+    const today = new Date().toISOString().split('T')[0]
+    supabase.from('profile_views')
+      .upsert(
+        { vendor_id: vendorId, viewer_id: user.id, view_date: today, viewed_at: new Date().toISOString() },
+        { onConflict: 'vendor_id,viewer_id,view_date', ignoreDuplicates: true }
+      )
       .then(({ error }) => { if (error) console.error('profile_view error:', error) })
-  }, [vendorId, user?.id, userType, isOwnListing])
+  }, [vendorId, user?.id, isOwnListing])
 
   useEffect(() => {
     if (!vendorId || !supabase) return
