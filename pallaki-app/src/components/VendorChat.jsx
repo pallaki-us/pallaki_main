@@ -30,12 +30,17 @@ const INTAKE_STEPS = [
   },
 ]
 
-function buildMessage(answers, notes) {
+function buildMessage(answers, notes, contactEmail, contactPhone) {
   let msg = `Hi! I'm interested in booking your services.\n\n`
   msg += `Event Type: ${answers.eventType}\n`
   msg += `Timeline: ${answers.eventDate}\n`
   msg += `Guest Count: ${answers.guestCount}\n`
   msg += `Budget: ${answers.budget}`
+  if (contactEmail || contactPhone) {
+    msg += `\n\nBest way to reach me:`
+    if (contactEmail) msg += `\nEmail: ${contactEmail}`
+    if (contactPhone) msg += `\nPhone: ${contactPhone}`
+  }
   if (notes.trim()) msg += `\n\nAdditional notes: ${notes.trim()}`
   return msg
 }
@@ -46,9 +51,11 @@ export default function VendorChat({ open, onClose, vendor }) {
   const bottomRef = useRef(null)
 
   // Intake state
-  const [mode, setMode] = useState('intake') // 'intake' | 'confirm' | 'done' | 'chat'
+  const [mode, setMode] = useState('intake') // 'intake' | 'contact' | 'confirm' | 'done' | 'chat'
   const [step, setStep] = useState(0)
   const [answers, setAnswers] = useState({})
+  const [contactEmail, setContactEmail] = useState('')
+  const [contactPhone, setContactPhone] = useState('')
   const [notes, setNotes] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
@@ -60,6 +67,7 @@ export default function VendorChat({ open, onClose, vendor }) {
   useEffect(() => {
     if (open) {
       setMode('intake'); setStep(0); setAnswers({}); setNotes('')
+      setContactEmail(user?.email || ''); setContactPhone('')
       setMessages([]); setInput('')
     }
   }, [open, vendor?.id])
@@ -78,21 +86,21 @@ export default function VendorChat({ open, onClose, vendor }) {
     if (step < INTAKE_STEPS.length - 1) {
       setStep(s => s + 1)
     } else {
-      setMode('confirm')
+      setMode('contact')
     }
   }
 
   async function handleSubmit() {
     if (!user) { onClose(); navigate('/planner/login'); return }
     setSubmitting(true)
-    const message = buildMessage(answers, notes)
+    const message = buildMessage(answers, notes, contactEmail, contactPhone)
     const { error } = await sendInquiry({
       vendorId: vendor.id,
       plannerId: user.id,
       message,
       vendorEmail: vendor.email,
       vendorName: vendor.name,
-      intakeData: answers,
+      intakeData: { ...answers, contactEmail: contactEmail || null, contactPhone: contactPhone || null },
     })
     setSubmitting(false)
     if (error) { showToast('Something went wrong. Try again.'); return }
@@ -192,6 +200,76 @@ export default function VendorChat({ open, onClose, vendor }) {
     )
   }
 
+  // ── Contact view ─────────────────────────────────────────────────────────
+  if (mode === 'contact') {
+    return (
+      <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+        <div className="modal-dialog" style={{ maxWidth: 500 }}>
+          {header}
+          <div className="chat-msgs" style={{ height: 'auto', maxHeight: 320 }}>
+            {INTAKE_STEPS.map(s => (
+              <div key={s.id}>
+                <div className="chat-msg-row chat-msg-row-ai">
+                  <div className="chat-bubble chat-bubble-ai">{s.question}</div>
+                </div>
+                <div className="chat-msg-row chat-msg-row-user">
+                  <div className="chat-bubble chat-bubble-user">{answers[s.id]}</div>
+                </div>
+              </div>
+            ))}
+            <div className="chat-msg-row chat-msg-row-ai">
+              <div className="chat-bubble chat-bubble-ai">How can {vendor?.name} reach you directly?</div>
+            </div>
+            <div ref={bottomRef} />
+          </div>
+
+          <div className="chat-input-row">
+            <div className="details-form" style={{ gap: '.6rem', marginBottom: '.75rem' }}>
+              <div className="df full">
+                <label style={{ fontSize: '.7rem', textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--tl)', fontWeight: 500 }}>Email</label>
+                <input
+                  className="modal-input"
+                  type="email"
+                  value={contactEmail}
+                  onChange={e => setContactEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  style={{ marginBottom: 0 }}
+                />
+              </div>
+              <div className="df full">
+                <label style={{ fontSize: '.7rem', textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--tl)', fontWeight: 500 }}>Phone / WhatsApp <span style={{ textTransform: 'none', letterSpacing: 0, fontWeight: 300 }}>(optional)</span></label>
+                <input
+                  className="modal-input"
+                  type="tel"
+                  value={contactPhone}
+                  onChange={e => setContactPhone(e.target.value)}
+                  placeholder="+1 (555) 000-0000"
+                  style={{ marginBottom: 0 }}
+                />
+              </div>
+            </div>
+
+            {/* Trust & privacy note */}
+            <div style={{ background: 'var(--gp)', border: '1px solid rgba(196,154,60,.25)', borderRadius: 10, padding: '.75rem 1rem', marginBottom: '.75rem' }}>
+              <p style={{ fontSize: '.72rem', color: 'var(--tm)', lineHeight: 1.65, margin: 0 }}>
+                🔒 <strong style={{ color: 'var(--vx)' }}>Your privacy is protected.</strong> Your contact details are shared only with this vendor and never used for marketing or sold to third parties. All vendors on Pallaki are identity-verified.{' '}
+                <a href="/privacy" target="_blank" style={{ color: 'var(--v)' }}>Privacy Policy →</a>
+              </p>
+            </div>
+
+            <button className="modal-send-btn" onClick={() => setMode('confirm')}>
+              Continue →
+            </button>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '.4rem' }}>
+              <button className="chat-link-btn" style={{ fontSize: '.68rem' }} onClick={() => setStep(INTAKE_STEPS.length - 1)}>← Back</button>
+              <button className="chat-link-btn" style={{ fontSize: '.68rem' }} onClick={() => setMode('confirm')}>Skip →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   // ── Confirm view ─────────────────────────────────────────────────────────
   if (mode === 'confirm') {
     return (
@@ -236,7 +314,7 @@ export default function VendorChat({ open, onClose, vendor }) {
               {submitting ? 'Sending…' : `Send Booking Request to ${vendor?.name} →`}
             </button>
             <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '.4rem' }}>
-              <button className="chat-link-btn" style={{ fontSize: '.68rem' }} onClick={() => { setStep(0); setAnswers({}); setMode('intake') }}>← Start over</button>
+              <button className="chat-link-btn" style={{ fontSize: '.68rem' }} onClick={() => { setStep(0); setAnswers({}); setContactEmail(user?.email || ''); setContactPhone(''); setMode('intake') }}>← Start over</button>
             </div>
           </div>
         </div>

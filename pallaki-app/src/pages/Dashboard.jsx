@@ -491,8 +491,22 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
                             </span>
                           )}
                         </div>
+                        {(inq.intake_data.contactEmail || inq.intake_data.contactPhone) && (
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.35rem', marginTop: '.35rem' }}>
+                            {inq.intake_data.contactEmail && (
+                              <span style={{ fontSize: '.72rem', padding: '.2rem .65rem', background: 'rgba(150,172,156,.15)', border: '1px solid rgba(150,172,156,.4)', borderRadius: 100, color: 'var(--tm)' }}>
+                                ✉ {inq.intake_data.contactEmail}
+                              </span>
+                            )}
+                            {inq.intake_data.contactPhone && (
+                              <span style={{ fontSize: '.72rem', padding: '.2rem .65rem', background: 'rgba(150,172,156,.15)', border: '1px solid rgba(150,172,156,.4)', borderRadius: 100, color: 'var(--tm)' }}>
+                                📞 {inq.intake_data.contactPhone}
+                              </span>
+                            )}
+                          </div>
+                        )}
                         {inq.intake_data.notes && (
-                          <div style={{ fontSize: '.83rem', color: 'var(--tm)', fontStyle: 'italic', lineHeight: 1.6 }}>"{inq.intake_data.notes}"</div>
+                          <div style={{ fontSize: '.83rem', color: 'var(--tm)', fontStyle: 'italic', lineHeight: 1.6, marginTop: '.4rem' }}>"{inq.intake_data.notes}"</div>
                         )}
                       </div>
                     ) : (
