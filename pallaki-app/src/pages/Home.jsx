@@ -10,7 +10,7 @@ import TestimonialsSection from '../components/TestimonialsSection'
 import ContactSection from '../components/ContactSection'
 import ourStoryImg from '../assets/our story.jpg'
 
-const DEMO_CITIES = ['Dallas', 'Chicago', 'Atlanta', 'Houston', 'Los Angeles', 'New York', 'San Jose', 'Seattle', 'Austin', 'New Jersey']
+const FEATURED_CITIES = ['Bay Area', 'Los Angeles', 'New York', 'New Jersey', 'Seattle', 'Atlanta', 'Chicago', 'Dallas']
 
 const EVENT_TYPES = [
   { icon: '💍', label: 'Wedding' },
@@ -159,7 +159,7 @@ export default function Home() {
               <div className="no-match show">😕 No vendors in that area yet — check nearby cities!</div>
             )}
             <div className="pop-tags">
-              {citySuggestions.slice(0, 7).map(c => (
+              {FEATURED_CITIES.map(c => (
                 <span key={c} className="tag" onClick={() => { setCity(c); setNoMatch(false) }}>📍 {c}</span>
               ))}
             </div>
