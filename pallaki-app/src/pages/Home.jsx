@@ -181,12 +181,9 @@ export default function Home() {
             <img src={ourStoryImg} alt="Shruti and Vamsi" />
           </div>
           <div className="about-text">
-            <p>Hi, we're Shruti and Vamsi — the founders of Pallaki — and a couple who have been through this journey ourselves.</p>
-            <p>When we started planning our wedding in the U.S., one of the biggest challenges we faced wasn't finding vendors — it was finding them easily. Most of our search happened through endless scrolling on Instagram, jumping between pages, sending DMs, and waiting for responses. Everything felt scattered, and there was no single place to explore options in a structured way.</p>
-            <p>At the same time, we realized how valuable it was to work with vendors who understood our traditions and expectations without needing detailed explanations. That sense of familiarity made the experience so much smoother.</p>
-            <p>We were fortunate to have a beautiful wedding at the BAPS Swaminarayan Temple Chino Hills — a day filled with love and memories we'll always cherish. But getting there involved more effort than it should have.</p>
-            <p>That's why we created Pallaki. A one-stop platform designed to make vendor discovery simple and streamlined. Instead of spending hours searching across different platforms, couples can find everything they need in one place.</p>
-            <p>Our goal is simple — to remove the hassle, bring everything together, and make wedding planning a more seamless experience. Welcome — this space was built for you.</p>
+            <p>We're Shruti and Vamsi, the founders of Pallaki. Like many of you, our journey began with a vision for a beautiful wedding—and a spreadsheet that quickly got out of hand.</p>
+            <p>When we planned our own wedding at the BAPS Swaminarayan Temple in Chino Hills, we didn't struggle to find talent; we struggled to find it easily. Our days were spent endlessly scrolling through Instagram, jumping between portfolios, and waiting on DMs. We realized there was a missing link: a central space where culture, tradition, and convenience met.</p>
+            <p>We created Pallaki to be the platform we wish we'd had. We believe that finding a vendor who understands your traditions shouldn't require a dozen tabs and a week of research. We've brought everything together in one place so you can spend less time searching and more time celebrating.</p>
             <div className="stats-mini" style={{ marginTop: '2rem' }}>
               {[
                 [stats.vendors > 0 ? `${stats.vendors}+` : '—', 'Verified Vendors'],
