@@ -30,14 +30,15 @@ const INTAKE_STEPS = [
   },
 ]
 
-function buildMessage(answers, notes, contactEmail, contactPhone) {
+function buildMessage(answers, notes, contactName, contactEmail, contactPhone) {
   let msg = `Hi! I'm interested in booking your services.\n\n`
   msg += `Event Type: ${answers.eventType}\n`
   msg += `Timeline: ${answers.eventDate}\n`
   msg += `Guest Count: ${answers.guestCount}\n`
   msg += `Budget: ${answers.budget}`
-  if (contactEmail || contactPhone) {
+  if (contactName || contactEmail || contactPhone) {
     msg += `\n\nBest way to reach me:`
+    if (contactName) msg += `\nName: ${contactName}`
     if (contactEmail) msg += `\nEmail: ${contactEmail}`
     if (contactPhone) msg += `\nPhone: ${contactPhone}`
   }
@@ -54,6 +55,7 @@ export default function VendorChat({ open, onClose, vendor }) {
   const [mode, setMode] = useState('intake') // 'intake' | 'contact' | 'confirm' | 'done' | 'chat'
   const [step, setStep] = useState(0)
   const [answers, setAnswers] = useState({})
+  const [contactName, setContactName] = useState('')
   const [contactEmail, setContactEmail] = useState('')
   const [contactPhone, setContactPhone] = useState('')
   const [notes, setNotes] = useState('')
@@ -67,7 +69,7 @@ export default function VendorChat({ open, onClose, vendor }) {
   useEffect(() => {
     if (open) {
       setMode('intake'); setStep(0); setAnswers({}); setNotes('')
-      setContactEmail(user?.email || ''); setContactPhone('')
+      setContactName(''); setContactEmail(user?.email || ''); setContactPhone('')
       setMessages([]); setInput('')
     }
   }, [open, vendor?.id])
@@ -93,14 +95,14 @@ export default function VendorChat({ open, onClose, vendor }) {
   async function handleSubmit() {
     if (!user) { onClose(); navigate('/planner/login'); return }
     setSubmitting(true)
-    const message = buildMessage(answers, notes, contactEmail, contactPhone)
+    const message = buildMessage(answers, notes, contactName, contactEmail, contactPhone)
     const { error } = await sendInquiry({
       vendorId: vendor.id,
       plannerId: user.id,
       message,
       vendorEmail: vendor.email,
       vendorName: vendor.name,
-      intakeData: { ...answers, contactEmail: contactEmail || null, contactPhone: contactPhone || null },
+      intakeData: { ...answers, contactName: contactName || null, contactEmail: contactEmail || null, contactPhone: contactPhone || null },
     })
     setSubmitting(false)
     if (error) { showToast('Something went wrong. Try again.'); return }
@@ -226,6 +228,17 @@ export default function VendorChat({ open, onClose, vendor }) {
           <div className="chat-input-row">
             <div className="details-form" style={{ gap: '.6rem', marginBottom: '.75rem' }}>
               <div className="df full">
+                <label style={{ fontSize: '.7rem', textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--tl)', fontWeight: 500 }}>Your Name</label>
+                <input
+                  className="modal-input"
+                  type="text"
+                  value={contactName}
+                  onChange={e => setContactName(e.target.value)}
+                  placeholder="First and last name"
+                  style={{ marginBottom: 0 }}
+                />
+              </div>
+              <div className="df full">
                 <label style={{ fontSize: '.7rem', textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--tl)', fontWeight: 500 }}>Email</label>
                 <input
                   className="modal-input"
@@ -314,7 +327,7 @@ export default function VendorChat({ open, onClose, vendor }) {
               {submitting ? 'Sending…' : `Send Booking Request to ${vendor?.name} →`}
             </button>
             <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '.4rem' }}>
-              <button className="chat-link-btn" style={{ fontSize: '.68rem' }} onClick={() => { setStep(0); setAnswers({}); setContactEmail(user?.email || ''); setContactPhone(''); setMode('intake') }}>← Start over</button>
+              <button className="chat-link-btn" style={{ fontSize: '.68rem' }} onClick={() => { setStep(0); setAnswers({}); setContactName(''); setContactEmail(user?.email || ''); setContactPhone(''); setMode('intake') }}>← Start over</button>
             </div>
           </div>
         </div>

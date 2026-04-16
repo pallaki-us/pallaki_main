@@ -448,7 +448,7 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
                         {/* Planner header */}
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '.75rem', marginBottom: '.75rem' }}>
                           <div style={{ fontSize: '.9rem', fontWeight: 600, color: 'var(--vx)' }}>
-                            {profile?.name || profile?.email || items[0]?.intake_data?.contactEmail || 'Planner'}
+                            {items[0]?.intake_data?.contactName || profile?.name || profile?.email || items[0]?.intake_data?.contactEmail || 'Planner'}
                           </div>
                           {hasNew && <span style={{ fontSize: '.68rem', color: 'var(--v)', fontWeight: 600, flexShrink: 0 }}>New</span>}
                         </div>
@@ -468,8 +468,9 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
                                   {inq.intake_data.guestCount && <span style={{ fontSize: '.72rem', padding: '.2rem .65rem', background: 'var(--vf)', border: '1px solid var(--br)', borderRadius: 100, color: 'var(--tm)' }}>👥 {inq.intake_data.guestCount}</span>}
                                   {inq.intake_data.budget && <span style={{ fontSize: '.72rem', padding: '.2rem .65rem', background: 'var(--vf)', border: '1px solid var(--br)', borderRadius: 100, color: 'var(--tm)' }}>💰 {inq.intake_data.budget}</span>}
                                 </div>
-                                {(inq.intake_data.contactEmail || inq.intake_data.contactPhone) && (
+                                {(inq.intake_data.contactName || inq.intake_data.contactEmail || inq.intake_data.contactPhone) && (
                                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.35rem', marginBottom: '.4rem' }}>
+                                    {inq.intake_data.contactName && <span style={{ fontSize: '.72rem', padding: '.2rem .65rem', background: 'rgba(150,172,156,.15)', border: '1px solid rgba(150,172,156,.4)', borderRadius: 100, color: 'var(--tm)' }}>👤 {inq.intake_data.contactName}</span>}
                                     {inq.intake_data.contactEmail && <span style={{ fontSize: '.72rem', padding: '.2rem .65rem', background: 'rgba(150,172,156,.15)', border: '1px solid rgba(150,172,156,.4)', borderRadius: 100, color: 'var(--tm)' }}>✉ {inq.intake_data.contactEmail}</span>}
                                     {inq.intake_data.contactPhone && <span style={{ fontSize: '.72rem', padding: '.2rem .65rem', background: 'rgba(150,172,156,.15)', border: '1px solid rgba(150,172,156,.4)', borderRadius: 100, color: 'var(--tm)' }}>📞 {inq.intake_data.contactPhone}</span>}
                                   </div>
