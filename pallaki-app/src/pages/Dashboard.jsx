@@ -22,9 +22,6 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
   const navigate = useNavigate()
   const { profile, saving, saveProfile, fetchProfile } = useVendorProfile()
   const { inquiries, updateStatus, saveReply, archiveInquiry } = useVendorInquiries(profile?.id)
-  const [replyingTo, setReplyingTo] = useState(null)
-  const [replyText, setReplyText] = useState('')
-  const [showArchived, setShowArchived] = useState(false)
   const [period, setPeriod] = useState(365)
   const { data: anData } = useVendorAnalytics(profile?.id, period)
   const [selServices, setSelServices] = useState(['Weddings','Engagements'])
@@ -419,152 +416,91 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
               </div>
             </div>
 
-            {/* Inquiries */}
+            {/* Inquiries — grouped by planner */}
             <div className="an-card">
               <div className="an-card-head">
                 <h3>💌 Inquiries</h3>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem' }}>
-                  {inquiries.filter(i => i.status === 'pending').length > 0 && (
-                    <span style={{ fontSize: '.7rem', color: 'var(--v)', fontWeight: 500 }}>{inquiries.filter(i => i.status === 'pending').length} new</span>
-                  )}
-                  <button style={{ fontSize: '.7rem', color: 'var(--tl)', background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Cormorant Garamond',serif" }}
-                    onClick={() => setShowArchived(p => !p)}>
-                    {showArchived ? 'Hide Archived' : 'Show Archived'}
-                  </button>
-                </div>
+                {inquiries.filter(i => i.status === 'pending').length > 0 && (
+                  <span style={{ fontSize: '.7rem', color: 'var(--v)', fontWeight: 500 }}>
+                    {inquiries.filter(i => i.status === 'pending').length} new
+                  </span>
+                )}
               </div>
               <div className="an-card-body" style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
-                {inquiries.filter(i => showArchived ? i.status === 'archived' : i.status !== 'archived').length === 0 ? (
+                {inquiries.length === 0 ? (
                   <p style={{ fontSize: '.88rem', color: 'var(--tl)', textAlign: 'center', padding: '2rem', fontStyle: 'italic' }}>
-                    {showArchived ? 'No archived inquiries.' : 'No inquiries yet — your listing is live and families can find you!'}
+                    No inquiries yet — your listing is live and families can find you!
                   </p>
-                ) : inquiries.filter(i => showArchived ? i.status === 'archived' : i.status !== 'archived').map(inq => (
-                  <div key={inq.id} style={{ padding: '1rem', background: inq.status === 'pending' ? 'var(--vf)' : 'var(--wh)', border: `1px solid ${inq.status === 'pending' ? 'rgba(196,132,140,.3)' : 'var(--br)'}`, borderRadius: 12 }}>
-                    {/* Header row */}
-                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '.75rem', marginBottom: '.6rem' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem' }}>
-                        <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--v)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: '#fff', fontSize: '.88rem', flexShrink: 0 }}>
-                          {(inq.profiles?.name || inq.profiles?.email || '?').charAt(0).toUpperCase()}
-                        </div>
-                        <div>
-                          <div style={{ fontSize: '.86rem', fontWeight: 500, color: 'var(--vx)' }}>
-                            {inq.profiles?.name || inq.profiles?.email}
-                            {inq.profiles?.event_type && <span style={{ fontWeight: 300, color: 'var(--tm)' }}> · {inq.profiles.event_type}</span>}
+                ) : (() => {
+                  // Group by planner_id, preserve order of first inquiry
+                  const groups = {}
+                  const order = []
+                  inquiries.forEach(inq => {
+                    const pid = inq.planner_id
+                    if (!groups[pid]) { groups[pid] = { profile: inq.profiles, items: [] }; order.push(pid) }
+                    groups[pid].items.push(inq)
+                  })
+                  return order.map(pid => {
+                    const { profile, items } = groups[pid]
+                    const hasNew = items.some(i => i.status === 'pending')
+                    return (
+                      <div key={pid} style={{ padding: '1rem', background: hasNew ? 'var(--vf)' : 'var(--wh)', border: `1px solid ${hasNew ? 'rgba(196,132,140,.3)' : 'var(--br)'}`, borderRadius: 12 }}>
+                        {/* Planner header */}
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '.75rem', marginBottom: '.75rem' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem' }}>
+                            <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--v)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: '#fff', fontSize: '.88rem', flexShrink: 0 }}>
+                              {(profile?.name || profile?.email || '?').charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                              <div style={{ fontSize: '.86rem', fontWeight: 500, color: 'var(--vx)' }}>
+                                {profile?.name || profile?.email}
+                                {profile?.event_type && <span style={{ fontWeight: 300, color: 'var(--tm)' }}> · {profile.event_type}</span>}
+                              </div>
+                              <div style={{ fontSize: '.72rem', color: 'var(--tl)', marginTop: '.15rem', display: 'flex', gap: '.75rem', flexWrap: 'wrap' }}>
+                                {profile?.email && <span>✉ {profile.email}</span>}
+                                {profile?.phone && <span>📞 {profile.phone}</span>}
+                                {profile?.city && <span>📍 {profile.city}{profile.state ? `, ${profile.state}` : ''}</span>}
+                              </div>
+                            </div>
                           </div>
-                          <div style={{ fontSize: '.72rem', color: 'var(--tl)', marginTop: '.15rem', display: 'flex', gap: '.75rem', flexWrap: 'wrap' }}>
-                            {inq.profiles?.email && <span>✉ {inq.profiles.email}</span>}
-                            {inq.profiles?.phone && <span>📞 {inq.profiles.phone}</span>}
-                            {inq.profiles?.city && <span>📍 {inq.profiles.city}{inq.profiles.state ? `, ${inq.profiles.state}` : ''}</span>}
-                          </div>
+                          {hasNew && <span style={{ fontSize: '.68rem', color: 'var(--v)', fontWeight: 600, flexShrink: 0 }}>New</span>}
                         </div>
-                      </div>
-                      <div style={{ fontSize: '.68rem', color: 'var(--tl)', whiteSpace: 'nowrap', textAlign: 'right', flexShrink: 0 }}>
-                        {new Date(inq.created_at).toLocaleDateString()}
-                        {inq.status === 'pending' && <div style={{ color: 'var(--v)', fontWeight: 600, marginTop: 2 }}>New</div>}
-                        {inq.status === 'replied' && <div style={{ color: 'var(--sage)', fontWeight: 500, marginTop: 2 }}>Replied</div>}
-                        {inq.status === 'archived' && <div style={{ color: 'var(--tl)', marginTop: 2 }}>Archived</div>}
-                      </div>
-                    </div>
 
-                    {/* Intake data badges */}
-                    {inq.intake_data ? (
-                      <div style={{ marginBottom: '.6rem' }}>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.35rem', marginBottom: '.5rem' }}>
-                          {inq.intake_data.eventType && (
-                            <span style={{ fontSize: '.72rem', padding: '.2rem .65rem', background: 'var(--vf)', border: '1px solid var(--br)', borderRadius: 100, color: 'var(--tm)' }}>
-                              {inq.intake_data.eventType}
-                            </span>
-                          )}
-                          {inq.intake_data.eventDate && (
-                            <span style={{ fontSize: '.72rem', padding: '.2rem .65rem', background: 'var(--vf)', border: '1px solid var(--br)', borderRadius: 100, color: 'var(--tm)' }}>
-                              🗓 {inq.intake_data.eventDate}
-                            </span>
-                          )}
-                          {inq.intake_data.guestCount && (
-                            <span style={{ fontSize: '.72rem', padding: '.2rem .65rem', background: 'var(--vf)', border: '1px solid var(--br)', borderRadius: 100, color: 'var(--tm)' }}>
-                              👥 {inq.intake_data.guestCount}
-                            </span>
-                          )}
-                          {inq.intake_data.budget && (
-                            <span style={{ fontSize: '.72rem', padding: '.2rem .65rem', background: 'var(--vf)', border: '1px solid var(--br)', borderRadius: 100, color: 'var(--tm)' }}>
-                              💰 {inq.intake_data.budget}
-                            </span>
-                          )}
-                        </div>
-                        {(inq.intake_data.contactEmail || inq.intake_data.contactPhone) && (
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.35rem', marginTop: '.35rem' }}>
-                            {inq.intake_data.contactEmail && (
-                              <span style={{ fontSize: '.72rem', padding: '.2rem .65rem', background: 'rgba(150,172,156,.15)', border: '1px solid rgba(150,172,156,.4)', borderRadius: 100, color: 'var(--tm)' }}>
-                                ✉ {inq.intake_data.contactEmail}
-                              </span>
+                        {/* All submissions from this planner */}
+                        {items.map((inq, idx) => (
+                          <div key={inq.id} style={{ paddingTop: '.75rem', marginTop: '.75rem', borderTop: idx === 0 ? '1px solid var(--br)' : '1px dashed var(--br)' }}>
+                            <div style={{ fontSize: '.68rem', color: 'var(--tl)', marginBottom: '.4rem' }}>
+                              {new Date(inq.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                            </div>
+
+                            {inq.intake_data ? (
+                              <div>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.35rem', marginBottom: '.4rem' }}>
+                                  {inq.intake_data.eventType && <span style={{ fontSize: '.72rem', padding: '.2rem .65rem', background: 'var(--vf)', border: '1px solid var(--br)', borderRadius: 100, color: 'var(--tm)' }}>{inq.intake_data.eventType}</span>}
+                                  {inq.intake_data.eventDate && <span style={{ fontSize: '.72rem', padding: '.2rem .65rem', background: 'var(--vf)', border: '1px solid var(--br)', borderRadius: 100, color: 'var(--tm)' }}>🗓 {inq.intake_data.eventDate}</span>}
+                                  {inq.intake_data.guestCount && <span style={{ fontSize: '.72rem', padding: '.2rem .65rem', background: 'var(--vf)', border: '1px solid var(--br)', borderRadius: 100, color: 'var(--tm)' }}>👥 {inq.intake_data.guestCount}</span>}
+                                  {inq.intake_data.budget && <span style={{ fontSize: '.72rem', padding: '.2rem .65rem', background: 'var(--vf)', border: '1px solid var(--br)', borderRadius: 100, color: 'var(--tm)' }}>💰 {inq.intake_data.budget}</span>}
+                                </div>
+                                {(inq.intake_data.contactEmail || inq.intake_data.contactPhone) && (
+                                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.35rem', marginBottom: '.4rem' }}>
+                                    {inq.intake_data.contactEmail && <span style={{ fontSize: '.72rem', padding: '.2rem .65rem', background: 'rgba(150,172,156,.15)', border: '1px solid rgba(150,172,156,.4)', borderRadius: 100, color: 'var(--tm)' }}>✉ {inq.intake_data.contactEmail}</span>}
+                                    {inq.intake_data.contactPhone && <span style={{ fontSize: '.72rem', padding: '.2rem .65rem', background: 'rgba(150,172,156,.15)', border: '1px solid rgba(150,172,156,.4)', borderRadius: 100, color: 'var(--tm)' }}>📞 {inq.intake_data.contactPhone}</span>}
+                                  </div>
+                                )}
+                                {inq.intake_data.notes && <div style={{ fontSize: '.83rem', color: 'var(--tm)', fontStyle: 'italic', lineHeight: 1.6 }}>"{inq.intake_data.notes}"</div>}
+                              </div>
+                            ) : (
+                              <div>
+                                {inq.event_date && <div style={{ fontSize: '.72rem', color: 'var(--tm)', marginBottom: '.3rem' }}>📅 {new Date(inq.event_date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</div>}
+                                <div style={{ fontSize: '.84rem', color: 'var(--tm)', fontStyle: 'italic', lineHeight: 1.6 }}>"{inq.message}"</div>
+                              </div>
                             )}
-                            {inq.intake_data.contactPhone && (
-                              <span style={{ fontSize: '.72rem', padding: '.2rem .65rem', background: 'rgba(150,172,156,.15)', border: '1px solid rgba(150,172,156,.4)', borderRadius: 100, color: 'var(--tm)' }}>
-                                📞 {inq.intake_data.contactPhone}
-                              </span>
-                            )}
                           </div>
-                        )}
-                        {inq.intake_data.notes && (
-                          <div style={{ fontSize: '.83rem', color: 'var(--tm)', fontStyle: 'italic', lineHeight: 1.6, marginTop: '.4rem' }}>"{inq.intake_data.notes}"</div>
-                        )}
+                        ))}
                       </div>
-                    ) : (
-                      <div style={{ marginBottom: '.6rem' }}>
-                        {inq.event_date && (
-                          <div style={{ fontSize: '.72rem', color: 'var(--tm)', marginBottom: '.35rem' }}>📅 Event date: {new Date(inq.event_date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</div>
-                        )}
-                        <div style={{ fontSize: '.84rem', color: 'var(--tm)', fontStyle: 'italic', lineHeight: 1.6 }}>"{inq.message}"</div>
-                      </div>
-                    )}
-
-                    {/* Vendor reply (if exists) */}
-                    {inq.vendor_reply && (
-                      <div style={{ background: 'var(--cd)', border: '1px solid var(--br)', borderRadius: 8, padding: '.6rem .8rem', marginBottom: '.6rem' }}>
-                        <div style={{ fontSize: '.68rem', color: 'var(--tl)', marginBottom: '.25rem', textTransform: 'uppercase', letterSpacing: '.06em' }}>Your reply</div>
-                        <div style={{ fontSize: '.82rem', color: 'var(--tm)', lineHeight: 1.6 }}>{inq.vendor_reply}</div>
-                      </div>
-                    )}
-
-                    {/* Reply box */}
-                    {replyingTo === inq.id && (
-                      <div style={{ marginBottom: '.6rem' }}>
-                        <textarea
-                          value={replyText}
-                          onChange={e => setReplyText(e.target.value)}
-                          placeholder="Write your reply…"
-                          style={{ width: '100%', padding: '.65rem .8rem', border: '1.5px solid var(--v)', borderRadius: 8, fontFamily: "'Cormorant Garamond',serif", fontSize: '.84rem', resize: 'vertical', minHeight: 80, outline: 'none', background: 'var(--cr)', boxSizing: 'border-box' }}
-                        />
-                        <div style={{ display: 'flex', gap: '.5rem', marginTop: '.4rem' }}>
-                          <button style={{ fontSize: '.75rem', padding: '.35rem .9rem', background: 'var(--v)', color: '#fff', border: 'none', borderRadius: 20, cursor: 'pointer', fontFamily: "'Cormorant Garamond',serif" }}
-                            onClick={async () => { if (!replyText.trim()) return; await saveReply(inq.id, replyText, inq.profiles?.email, inq.profiles?.name, profile?.name); setReplyingTo(null); setReplyText('') }}>
-                            Send Reply ✓
-                          </button>
-                          <button style={{ fontSize: '.75rem', padding: '.35rem .9rem', background: 'none', color: 'var(--tl)', border: '1px solid var(--br)', borderRadius: 20, cursor: 'pointer', fontFamily: "'Cormorant Garamond',serif" }}
-                            onClick={() => { setReplyingTo(null); setReplyText('') }}>
-                            Cancel
-                          </button>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Actions */}
-                    {inq.status !== 'archived' && (
-                      <div style={{ display: 'flex', gap: '.5rem', flexWrap: 'wrap' }}>
-                        {replyingTo !== inq.id && (
-                          <button style={{ fontSize: '.72rem', padding: '.3rem .85rem', background: 'var(--v)', color: '#fff', border: 'none', borderRadius: 20, cursor: 'pointer', fontFamily: "'Cormorant Garamond',serif" }}
-                            onClick={() => { setReplyingTo(inq.id); setReplyText(inq.vendor_reply || '') }}>
-                            {inq.vendor_reply ? 'Edit Reply' : 'Reply'}
-                          </button>
-                        )}
-                        <button style={{ fontSize: '.72rem', padding: '.3rem .85rem', background: 'none', color: 'var(--tl)', border: '1px solid var(--br)', borderRadius: 20, cursor: 'pointer', fontFamily: "'Cormorant Garamond',serif" }}
-                          onClick={() => archiveInquiry(inq.id)}>
-                          Archive
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                ))}
+                    )
+                  })
+                })()}
               </div>
             </div>
           </div>
