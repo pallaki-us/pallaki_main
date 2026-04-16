@@ -33,7 +33,7 @@ export default function Detail() {
     if (!vendorId || !supabase) return
     if (!user || userType !== 'planner') return
     if (isOwnListing) return
-    supabase.from('profile_views').insert({ vendor_id: vendorId, viewer_id: user.id })
+    supabase.rpc('record_profile_view', { p_vendor_id: vendorId, p_viewer_id: user.id })
   }, [vendorId, user?.id, userType, isOwnListing])
 
   useEffect(() => {
