@@ -5,6 +5,7 @@ import { useAuth } from '../lib/AuthContext'
 import { showToast } from '../lib/toast'
 import { supabase } from '../lib/supabase'
 import InquiryModal from '../components/InquiryModal'
+import VendorChat from '../components/VendorChat'
 
 export default function Detail() {
   const { id: vendorId } = useParams()
@@ -15,6 +16,7 @@ export default function Detail() {
   const { vendor: v, loading } = useVendor(vendorId)
   const [activeTab, setActiveTab] = useState('overview')
   const [inquiryOpen, setInquiryOpen] = useState(false)
+  const [chatOpen, setChatOpen] = useState(false)
   const [reviews, setReviews] = useState([])
   const [portfolioUrls, setPortfolioUrls] = useState(null)
   const [featuredUrls, setFeaturedUrls] = useState(null)
@@ -167,9 +169,8 @@ export default function Detail() {
               <div className="cc-card">
                 <h3>Contact this Vendor</h3>
                 <div className="cc-row">📍 <span>{v.loc}</span></div>
-                <div className="cc-row">💌 Responds within 24 hours</div>
                 <div className="cc-row">✓ Identity verified by Pallaki</div>
-                <button className="inq-btn" onClick={sendInquiry}>Send Inquiry →</button>
+                <button className="inq-btn chat-now-btn" onClick={() => setChatOpen(true)}>💬 Chat Now — Instant answers</button>
               </div>
             )}
           </div>
@@ -300,11 +301,10 @@ export default function Detail() {
             </div>
             <div>
               <div className="cc-card">
-                <h3>Send an Inquiry</h3>
+                <h3>Contact this Vendor</h3>
                 <div className="cc-row">📍 <span>{v.loc}</span></div>
-                <div className="cc-row">💌 Responds within 24 hours</div>
                 <div className="cc-row">✓ Identity verified by Pallaki</div>
-                <button className="inq-btn" onClick={sendInquiry}>Send Inquiry →</button>
+                <button className="inq-btn chat-now-btn" onClick={() => setChatOpen(true)}>💬 Chat Now — Instant answers</button>
               </div>
               <div className="gr-plug">
                 <span className="gr-logo">⭐</span>
@@ -321,6 +321,12 @@ export default function Detail() {
       <InquiryModal
         open={inquiryOpen}
         onClose={() => setInquiryOpen(false)}
+        vendor={v}
+      />
+      <VendorChat
+        open={chatOpen}
+        onClose={() => setChatOpen(false)}
+        onSendInquiry={() => { setChatOpen(false); setInquiryOpen(true) }}
         vendor={v}
       />
     </div>

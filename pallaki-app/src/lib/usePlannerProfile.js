@@ -29,7 +29,12 @@ export function usePlannerProfile() {
     const result = await supabase
       .from('profiles')
       .upsert({ id: user.id, user_type: 'planner', ...fields }, { onConflict: 'id' })
-    if (!result.error) await fetchProfile()
+    if (!result.error) {
+      if (fields.name) {
+        await supabase.auth.updateUser({ data: { name: fields.name } })
+      }
+      await fetchProfile()
+    }
     setSaving(false)
     return result
   }

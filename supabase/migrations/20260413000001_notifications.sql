@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS public.notifications (
   title       text NOT NULL,
   body        text NOT NULL,
   read        boolean NOT NULL DEFAULT false,
-  inquiry_id  bigint REFERENCES public.inquiries(id) ON DELETE CASCADE,
+  inquiry_id  uuid REFERENCES public.inquiries(id) ON DELETE CASCADE,
   created_at  timestamptz NOT NULL DEFAULT now()
 );
 
