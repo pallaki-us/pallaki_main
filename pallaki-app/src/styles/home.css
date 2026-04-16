@@ -40,8 +40,9 @@
 .srch-btn:hover { background: var(--vd); }
 .no-match { background: rgba(196,132,140,.08); border: 1px solid rgba(196,132,140,.28); border-radius: 10px; padding: .9rem 1.4rem; margin-top: 1rem; font-size: .86rem; color: var(--vd); display: none; }
 .no-match.show { display: block; }
-.pop-tags { margin-top: .9rem; display: flex; gap: .45rem; flex-wrap: wrap; justify-content: center; }
-.tag { font-size: .73rem; color: var(--tm); border: 1px solid var(--br); padding: .25rem .78rem; border-radius: 100px; cursor: pointer; transition: all .15s; background: var(--wh); }
+.pop-tags { margin-top: .9rem; display: flex; gap: .45rem; flex-wrap: nowrap; justify-content: center; overflow-x: auto; scrollbar-width: none; }
+.pop-tags::-webkit-scrollbar { display: none; }
+.tag { font-size: .7rem; color: var(--tm); border: 1px solid var(--br); padding: .22rem .65rem; border-radius: 100px; cursor: pointer; transition: all .15s; background: var(--wh); white-space: nowrap; flex-shrink: 0; }
 .tag:hover { background: var(--v); color: var(--wh); border-color: var(--v); }
 
 /* ── MOBILE ── */
@@ -57,7 +58,7 @@
   .srch-bar select { border-right: none; border-bottom: 1px solid var(--br); border-radius: 16px 16px 0 0; min-width: unset; width: 100%; }
   .srch-bar input { width: 100%; }
   .srch-btn { border-radius: 0 0 14px 14px; padding: .85rem; text-align: center; }
-  .pop-tags { gap: .35rem; }
+  .pop-tags { gap: .35rem; justify-content: flex-start; }
 }
 
 @media (max-width: 480px) {
