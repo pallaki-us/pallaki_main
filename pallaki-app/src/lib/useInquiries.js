@@ -3,7 +3,7 @@ import { supabase } from './supabase'
 import { useAuth } from './AuthContext'
 
 // For planners — send an inquiry
-export async function sendInquiry({ vendorId, plannerId, message, eventDate, plannerName, vendorEmail, vendorName }) {
+export async function sendInquiry({ vendorId, plannerId, message, eventDate, plannerName, vendorEmail, vendorName, intakeData }) {
   if (!supabase) return { error: null }
   const payload = {
     vendor_id: vendorId,
@@ -11,6 +11,7 @@ export async function sendInquiry({ vendorId, plannerId, message, eventDate, pla
     message,
     event_date: eventDate ? `${eventDate}-01` : null,
     status: 'pending',
+    ...(intakeData ? { intake_data: intakeData } : {}),
   }
   const result = await supabase.from('inquiries').insert(payload)
   if (!result.error && vendorEmail) {

@@ -466,11 +466,43 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
                       </div>
                     </div>
 
-                    {/* Message */}
-                    {inq.event_date && (
-                      <div style={{ fontSize: '.72rem', color: 'var(--tm)', marginBottom: '.35rem' }}>📅 Event date: {new Date(inq.event_date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</div>
+                    {/* Intake data badges */}
+                    {inq.intake_data ? (
+                      <div style={{ marginBottom: '.6rem' }}>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.35rem', marginBottom: '.5rem' }}>
+                          {inq.intake_data.eventType && (
+                            <span style={{ fontSize: '.72rem', padding: '.2rem .65rem', background: 'var(--vf)', border: '1px solid var(--br)', borderRadius: 100, color: 'var(--tm)' }}>
+                              {inq.intake_data.eventType}
+                            </span>
+                          )}
+                          {inq.intake_data.eventDate && (
+                            <span style={{ fontSize: '.72rem', padding: '.2rem .65rem', background: 'var(--vf)', border: '1px solid var(--br)', borderRadius: 100, color: 'var(--tm)' }}>
+                              🗓 {inq.intake_data.eventDate}
+                            </span>
+                          )}
+                          {inq.intake_data.guestCount && (
+                            <span style={{ fontSize: '.72rem', padding: '.2rem .65rem', background: 'var(--vf)', border: '1px solid var(--br)', borderRadius: 100, color: 'var(--tm)' }}>
+                              👥 {inq.intake_data.guestCount}
+                            </span>
+                          )}
+                          {inq.intake_data.budget && (
+                            <span style={{ fontSize: '.72rem', padding: '.2rem .65rem', background: 'var(--vf)', border: '1px solid var(--br)', borderRadius: 100, color: 'var(--tm)' }}>
+                              💰 {inq.intake_data.budget}
+                            </span>
+                          )}
+                        </div>
+                        {inq.intake_data.notes && (
+                          <div style={{ fontSize: '.83rem', color: 'var(--tm)', fontStyle: 'italic', lineHeight: 1.6 }}>"{inq.intake_data.notes}"</div>
+                        )}
+                      </div>
+                    ) : (
+                      <div style={{ marginBottom: '.6rem' }}>
+                        {inq.event_date && (
+                          <div style={{ fontSize: '.72rem', color: 'var(--tm)', marginBottom: '.35rem' }}>📅 Event date: {new Date(inq.event_date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</div>
+                        )}
+                        <div style={{ fontSize: '.84rem', color: 'var(--tm)', fontStyle: 'italic', lineHeight: 1.6 }}>"{inq.message}"</div>
+                      </div>
                     )}
-                    <div style={{ fontSize: '.84rem', color: 'var(--tm)', fontStyle: 'italic', marginBottom: '.6rem', lineHeight: 1.6 }}>"{inq.message}"</div>
 
                     {/* Vendor reply (if exists) */}
                     {inq.vendor_reply && (

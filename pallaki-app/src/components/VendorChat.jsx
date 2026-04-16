@@ -92,6 +92,7 @@ export default function VendorChat({ open, onClose, vendor }) {
       message,
       vendorEmail: vendor.email,
       vendorName: vendor.name,
+      intakeData: answers,
     })
     setSubmitting(false)
     if (error) { showToast('Something went wrong. Try again.'); return }
