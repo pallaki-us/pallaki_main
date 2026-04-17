@@ -265,7 +265,7 @@ export default function Home() {
           </div>
         </div>
         <div className="fb">
-          <span>© 2025 Pallaki. All rights reserved.</span>
+          <span>© 2026 Pallaki. All rights reserved.</span>
           <div style={{ display: 'flex', gap: '1.2rem' }}>
             <span style={{ cursor: 'pointer', textDecoration: 'underline' }} onClick={() => navigate('/privacy')}>Privacy Policy</span>
             <span style={{ cursor: 'pointer', textDecoration: 'underline' }} onClick={() => navigate('/terms')}>Terms & Conditions</span>
