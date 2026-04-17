@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
 
 const SCRIPTS = [
-  { text: 'पल्लकी', font: "'Tiro Devanagari Hindi', serif" },   // Hindi
-  { text: 'పల్లకి', font: "'Noto Sans Telugu', serif" },         // Telugu
-  { text: 'ಪಲ್ಲಕಿ', font: "'Noto Sans Kannada', serif" },        // Kannada
-  { text: 'பல்லக்கு', font: "'Noto Sans Tamil', serif" },        // Tamil
-  { text: 'ਪਾਲਕੀ', font: "'Noto Sans Gurmukhi', serif" },        // Punjabi
+  { text: 'Pallaki', font: "'Cormorant Garamond', serif" },       // English
+  { text: 'पल्लकी', font: "'Tiro Devanagari Hindi', serif" },     // Hindi
+  { text: 'పల్లకి', font: "'Noto Sans Telugu', serif" },           // Telugu
+  { text: 'ಪಲ್ಲಕಿ', font: "'Noto Sans Kannada', serif" },          // Kannada
+  { text: 'பல்லக்கு', font: "'Noto Sans Tamil', serif" },          // Tamil
+  { text: 'ਪਾਲਕੀ', font: "'Noto Sans Gurmukhi', serif" },          // Punjabi
+  { text: 'پالکی', font: "'Noto Nastaliq Urdu', serif" },          // Urdu
 ]
 
 export default function AnimatedLogo({ size = '2rem', color = 'var(--v)', onClick }) {
