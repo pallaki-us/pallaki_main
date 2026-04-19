@@ -17,7 +17,7 @@ function validate(name, email, password, isVendor) {
 
 export default function SignupForm({ role }) {
   const navigate = useNavigate()
-  const { user, userType, signUp, signInWithGoogle } = useAuth()
+  const { user, userType, signUp, verifyOtp, signInWithGoogle } = useAuth()
 
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -27,6 +27,9 @@ export default function SignupForm({ role }) {
   const [formError, setFormError] = useState('')
   const [loading, setLoading] = useState(false)
   const [verifyEmail, setVerifyEmail] = useState('')
+  const [otp, setOtp] = useState('')
+  const [otpError, setOtpError] = useState('')
+  const [otpLoading, setOtpLoading] = useState(false)
 
   const isVendor = role === 'vendor'
 
@@ -67,20 +70,55 @@ export default function SignupForm({ role }) {
     await signInWithGoogle()
   }
 
-  // Post-signup: show email verification prompt
+  async function handleOtpSubmit(e) {
+    e?.preventDefault()
+    const code = otp.trim()
+    if (code.length !== 6) { setOtpError('Enter the 6-digit code from your email.'); return }
+    setOtpError('')
+    setOtpLoading(true)
+    const { error } = await verifyOtp(verifyEmail, code)
+    setOtpLoading(false)
+    if (error) {
+      setOtpError(error.message?.includes('expired') ? 'Code expired — please request a new one.' : 'Invalid code. Please try again.')
+      return
+    }
+    navigate(role === 'vendor' ? '/onboarding' : '/profile', { replace: true })
+  }
+
+  // Post-signup: show OTP entry + link fallback
   if (verifyEmail) {
     return (
       <div className="auth-form auth-verify">
         <div className="auth-verify-icon">📬</div>
         <h1 className="auth-form-title">Check your inbox</h1>
-        <p className="auth-verify-text">We sent a verification link to</p>
+        <p className="auth-verify-text">We sent a 6-digit code to</p>
         <p className="auth-verify-email">{verifyEmail}</p>
+
+        <form onSubmit={handleOtpSubmit} noValidate className="auth-otp-form">
+          <div className="auth-field">
+            <label htmlFor="otp-input">Enter your verification code</label>
+            <input
+              id="otp-input"
+              type="text"
+              inputMode="numeric"
+              maxLength={6}
+              value={otp}
+              onChange={e => { setOtp(e.target.value.replace(/\D/g, '')); setOtpError('') }}
+              placeholder="000000"
+              autoComplete="one-time-code"
+              className={`auth-otp-input${otpError ? ' err' : ''}`}
+              autoFocus
+            />
+            {otpError && <span className="auth-field-err">{otpError}</span>}
+          </div>
+          <button type="submit" className="auth-submit" disabled={otpLoading}>
+            {otpLoading ? 'Verifying…' : 'Confirm Account →'}
+          </button>
+        </form>
+
         <p className="auth-verify-hint">
-          Click the link in the email to activate your account. Check your spam folder if you don&apos;t see it within a few minutes.
+          You can also click the link in the email. Check your spam if you don&apos;t see it.
         </p>
-        <button className="auth-submit" onClick={() => navigate(`/${role}/login`)}>
-          Go to Sign In →
-        </button>
       </div>
     )
   }

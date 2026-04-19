@@ -1,7 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 
-const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
-const FROM_EMAIL = 'Pallaki <notifications@pallaki.com>'
+const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') || ''
+const FROM_EMAIL = Deno.env.get('RESEND_FROM_EMAIL') || 'Pallaki <noreply@pallaki.com>'
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -34,7 +34,7 @@ serve(async (req) => {
             <div style="background: #fff; border: 1px solid #F5D0D6; border-radius: 8px; padding: 14px 16px; margin: 16px 0; font-style: italic; color: #5A3A3A; line-height: 1.65; font-size: .92rem;">
               "${inquiryMessage}"
             </div>` : ''}
-            <a href="https://pallaki.com/staging/analytics" style="display: inline-block; background: #C4848C; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-size: .9rem; margin-top: 8px;">
+            <a href="https://pallaki.com/analytics" style="display: inline-block; background: #C4848C; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-size: .9rem; margin-top: 8px;">
               View Inquiry →
             </a>
             <p style="color: #9B7B80; font-size: .78rem; margin-top: 24px; line-height: 1.6;">
@@ -58,7 +58,7 @@ serve(async (req) => {
             <div style="background: #fff; border: 1px solid #F5D0D6; border-radius: 8px; padding: 14px 16px; margin: 16px 0; color: #5A3A3A; line-height: 1.65; font-size: .92rem;">
               ${inquiryMessage}
             </div>` : ''}
-            <a href="https://pallaki.com/staging/profile" style="display: inline-block; background: #C4848C; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-size: .9rem; margin-top: 8px;">
+            <a href="https://pallaki.com/profile" style="display: inline-block; background: #C4848C; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-size: .9rem; margin-top: 8px;">
               View Reply →
             </a>
             <p style="color: #9B7B80; font-size: .78rem; margin-top: 24px; line-height: 1.6;">
@@ -82,8 +82,52 @@ serve(async (req) => {
               <strong style="color: #6B3A46;">What's next?</strong><br/>
               Log in to your dashboard to complete your profile, add portfolio photos, and update your availability.
             </div>
-            <a href="https://pallaki.com/staging/dashboard" style="display: inline-block; background: #C4848C; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-size: .9rem; margin-top: 8px;">
+            <a href="https://pallaki.com/dashboard" style="display: inline-block; background: #C4848C; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-size: .9rem; margin-top: 8px;">
               Go to My Dashboard →
+            </a>
+            <p style="color: #9B7B80; font-size: .78rem; margin-top: 24px; line-height: 1.6;">
+              You're receiving this because you applied as a vendor on Pallaki.
+            </p>
+          </div>
+        </div>`
+    } else if (type === 'welcome_planner') {
+      subject = `Welcome to Pallaki! — Start planning your event`
+      html = `
+        <div style="font-family: Georgia, serif; max-width: 520px; margin: 0 auto; color: #3D1D2A;">
+          <div style="background: linear-gradient(135deg, #6B3A46, #3D1D2A); padding: 28px 32px; border-radius: 12px 12px 0 0;">
+            <h1 style="color: #fff; font-size: 1.4rem; font-weight: 400; margin: 0;">पल्लकी</h1>
+          </div>
+          <div style="background: #FFF6F8; padding: 28px 32px; border: 1px solid #F5D0D6; border-top: none; border-radius: 0 0 12px 12px;">
+            <h2 style="font-size: 1.2rem; font-weight: 500; color: #6B3A46; margin-top: 0;">Welcome${recipientName ? `, ${recipientName}` : ''}!</h2>
+            <p style="color: #5A3A3A; line-height: 1.7; font-size: .95rem;">
+              Your Pallaki account is ready. Browse our curated directory of South Asian wedding and event vendors — from mehndi artists to caterers to photographers.
+            </p>
+            <a href="https://pallaki.com" style="display: inline-block; background: #C4848C; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-size: .9rem; margin-top: 8px;">
+              Browse Vendors →
+            </a>
+            <p style="color: #9B7B80; font-size: .78rem; margin-top: 24px; line-height: 1.6;">
+              You're receiving this because you created an account on Pallaki.
+            </p>
+          </div>
+        </div>`
+    } else if (type === 'welcome_vendor') {
+      subject = `Welcome to Pallaki! — Your application is under review`
+      html = `
+        <div style="font-family: Georgia, serif; max-width: 520px; margin: 0 auto; color: #3D1D2A;">
+          <div style="background: linear-gradient(135deg, #6B3A46, #3D1D2A); padding: 28px 32px; border-radius: 12px 12px 0 0;">
+            <h1 style="color: #fff; font-size: 1.4rem; font-weight: 400; margin: 0;">पल्लकी</h1>
+          </div>
+          <div style="background: #FFF6F8; padding: 28px 32px; border: 1px solid #F5D0D6; border-top: none; border-radius: 0 0 12px 12px;">
+            <h2 style="font-size: 1.2rem; font-weight: 500; color: #6B3A46; margin-top: 0;">Welcome${recipientName ? `, ${recipientName}` : ''}!</h2>
+            <p style="color: #5A3A3A; line-height: 1.7; font-size: .95rem;">
+              Thanks for applying to list your business on Pallaki. Your application is now under review — we'll send you an email once it's approved.
+            </p>
+            <div style="background: #fff; border: 1px solid #F5D0D6; border-radius: 8px; padding: 14px 16px; margin: 16px 0; color: #5A3A3A; line-height: 1.65; font-size: .92rem;">
+              <strong style="color: #6B3A46;">While you wait</strong><br/>
+              Log in to complete your profile, add photos, and set your availability so you're ready to go live.
+            </div>
+            <a href="https://pallaki.com/vendor/login" style="display: inline-block; background: #C4848C; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-size: .9rem; margin-top: 8px;">
+              Complete My Profile →
             </a>
             <p style="color: #9B7B80; font-size: .78rem; margin-top: 24px; line-height: 1.6;">
               You're receiving this because you applied as a vendor on Pallaki.
@@ -96,12 +140,22 @@ serve(async (req) => {
 
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
-      headers: { 'Authorization': `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from: FROM_EMAIL, to: recipientEmail, subject, html }),
+      headers: {
+        'Authorization': `Bearer ${RESEND_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: FROM_EMAIL,
+        to: [recipientEmail],
+        subject,
+        html,
+      }),
     })
 
-    const data = await res.json()
-    if (!res.ok) return new Response(JSON.stringify({ error: data }), { status: res.status })
+    if (!res.ok) {
+      const err = await res.text()
+      return new Response(JSON.stringify({ error: err }), { status: res.status })
+    }
 
     return new Response(JSON.stringify({ ok: true }), { status: 200 })
   } catch (err) {

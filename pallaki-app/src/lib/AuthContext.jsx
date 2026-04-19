@@ -64,7 +64,7 @@ export function AuthProvider({ children }) {
       password,
       options: {
         data: { name, user_type: type },
-        emailRedirectTo: `${window.location.origin}`,
+        emailRedirectTo: `${window.location.origin}${import.meta.env.BASE_URL}`,
       },
     })
     if (error) return { error }
@@ -72,6 +72,14 @@ export function AuthProvider({ children }) {
     if (data.session?.user) {
       await fetchUserType(data.session.user.id)
     }
+
+    supabase.functions.invoke('send-notification-email', {
+      body: {
+        type: type === 'vendor' ? 'welcome_vendor' : 'welcome_planner',
+        recipientEmail: email,
+        recipientName: name,
+      },
+    })
 
     return { data, error: null }
   }
@@ -118,6 +126,14 @@ export function AuthProvider({ children }) {
     setUserType(null)
   }
 
+  async function verifyOtp(email, token) {
+    if (!supabase) return { error: { message: 'Not available in demo mode.' } }
+    const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'signup' })
+    if (error) return { error }
+    if (data.session?.user) await fetchUserType(data.session.user.id)
+    return { data, error: null }
+  }
+
   async function resetPassword(email) {
     if (!supabase) return { error: { message: 'Not available in demo mode.' } }
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -127,7 +143,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, userType, setUserType, loading, signUp, signIn, signInWithGoogle, signOut, resetPassword }}>
+    <AuthContext.Provider value={{ user, userType, setUserType, loading, signUp, verifyOtp, signIn, signInWithGoogle, signOut, resetPassword }}>
       {!loading && children}
     </AuthContext.Provider>
   )
