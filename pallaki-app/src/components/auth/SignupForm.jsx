@@ -73,7 +73,7 @@ export default function SignupForm({ role }) {
   async function handleOtpSubmit(e) {
     e?.preventDefault()
     const code = otp.trim()
-    if (code.length !== 6) { setOtpError('Enter the 6-digit code from your email.'); return }
+    if (code.length !== 8) { setOtpError('Enter the 8-digit code from your email.'); return }
     setOtpError('')
     setOtpLoading(true)
     const { error } = await verifyOtp(verifyEmail, code)
@@ -96,15 +96,15 @@ export default function SignupForm({ role }) {
 
         <form onSubmit={handleOtpSubmit} noValidate className="auth-otp-form">
           <div className="auth-field">
-            <label htmlFor="otp-input">Enter your verification code</label>
+            <label htmlFor="otp-input">Enter your 8-digit verification code</label>
             <input
               id="otp-input"
               type="text"
               inputMode="numeric"
-              maxLength={6}
+              maxLength={8}
               value={otp}
               onChange={e => { setOtp(e.target.value.replace(/\D/g, '')); setOtpError('') }}
-              placeholder="000000"
+              placeholder="00000000"
               autoComplete="one-time-code"
               className={`auth-otp-input${otpError ? ' err' : ''}`}
               autoFocus
