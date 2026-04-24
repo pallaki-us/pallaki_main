@@ -26,6 +26,7 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
   const { inquiries, updateStatus, saveReply, archiveInquiry } = useVendorInquiries(profile?.id)
   const { threads } = useVendorThreads(profile?.id)
   const [activeThread, setActiveThread] = useState(null)
+  const [readThreadIds, setReadThreadIds] = useState(new Set())
   const [period, setPeriod] = useState(365)
   const { data: anData } = useVendorAnalytics(profile?.id, period)
   const [selServices, setSelServices] = useState(['Weddings','Engagements'])
@@ -378,22 +379,29 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
                   </div>
                   {threads.length === 0 ? (
                     <p style={{ fontSize: '.82rem', color: 'var(--tl)', fontStyle: 'italic', padding: '1.5rem 1rem', textAlign: 'center' }}>No conversations yet.</p>
-                  ) : threads.map(t => (
-                    <div
-                      key={t.planner_id}
-                      onClick={() => setActiveThread(t)}
-                      style={{
-                        padding: '.75rem 1rem',
-                        cursor: 'pointer',
-                        borderBottom: '1px solid var(--br)',
-                        background: activeThread?.planner_id === t.planner_id ? 'var(--vf)' : 'transparent',
-                        transition: 'background .15s',
-                      }}
-                    >
-                      <div style={{ fontSize: '.85rem', fontWeight: 600, color: 'var(--vx)', marginBottom: '.15rem' }}>{t.name}</div>
-                      {t.email && <div style={{ fontSize: '.72rem', color: 'var(--tl)' }}>{t.email}</div>}
-                    </div>
-                  ))}
+                  ) : threads.map(t => {
+                    const isUnread = t.hasUnread && !readThreadIds.has(t.planner_id)
+                    return (
+                      <div
+                        key={t.planner_id}
+                        onClick={() => { setActiveThread(t); setReadThreadIds(prev => new Set([...prev, t.planner_id])) }}
+                        style={{
+                          padding: '.75rem 1rem',
+                          cursor: 'pointer',
+                          borderBottom: '1px solid var(--br)',
+                          background: activeThread?.planner_id === t.planner_id ? 'var(--vf)' : 'transparent',
+                          transition: 'background .15s',
+                          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '.5rem',
+                        }}
+                      >
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ fontSize: '.85rem', fontWeight: isUnread ? 700 : 600, color: 'var(--vx)', marginBottom: '.15rem' }}>{t.name}</div>
+                          {t.email && <div style={{ fontSize: '.72rem', color: 'var(--tl)' }}>{t.email}</div>}
+                        </div>
+                        {isUnread && <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#C4848C', flexShrink: 0 }} />}
+                      </div>
+                    )
+                  })}
                 </div>
 
                 {/* Chat panel */}

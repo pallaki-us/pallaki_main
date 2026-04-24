@@ -9,6 +9,7 @@ export default function PlannerConversations() {
   const navigate = useNavigate()
   const { threads, loading } = usePlannerThreads(user?.id)
   const [activeThread, setActiveThread] = useState(null)
+  const [readThreadIds, setReadThreadIds] = useState(new Set())
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--cd)', paddingTop: 64 }}>
@@ -41,10 +42,11 @@ export default function PlannerConversations() {
               {threads.map(t => {
                 const v = t.vendor
                 const isActive = activeThread?.vendor_id === t.vendor_id
+                const isUnread = t.hasUnread && !readThreadIds.has(t.vendor_id)
                 return (
                   <div
                     key={t.vendor_id}
-                    onClick={() => setActiveThread(t)}
+                    onClick={() => { setActiveThread(t); setReadThreadIds(prev => new Set([...prev, t.vendor_id])) }}
                     style={{
                       padding: '.85rem 1rem',
                       cursor: 'pointer',
@@ -59,10 +61,11 @@ export default function PlannerConversations() {
                         ? <img src={v.avatar_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         : v?.icon || '🌸'}
                     </div>
-                    <div style={{ minWidth: 0 }}>
-                      <div style={{ fontSize: '.85rem', fontWeight: 600, color: 'var(--vx)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{v?.name || 'Vendor'}</div>
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <div style={{ fontSize: '.85rem', fontWeight: isUnread ? 700 : 600, color: 'var(--vx)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{v?.name || 'Vendor'}</div>
                       <div style={{ fontSize: '.72rem', color: 'var(--tl)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{v?.category}{v?.city ? ` · ${v.city}` : ''}</div>
                     </div>
+                    {isUnread && <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--v)', flexShrink: 0 }} />}
                   </div>
                 )
               })}

@@ -3,14 +3,15 @@ import { useMessages } from '../lib/useMessages'
 import { showToast } from '../lib/toast'
 
 export default function ChatThread({ vendorId, plannerId, senderRole, senderId, otherName }) {
-  const { messages, loading, send } = useMessages(vendorId, plannerId)
+  const { messages, loading, send, markRead } = useMessages(vendorId, plannerId)
   const [input, setInput] = useState('')
   const [sending, setSending] = useState(false)
   const bottomRef = useRef(null)
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
+    if (messages.length > 0) markRead(senderRole)
+  }, [messages.length])
 
   async function handleSend(e) {
     e?.preventDefault()

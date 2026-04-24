@@ -42,10 +42,22 @@ export function useMessages(vendorId, plannerId) {
     return { error }
   }
 
-  return { messages, loading, send, refetch: fetchMessages }
+  async function markRead(readerRole) {
+    if (!supabase || !vendorId || !plannerId) return
+    const otherRole = readerRole === 'planner' ? 'vendor' : 'planner'
+    await supabase
+      .from('messages')
+      .update({ is_read: true })
+      .eq('vendor_id', vendorId)
+      .eq('planner_id', plannerId)
+      .eq('sender_role', otherRole)
+      .eq('is_read', false)
+  }
+
+  return { messages, loading, send, markRead, refetch: fetchMessages }
 }
 
-// For vendor dashboard: list of planners who have sent messages, using inquiries for profile info
+// For vendor dashboard: list of planners who have sent messages
 export function useVendorThreads(vendorId) {
   const [threads, setThreads] = useState([])
   const [loading, setLoading] = useState(true)
@@ -64,6 +76,15 @@ export function useVendorThreads(vendorId) {
 
     if (!data) { setThreads([]); setLoading(false); return }
 
+    const { data: unreadData } = await supabase
+      .from('messages')
+      .select('planner_id')
+      .eq('vendor_id', vendorId)
+      .eq('sender_role', 'planner')
+      .eq('is_read', false)
+
+    const unreadPlannerIds = new Set((unreadData || []).map(m => m.planner_id))
+
     const seen = new Set()
     const result = []
     for (const inq of data) {
@@ -73,6 +94,7 @@ export function useVendorThreads(vendorId) {
           planner_id: inq.planner_id,
           name: inq.intake_data?.contactName || inq.profiles?.name || inq.profiles?.email || 'Planner',
           email: inq.intake_data?.contactEmail || inq.profiles?.email,
+          hasUnread: unreadPlannerIds.has(inq.planner_id),
         })
       }
     }
@@ -83,7 +105,7 @@ export function useVendorThreads(vendorId) {
   return { threads, loading, refetch: fetchThreads }
 }
 
-// For planner profile: list of vendors they've contacted
+// For planner conversations: list of vendors they've contacted
 export function usePlannerThreads(plannerId) {
   const [threads, setThreads] = useState([])
   const [loading, setLoading] = useState(true)
@@ -102,12 +124,25 @@ export function usePlannerThreads(plannerId) {
 
     if (!data) { setThreads([]); setLoading(false); return }
 
+    const { data: unreadData } = await supabase
+      .from('messages')
+      .select('vendor_id')
+      .eq('planner_id', plannerId)
+      .eq('sender_role', 'vendor')
+      .eq('is_read', false)
+
+    const unreadVendorIds = new Set((unreadData || []).map(m => m.vendor_id))
+
     const seen = new Set()
     const result = []
     for (const inq of data) {
       if (!seen.has(inq.vendor_id)) {
         seen.add(inq.vendor_id)
-        result.push({ vendor_id: inq.vendor_id, vendor: inq.vendors })
+        result.push({
+          vendor_id: inq.vendor_id,
+          vendor: inq.vendors,
+          hasUnread: unreadVendorIds.has(inq.vendor_id),
+        })
       }
     }
     setThreads(result)
