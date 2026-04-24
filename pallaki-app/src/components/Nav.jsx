@@ -73,6 +73,9 @@ export default function Nav({ onShowVendorListing }) {
               <div className="nav-user-dd-item" onClick={() => navigate('/profile')}>
                 ✎ Edit Profile
               </div>
+              <div className="nav-user-dd-item" onClick={() => navigate('/conversations')}>
+                💌 My Conversations
+              </div>
               <div className="nav-user-dd-item" onClick={() => navigate('/vendors')}>
                 🔍 Browse Vendors
               </div>

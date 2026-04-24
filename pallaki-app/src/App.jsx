@@ -10,6 +10,7 @@ import Listing from './pages/Listing'
 import Detail from './pages/Detail'
 import Dashboard from './pages/Dashboard'
 import PlannerProfile from './pages/PlannerProfile'
+import PlannerConversations from './pages/PlannerConversations'
 import VendorOnboarding from './pages/VendorOnboarding'
 import Privacy from './pages/Privacy'
 import Terms from './pages/Terms'
@@ -92,6 +93,7 @@ function AppInner() {
         <Route path="/dashboard" element={<RequireAuth role="vendor"><Dashboard activePage="dashboard" onShowVendorListing={showVendorListing} /></RequireAuth>} />
         <Route path="/analytics" element={<RequireAuth role="vendor"><Dashboard activePage="analytics" onShowVendorListing={showVendorListing} /></RequireAuth>} />
         <Route path="/profile" element={<RequireAuth role="planner"><PlannerProfile /></RequireAuth>} />
+        <Route path="/conversations" element={<RequireAuth role="planner"><PlannerConversations /></RequireAuth>} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/planner/login" element={<PlannerLogin />} />
