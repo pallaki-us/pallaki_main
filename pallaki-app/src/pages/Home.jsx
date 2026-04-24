@@ -258,7 +258,7 @@ export default function Home() {
         <div className="fi">
           <div>
             <div className="flogo"><AnimatedLogo size="1.65rem" color="var(--gl)" /></div>
-            <p className="ftag">Where South Asian traditions meet American celebrations.</p>
+            <p className="ftag">Craft your dream celebration with us.</p>
           </div>
           <div className="fc">
             <h4>Discover</h4>
