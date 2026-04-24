@@ -79,7 +79,7 @@ export default function SignupForm({ role }) {
     const { error } = await verifyOtp(verifyEmail, code)
     setOtpLoading(false)
     if (error) {
-      setOtpError(error.message?.includes('expired') ? 'Code expired — please request a new one.' : 'Invalid code. Please try again.')
+      setOtpError('Please enter the correct code from your email.')
       return
     }
     navigate(role === 'vendor' ? '/onboarding' : '/profile', { replace: true })
