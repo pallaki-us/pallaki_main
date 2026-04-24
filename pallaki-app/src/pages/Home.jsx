@@ -6,7 +6,6 @@ import { IS_DEMO, IS_PROD } from '../lib/env'
 import AnimatedLogo from '../components/AnimatedLogo'
 import TrendingSection from '../components/TrendingSection'
 import HowItWorksSection from '../components/HowItWorksSection'
-import TestimonialsSection from '../components/TestimonialsSection'
 import ContactSection from '../components/ContactSection'
 import ourStoryImg from '../assets/our story.jpg'
 
@@ -200,10 +199,6 @@ export default function Home() {
         </div>
       </section>
 
-      <TestimonialsSection />
-
-      <div className="sec-divider"><span>◆ ◇ ◆</span></div>
-
       {/* ── FOR VENDORS ── */}
       <section className="fv-section">
         <div className="fv-inner">
@@ -229,6 +224,28 @@ export default function Home() {
                 {['R', 'A', 'S', 'M'].map(l => <span key={l}>{l}</span>)}
               </div>
               <p className="fv-trust-txt"><strong>{IS_PROD ? (stats.vendors > 0 ? `${stats.vendors}+` : 'Growing') : '100+'} vendors</strong> already growing on Pallaki</p>
+            </div>
+          </div>
+          <div className="fv-right">
+            <div className="fv-right-pattern" />
+            <div className="fv-quotes">
+              {[
+                { icon: '💍', quote: "Finding vendors who truly understood our traditions was the hardest part. Pallaki made it effortless.", name: "Priya & Rohan", event: "Wedding · Dallas, TX" },
+                { icon: '🌸', quote: "Every vendor we reached out to through Pallaki was professional and culturally aware. Planning felt less overwhelming than we expected.", name: "Anita & Vikram", event: "Wedding · Chicago, IL" },
+                { icon: '📸', quote: "Pallaki brought us clients who understand the importance of what we do. The quality of inquiries is unlike anything else we've tried.", name: "Meera Nair Photography", event: "Photography Vendor · Atlanta, GA" },
+              ].map((t, i) => (
+                <div key={i} className={`fv-quote${i % 2 === 1 ? ' alt' : ''}`}>
+                  <div className="fv-quote-stars">★★★★★</div>
+                  <p className="fv-quote-text">"{t.quote}"</p>
+                  <div className="fv-quote-author">
+                    <span className="fv-quote-av">{t.icon}</span>
+                    <div>
+                      <div className="fv-quote-name">{t.name}</div>
+                      <div className="fv-quote-event">{t.event}</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
