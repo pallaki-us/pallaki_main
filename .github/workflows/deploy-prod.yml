@@ -1,0 +1,55 @@
+name: Deploy Production to GitHub Pages
+
+on:
+  push:
+    branches: [prod]
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Load secrets from 1Password
+        uses: 1password/load-secrets-action@v2
+        with:
+          export-env: true
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          VITE_SUPABASE_URL: op://Pallaki Weddings/Pallaki Prod/supabase_url
+          VITE_SUPABASE_ANON_KEY: op://Pallaki Weddings/Pallaki Prod/supabase_anon_key
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: pallaki-app
+
+      - name: Build
+        run: npm run build
+        working-directory: pallaki-app
+        env:
+          VITE_ENV: prod
+          VITE_BASE_PATH: /
+
+      - name: Add 404.html for SPA routing
+        run: cp pallaki-app/dist/index.html pallaki-app/dist/404.html
+
+      - name: Add CNAME for custom domain
+        run: echo "pallaki.us" > pallaki-app/dist/CNAME
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          personal_token: ${{ secrets.GH_PAT }}
+          publish_dir: pallaki-app/dist
+          keep_files: true
