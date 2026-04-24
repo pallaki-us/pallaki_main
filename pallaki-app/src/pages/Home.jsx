@@ -41,8 +41,8 @@ export default function Home() {
       if (error) throw error
       const unique = [...new Set(data.map(v => v.city).filter(Boolean))].sort()
       setCitySuggestions(unique)
-    } catch (err) {
-      console.error('Failed to fetch cities:', err)
+    } catch {
+      // silently ignore
     }
   }
 
@@ -63,8 +63,8 @@ export default function Home() {
         : 0
       const planners = plannersRes.count || 0
       setStats({ vendors: vendorCount, cities, categories: categories || 10, planners })
-    } catch (err) {
-      console.error('Failed to fetch stats:', err)
+    } catch {
+      // silently ignore
     }
   }
 
@@ -182,26 +182,28 @@ export default function Home() {
             <p>We're Shruti and Vamsi, the founders of Pallaki. Like many of you, our journey began with a vision for a beautiful wedding—and a spreadsheet that quickly got out of hand.</p>
             <p>When we planned our own wedding at the BAPS Swaminarayan Temple in Chino Hills, we didn't struggle to find talent; we struggled to find it easily. Our days were spent endlessly scrolling through Instagram, jumping between portfolios, and waiting on DMs. We realized there was a missing link: a central space where culture, tradition, and convenience met.</p>
             <p>We created Pallaki to be the platform we wish we'd had. We believe that finding a vendor who understands your traditions shouldn't require a dozen tabs and a week of research. We've brought everything together in one place so you can spend less time searching and more time celebrating.</p>
-            <div className="stats-mini" style={{ marginTop: '2rem' }}>
-              {[
-                [stats.vendors > 0 ? `${stats.vendors}+` : '—', 'Verified Vendors'],
-                [stats.cities > 0 ? `${stats.cities}` : '—', 'Cities Covered'],
-                [stats.categories > 0 ? `${stats.categories}` : '—', 'Categories'],
-                [stats.planners > 0 ? `${stats.planners * 2}+` : '—', 'Happy Families'],
-              ].map(([n, l]) => (
-                <div key={l} className="smi">
-                  <div className="smi-n">{n}</div>
-                  <div className="smi-l">{l}</div>
-                </div>
-              ))}
-            </div>
+            {!IS_PROD && (
+              <div className="stats-mini" style={{ marginTop: '2rem' }}>
+                {[
+                  [stats.vendors > 0 ? `${stats.vendors}+` : '—', 'Verified Vendors'],
+                  [stats.cities > 0 ? `${stats.cities}` : '—', 'Cities Covered'],
+                  [stats.categories > 0 ? `${stats.categories}` : '—', 'Categories'],
+                  [stats.planners > 0 ? `${stats.planners * 2}+` : '—', 'Happy Families'],
+                ].map(([n, l]) => (
+                  <div key={l} className="smi">
+                    <div className="smi-n">{n}</div>
+                    <div className="smi-l">{l}</div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </section>
 
       {/* ── FOR VENDORS ── */}
       <section className="fv-section">
-        <div className="fv-inner">
+        <div className="fv-inner" style={IS_PROD ? { gridTemplateColumns: '1fr' } : {}}>
           <div className="fv-left">
             <span className="sec-lbl">For Vendors</span>
             <h2 className="fv-title">Grow Your Business<br />with <em>Pallaki</em></h2>
@@ -219,35 +221,39 @@ export default function Home() {
                 </div>
               ))}
             </div>
-            <div className="fv-trust">
-              <div className="fv-trust-av">
-                {['R', 'A', 'S', 'M'].map(l => <span key={l}>{l}</span>)}
+            {!IS_PROD && (
+              <div className="fv-trust">
+                <div className="fv-trust-av">
+                  {['R', 'A', 'S', 'M'].map(l => <span key={l}>{l}</span>)}
+                </div>
+                <p className="fv-trust-txt"><strong>100+ vendors</strong> already growing on Pallaki</p>
               </div>
-              <p className="fv-trust-txt"><strong>{IS_PROD ? (stats.vendors > 0 ? `${stats.vendors}+` : 'Growing') : '100+'} vendors</strong> already growing on Pallaki</p>
-            </div>
+            )}
           </div>
-          <div className="fv-right">
-            <div className="fv-right-pattern" />
-            <div className="fv-quotes">
-              {[
-                { icon: '💍', quote: "Finding vendors who truly understood our traditions was the hardest part. Pallaki made it effortless.", name: "Priya & Rohan", event: "Wedding · Dallas, TX" },
-                { icon: '🌸', quote: "Every vendor we reached out to through Pallaki was professional and culturally aware. Planning felt less overwhelming than we expected.", name: "Anita & Vikram", event: "Wedding · Chicago, IL" },
-                { icon: '📸', quote: "Pallaki brought us clients who understand the importance of what we do. The quality of inquiries is unlike anything else we've tried.", name: "Meera Nair Photography", event: "Photography Vendor · Atlanta, GA" },
-              ].map((t, i) => (
-                <div key={i} className={`fv-quote${i % 2 === 1 ? ' alt' : ''}`}>
-                  <div className="fv-quote-stars">★★★★★</div>
-                  <p className="fv-quote-text">"{t.quote}"</p>
-                  <div className="fv-quote-author">
-                    <span className="fv-quote-av">{t.icon}</span>
-                    <div>
-                      <div className="fv-quote-name">{t.name}</div>
-                      <div className="fv-quote-event">{t.event}</div>
+          {!IS_PROD && (
+            <div className="fv-right">
+              <div className="fv-right-pattern" />
+              <div className="fv-quotes">
+                {[
+                  { icon: '💍', quote: "Finding vendors who truly understood our traditions was the hardest part. Pallaki made it effortless.", name: "Priya & Rohan", event: "Wedding · Dallas, TX" },
+                  { icon: '🌸', quote: "Every vendor we reached out to through Pallaki was professional and culturally aware. Planning felt less overwhelming than we expected.", name: "Anita & Vikram", event: "Wedding · Chicago, IL" },
+                  { icon: '📸', quote: "Pallaki brought us clients who understand the importance of what we do. The quality of inquiries is unlike anything else we've tried.", name: "Meera Nair Photography", event: "Photography Vendor · Atlanta, GA" },
+                ].map((t, i) => (
+                  <div key={i} className={`fv-quote${i % 2 === 1 ? ' alt' : ''}`}>
+                    <div className="fv-quote-stars">★★★★★</div>
+                    <p className="fv-quote-text">"{t.quote}"</p>
+                    <div className="fv-quote-author">
+                      <span className="fv-quote-av">{t.icon}</span>
+                      <div>
+                        <div className="fv-quote-name">{t.name}</div>
+                        <div className="fv-quote-event">{t.event}</div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </section>
 

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/AuthContext'
 import { supabase } from '../lib/supabase'
-import { IS_DEMO } from '../lib/env'
+import { IS_DEMO, IS_PROD } from '../lib/env'
 import { CAT_VENDORS } from '../data/vendors'
 
 const CAT_CHIPS = [
@@ -31,7 +31,7 @@ export default function TrendingSection() {
 
   async function fetchTrending(category) {
     if (!supabase || IS_DEMO) {
-      setVendors(CAT_VENDORS[category] || [])
+      setVendors(IS_PROD ? [] : (CAT_VENDORS[category] || []))
       return
     }
     try {
@@ -51,8 +51,7 @@ export default function TrendingSection() {
         rating: v.rating?.toFixed(1),
         reviews: v.review_count,
       })) || [])
-    } catch (err) {
-      console.error('Failed to fetch trending vendors:', err)
+    } catch {
       setVendors(CAT_VENDORS[category] || [])
     }
   }
