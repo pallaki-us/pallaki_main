@@ -130,8 +130,12 @@ export default function VendorChat({ open, onClose, vendor }) {
     e?.preventDefault()
     if (!chatInput.trim() || sending) return
     setSending(true)
-    await send(chatInput, 'planner', user?.id)
-    setChatInput('')
+    const { error } = await send(chatInput, 'planner', user?.id)
+    if (error) {
+      showToast('Failed to send message. Please try again.')
+    } else {
+      setChatInput('')
+    }
     setSending(false)
   }
 

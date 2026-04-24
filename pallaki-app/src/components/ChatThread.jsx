@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useMessages } from '../lib/useMessages'
+import { showToast } from '../lib/toast'
 
 export default function ChatThread({ vendorId, plannerId, senderRole, senderId, otherName }) {
   const { messages, loading, send } = useMessages(vendorId, plannerId)
@@ -15,8 +16,12 @@ export default function ChatThread({ vendorId, plannerId, senderRole, senderId, 
     e?.preventDefault()
     if (!input.trim() || sending) return
     setSending(true)
-    await send(input, senderRole, senderId)
-    setInput('')
+    const { error } = await send(input, senderRole, senderId)
+    if (error) {
+      showToast('Failed to send message. Please try again.')
+    } else {
+      setInput('')
+    }
     setSending(false)
   }
 

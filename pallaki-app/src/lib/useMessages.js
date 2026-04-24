@@ -30,14 +30,15 @@ export function useMessages(vendorId, plannerId) {
   }
 
   async function send(body, senderRole, senderId) {
-    if (!supabase || !body.trim()) return
-    await supabase.from('messages').insert({
+    if (!supabase || !body.trim() || !vendorId || !plannerId) return { error: 'Missing IDs' }
+    const { error } = await supabase.from('messages').insert({
       vendor_id: vendorId,
       planner_id: plannerId,
       sender_id: senderId,
       sender_role: senderRole,
       body: body.trim(),
     })
+    return { error }
   }
 
   return { messages, loading, send, refetch: fetchMessages }
