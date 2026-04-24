@@ -124,7 +124,7 @@ serve(async (req) => {
             </p>
             <div style="background: #fff; border: 1px solid #F5D0D6; border-radius: 8px; padding: 14px 16px; margin: 16px 0; color: #5A3A3A; line-height: 1.65; font-size: .92rem;">
               <strong style="color: #6B3A46;">While you wait</strong><br/>
-              Log in to complete your profile, add photos, and set your availability so you're ready to go live.
+              Log in to complete your profile and add photos so you're ready to go live.
             </div>
             <a href="https://pallaki.com/vendor/login" style="display: inline-block; background: #C4848C; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-size: .9rem; margin-top: 8px;">
               Complete My Profile →
