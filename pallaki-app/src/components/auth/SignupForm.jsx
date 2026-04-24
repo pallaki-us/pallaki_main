@@ -91,7 +91,7 @@ export default function SignupForm({ role }) {
       <div className="auth-form auth-verify">
         <div className="auth-verify-icon">📬</div>
         <h1 className="auth-form-title">Check your inbox</h1>
-        <p className="auth-verify-text">We sent a 6-digit code to</p>
+        <p className="auth-verify-text">We sent you an 8-digit code to</p>
         <p className="auth-verify-email">{verifyEmail}</p>
 
         <form onSubmit={handleOtpSubmit} noValidate className="auth-otp-form">
