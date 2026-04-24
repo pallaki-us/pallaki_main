@@ -160,27 +160,17 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
     return null
   }
 
-  // Pending approval state
-  if (profile && !profile.is_verified) return (
-    <div style={{ paddingTop: 64, minHeight: '100vh', background: 'var(--cr)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
-      <div style={{ textAlign: 'center', maxWidth: 480 }}>
-        <div style={{ fontSize: '3.5rem', marginBottom: '1.5rem' }}>⏳</div>
-        <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '1.8rem', color: 'var(--vx)', marginBottom: '.75rem', fontWeight: 400 }}>
-          Your profile is under review
-        </h2>
-        <p style={{ fontSize: '.95rem', color: 'var(--tm)', lineHeight: 1.8, marginBottom: '.5rem', fontWeight: 300 }}>
-          We're verifying your listing for <strong>{profile.name}</strong>. This usually takes 24–48 hours.
-        </p>
-        <p style={{ fontSize: '.85rem', color: 'var(--tl)', lineHeight: 1.7, marginBottom: '2rem', fontWeight: 300 }}>
-          You'll receive an email once your profile is live on Pallaki.
-        </p>
-        <button className="btn-o" onClick={handleSignOut}>Sign Out</button>
-      </div>
-    </div>
-  )
+  const isPendingApproval = profile && !profile.is_verified
 
   return (
     <div style={{ paddingTop: 64, minHeight: '100vh', background: 'var(--cd)' }}>
+
+      {isPendingApproval && (
+        <div style={{ background: 'linear-gradient(135deg, #6B3A46, #3D1D2A)', color: '#fff', padding: '.75rem 1.5rem', textAlign: 'center', fontSize: '.88rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '.6rem' }}>
+          <span>⏳</span>
+          <span>Your listing for <strong>{profile.name}</strong> is under review. We'll email you within 1–2 hours once approved. Feel free to browse the site in the meantime.</span>
+        </div>
+      )}
 
       {/* ── DASHBOARD PAGE ── */}
       {activePage === 'dashboard' && (
