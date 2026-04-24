@@ -1,5 +1,5 @@
 /* ── TRENDING ── */
-.trending-section { padding: 3.5rem 3rem 4rem; background: var(--cr); }
+.trending-section { padding: 1.5rem 3rem 4rem; background: var(--cr); }
 .trending-inner { max-width: 1200px; margin: 0 auto; }
 .trending-header { text-align: center; margin-bottom: 1.5rem; }
 .trending-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 300; letter-spacing: 0.06em; color: var(--vx); margin: 0; }
