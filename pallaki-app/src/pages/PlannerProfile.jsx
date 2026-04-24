@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/AuthContext'
 import { usePlannerProfile } from '../lib/usePlannerProfile'
 import { usePlannerInquiries } from '../lib/useInquiries'
+import { usePlannerThreads } from '../lib/useMessages'
+import ChatThread from '../components/ChatThread'
 import { showToast } from '../lib/toast'
 
 const SERVICES = ['📷 Photography','🪷 Mehndi Artists','🎥 Videography','💄 Bridal Makeup','🍛 Catering','🌸 Decor','🎵 Music & DJ','📋 Event Planners','🎪 Party Rentals','🏛️ Wedding Venue']
@@ -16,6 +18,8 @@ export default function PlannerProfile() {
   const navigate = useNavigate()
   const { profile, saving, saveProfile } = usePlannerProfile()
   const { inquiries } = usePlannerInquiries()
+  const { threads: vendorThreads } = usePlannerThreads(user?.id)
+  const [activeVendorThread, setActiveVendorThread] = useState(null)
 
   const [fname, setFname] = useState('')
   const [lname, setLname] = useState('')
@@ -199,65 +203,70 @@ export default function PlannerProfile() {
           </div>
         </div>
 
-        {/* My Inquiries */}
-        <div className="dash-card">
-          <div className="dash-card-head">
-            <h3>💌 My Inquiries</h3>
-            {inquiries.filter(i => i.status === 'replied').length > 0 && (
-              <span style={{ fontSize: '.72rem', background: 'var(--vf)', border: '1px solid var(--v)', color: 'var(--v)', borderRadius: 20, padding: '.2rem .7rem', fontWeight: 500 }}>
-                {inquiries.filter(i => i.status === 'replied').length} replied
-              </span>
-            )}
-          </div>
-          <div className="dash-card-body" style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
-            {inquiries.length === 0 ? (
-              <p style={{ fontSize: '.88rem', color: 'var(--tl)', textAlign: 'center', padding: '2rem', fontStyle: 'italic' }}>
-                No inquiries sent yet — <a href="/vendors" style={{ color: 'var(--v)' }}>browse vendors</a> to get started.
-              </p>
-            ) : inquiries.map(inq => {
-              const v = inq.vendors
-              const hasReply = !!inq.vendor_reply
-              return (
-                <div key={inq.id} style={{ padding: '1rem', background: hasReply ? 'var(--vf)' : 'var(--wh)', border: `1px solid ${hasReply ? 'rgba(196,132,140,.3)' : 'var(--br)'}`, borderRadius: 12 }}>
-                  {/* Vendor info */}
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '.6rem', gap: '.75rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '.65rem' }}>
-                      <div style={{ width: 38, height: 38, borderRadius: 10, background: 'var(--vp)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', flexShrink: 0, overflow: 'hidden' }}>
-                        {v?.avatar_url
-                          ? <img src={v.avatar_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                          : v?.icon || '🌸'}
-                      </div>
-                      <div>
-                        <div style={{ fontSize: '.88rem', fontWeight: 500, color: 'var(--vx)' }}>{v?.name || 'Vendor'}</div>
-                        <div style={{ fontSize: '.72rem', color: 'var(--tl)' }}>{v?.category} · {v?.city}, {v?.state}</div>
-                      </div>
+        {/* My Conversations */}
+        <div className="dash-card" style={{ padding: 0, overflow: 'hidden' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '200px 1fr', height: 480 }}>
+            {/* Thread list */}
+            <div style={{ borderRight: '1px solid var(--br)', overflowY: 'auto', background: 'var(--cr)' }}>
+              <div style={{ padding: '.75rem 1rem', fontSize: '.72rem', fontWeight: 600, color: 'var(--tl)', textTransform: 'uppercase', letterSpacing: '.08em', borderBottom: '1px solid var(--br)' }}>
+                💌 My Conversations
+              </div>
+              {vendorThreads.length === 0 ? (
+                <p style={{ fontSize: '.82rem', color: 'var(--tl)', fontStyle: 'italic', padding: '1.5rem 1rem', textAlign: 'center' }}>
+                  No conversations yet.{' '}
+                  <span style={{ color: 'var(--v)', cursor: 'pointer' }} onClick={() => navigate('/vendors')}>Browse vendors →</span>
+                </p>
+              ) : vendorThreads.map(t => {
+                const v = t.vendor
+                return (
+                  <div
+                    key={t.vendor_id}
+                    onClick={() => setActiveVendorThread(t)}
+                    style={{
+                      padding: '.75rem 1rem',
+                      cursor: 'pointer',
+                      borderBottom: '1px solid var(--br)',
+                      background: activeVendorThread?.vendor_id === t.vendor_id ? 'var(--vf)' : 'transparent',
+                      display: 'flex', alignItems: 'center', gap: '.6rem',
+                      transition: 'background .15s',
+                    }}
+                  >
+                    <div style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--vp)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', flexShrink: 0, overflow: 'hidden' }}>
+                      {v?.avatar_url ? <img src={v.avatar_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : v?.icon || '🌸'}
                     </div>
-                    <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                      <div style={{ fontSize: '.68rem', color: 'var(--tl)' }}>{new Date(inq.created_at).toLocaleDateString()}</div>
-                      <div style={{ fontSize: '.68rem', marginTop: 2, fontWeight: 500,
-                        color: inq.status === 'replied' ? '#3a7a3a' : inq.status === 'archived' ? 'var(--tl)' : 'var(--v)' }}>
-                        {inq.status === 'replied' ? '✓ Replied' : inq.status === 'archived' ? 'Archived' : 'Awaiting reply'}
-                      </div>
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontSize: '.83rem', fontWeight: 600, color: 'var(--vx)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{v?.name || 'Vendor'}</div>
+                      <div style={{ fontSize: '.7rem', color: 'var(--tl)' }}>{v?.category}</div>
                     </div>
                   </div>
+                )
+              })}
+            </div>
 
-                  {/* Original message */}
-                  <div style={{ fontSize: '.83rem', color: 'var(--tm)', fontStyle: 'italic', lineHeight: 1.6, marginBottom: hasReply ? '.75rem' : 0 }}>
-                    "{inq.message}"
+            {/* Chat panel */}
+            <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+              {activeVendorThread ? (
+                <>
+                  <div style={{ padding: '.65rem 1rem', borderBottom: '1px solid var(--br)', display: 'flex', alignItems: 'center', gap: '.65rem', flexShrink: 0 }}>
+                    <div style={{ fontSize: '.85rem', fontWeight: 600, color: 'var(--vx)' }}>{activeVendorThread.vendor?.name}</div>
+                    <div style={{ fontSize: '.72rem', color: 'var(--tl)' }}>{activeVendorThread.vendor?.category} · {activeVendorThread.vendor?.city}</div>
                   </div>
-
-                  {/* Vendor reply */}
-                  {hasReply && (
-                    <div style={{ background: 'var(--cr)', border: '1px solid var(--br)', borderRadius: 8, padding: '.7rem .9rem' }}>
-                      <div style={{ fontSize: '.65rem', textTransform: 'uppercase', letterSpacing: '.08em', color: 'var(--tl)', marginBottom: '.3rem', fontWeight: 500 }}>
-                        {v?.name || 'Vendor'} replied {inq.replied_at ? `· ${new Date(inq.replied_at).toLocaleDateString()}` : ''}
-                      </div>
-                      <div style={{ fontSize: '.84rem', color: 'var(--vx)', lineHeight: 1.65 }}>{inq.vendor_reply}</div>
-                    </div>
-                  )}
+                  <div style={{ flex: 1, minHeight: 0 }}>
+                    <ChatThread
+                      vendorId={activeVendorThread.vendor_id}
+                      plannerId={user?.id}
+                      senderRole="planner"
+                      senderId={user?.id}
+                      otherName={activeVendorThread.vendor?.name}
+                    />
+                  </div>
+                </>
+              ) : (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--tl)', fontSize: '.88rem', fontStyle: 'italic' }}>
+                  Select a conversation
                 </div>
-              )
-            })}
+              )}
+            </div>
           </div>
         </div>
 

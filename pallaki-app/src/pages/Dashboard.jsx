@@ -6,6 +6,8 @@ import ImageUpload from '../components/ImageUpload'
 import { useVendorProfile } from '../lib/useVendorProfile'
 import { useVendorInquiries } from '../lib/useInquiries'
 import { useVendorAnalytics } from '../lib/useVendorAnalytics'
+import { useVendorThreads } from '../lib/useMessages'
+import ChatThread from '../components/ChatThread'
 import { supabase } from '../lib/supabase'
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
@@ -22,6 +24,8 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
   const navigate = useNavigate()
   const { profile, loading: profileLoading, saving, saveProfile, fetchProfile } = useVendorProfile()
   const { inquiries, updateStatus, saveReply, archiveInquiry } = useVendorInquiries(profile?.id)
+  const { threads } = useVendorThreads(profile?.id)
+  const [activeThread, setActiveThread] = useState(null)
   const [period, setPeriod] = useState(365)
   const { data: anData } = useVendorAnalytics(profile?.id, period)
   const [selServices, setSelServices] = useState(['Weddings','Engagements'])
@@ -363,79 +367,58 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
               </div>
             </div>
 
-            {/* Inquiries — grouped by planner */}
-            <div className="an-card">
-              <div className="an-card-head">
-                <h3>💌 Inquiries</h3>
-                {inquiries.filter(i => i.status === 'pending').length > 0 && (
-                  <span style={{ fontSize: '.7rem', color: 'var(--v)', fontWeight: 500 }}>
-                    {inquiries.filter(i => i.status === 'pending').length} new
-                  </span>
-                )}
-              </div>
-              <div className="an-card-body" style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
-                {inquiries.length === 0 ? (
-                  <p style={{ fontSize: '.88rem', color: 'var(--tl)', textAlign: 'center', padding: '2rem', fontStyle: 'italic' }}>
-                    No inquiries yet — your listing is live and families can find you!
-                  </p>
-                ) : (() => {
-                  // Group by planner_id, preserve order of first inquiry
-                  const groups = {}
-                  const order = []
-                  inquiries.forEach(inq => {
-                    const pid = inq.planner_id
-                    if (!groups[pid]) { groups[pid] = { profile: inq.profiles, items: [] }; order.push(pid) }
-                    groups[pid].items.push(inq)
-                  })
-                  return order.map(pid => {
-                    const { profile, items } = groups[pid]
-                    const hasNew = items.some(i => i.status === 'pending')
-                    return (
-                      <div key={pid} style={{ padding: '1rem', background: hasNew ? 'var(--vf)' : 'var(--wh)', border: `1px solid ${hasNew ? 'rgba(196,132,140,.3)' : 'var(--br)'}`, borderRadius: 12 }}>
-                        {/* Planner header */}
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '.75rem', marginBottom: '.75rem' }}>
-                          <div style={{ fontSize: '.9rem', fontWeight: 600, color: 'var(--vx)' }}>
-                            {items[0]?.intake_data?.contactName || profile?.name || profile?.email || items[0]?.intake_data?.contactEmail || 'Planner'}
-                          </div>
-                          {hasNew && <span style={{ fontSize: '.68rem', color: 'var(--v)', fontWeight: 600, flexShrink: 0 }}>New</span>}
-                        </div>
+            {/* Conversations */}
+            <div className="an-card" style={{ padding: 0, overflow: 'hidden' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr', height: 520 }}>
 
-                        {/* All submissions from this planner */}
-                        {items.map((inq, idx) => (
-                          <div key={inq.id} style={{ paddingTop: '.75rem', marginTop: '.75rem', borderTop: idx === 0 ? '1px solid var(--br)' : '1px dashed var(--br)' }}>
-                            <div style={{ fontSize: '.68rem', color: 'var(--tl)', marginBottom: '.4rem' }}>
-                              {new Date(inq.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                            </div>
+                {/* Thread list */}
+                <div style={{ borderRight: '1px solid var(--br)', overflowY: 'auto', background: 'var(--cr)' }}>
+                  <div style={{ padding: '.75rem 1rem', fontSize: '.72rem', fontWeight: 600, color: 'var(--tl)', textTransform: 'uppercase', letterSpacing: '.08em', borderBottom: '1px solid var(--br)' }}>
+                    💌 Conversations
+                  </div>
+                  {threads.length === 0 ? (
+                    <p style={{ fontSize: '.82rem', color: 'var(--tl)', fontStyle: 'italic', padding: '1.5rem 1rem', textAlign: 'center' }}>No conversations yet.</p>
+                  ) : threads.map(t => (
+                    <div
+                      key={t.planner_id}
+                      onClick={() => setActiveThread(t)}
+                      style={{
+                        padding: '.75rem 1rem',
+                        cursor: 'pointer',
+                        borderBottom: '1px solid var(--br)',
+                        background: activeThread?.planner_id === t.planner_id ? 'var(--vf)' : 'transparent',
+                        transition: 'background .15s',
+                      }}
+                    >
+                      <div style={{ fontSize: '.85rem', fontWeight: 600, color: 'var(--vx)', marginBottom: '.15rem' }}>{t.name}</div>
+                      {t.email && <div style={{ fontSize: '.72rem', color: 'var(--tl)' }}>{t.email}</div>}
+                    </div>
+                  ))}
+                </div>
 
-                            {inq.intake_data ? (
-                              <div>
-                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.35rem', marginBottom: '.4rem' }}>
-                                  {inq.intake_data.eventType && <span style={{ fontSize: '.72rem', padding: '.2rem .65rem', background: 'var(--vf)', border: '1px solid var(--br)', borderRadius: 100, color: 'var(--tm)' }}>{inq.intake_data.eventType}</span>}
-                                  {inq.intake_data.eventDate && <span style={{ fontSize: '.72rem', padding: '.2rem .65rem', background: 'var(--vf)', border: '1px solid var(--br)', borderRadius: 100, color: 'var(--tm)' }}>🗓 {inq.intake_data.eventDate}</span>}
-                                  {inq.intake_data.guestCount && <span style={{ fontSize: '.72rem', padding: '.2rem .65rem', background: 'var(--vf)', border: '1px solid var(--br)', borderRadius: 100, color: 'var(--tm)' }}>👥 {inq.intake_data.guestCount}</span>}
-                                  {inq.intake_data.budget && <span style={{ fontSize: '.72rem', padding: '.2rem .65rem', background: 'var(--vf)', border: '1px solid var(--br)', borderRadius: 100, color: 'var(--tm)' }}>💰 {inq.intake_data.budget}</span>}
-                                </div>
-                                {(inq.intake_data.contactName || inq.intake_data.contactEmail || inq.intake_data.contactPhone) && (
-                                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.35rem', marginBottom: '.4rem' }}>
-                                    {inq.intake_data.contactName && <span style={{ fontSize: '.72rem', padding: '.2rem .65rem', background: 'rgba(150,172,156,.15)', border: '1px solid rgba(150,172,156,.4)', borderRadius: 100, color: 'var(--tm)' }}>👤 {inq.intake_data.contactName}</span>}
-                                    {inq.intake_data.contactEmail && <span style={{ fontSize: '.72rem', padding: '.2rem .65rem', background: 'rgba(150,172,156,.15)', border: '1px solid rgba(150,172,156,.4)', borderRadius: 100, color: 'var(--tm)' }}>✉ {inq.intake_data.contactEmail}</span>}
-                                    {inq.intake_data.contactPhone && <span style={{ fontSize: '.72rem', padding: '.2rem .65rem', background: 'rgba(150,172,156,.15)', border: '1px solid rgba(150,172,156,.4)', borderRadius: 100, color: 'var(--tm)' }}>📞 {inq.intake_data.contactPhone}</span>}
-                                  </div>
-                                )}
-                                {inq.intake_data.notes && <div style={{ fontSize: '.83rem', color: 'var(--tm)', fontStyle: 'italic', lineHeight: 1.6 }}>"{inq.intake_data.notes}"</div>}
-                              </div>
-                            ) : (
-                              <div>
-                                {inq.event_date && <div style={{ fontSize: '.72rem', color: 'var(--tm)', marginBottom: '.3rem' }}>📅 {new Date(inq.event_date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</div>}
-                                <div style={{ fontSize: '.84rem', color: 'var(--tm)', fontStyle: 'italic', lineHeight: 1.6 }}>"{inq.message}"</div>
-                              </div>
-                            )}
-                          </div>
-                        ))}
+                {/* Chat panel */}
+                <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+                  {activeThread ? (
+                    <>
+                      <div style={{ padding: '.65rem 1rem', borderBottom: '1px solid var(--br)', fontSize: '.85rem', fontWeight: 600, color: 'var(--vx)', flexShrink: 0 }}>
+                        {activeThread.name}
                       </div>
-                    )
-                  })
-                })()}
+                      <div style={{ flex: 1, minHeight: 0 }}>
+                        <ChatThread
+                          vendorId={profile?.id}
+                          plannerId={activeThread.planner_id}
+                          senderRole="vendor"
+                          senderId={user?.id}
+                          otherName={activeThread.name}
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--tl)', fontSize: '.88rem', fontStyle: 'italic' }}>
+                      Select a conversation
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>

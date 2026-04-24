@@ -14,6 +14,18 @@ export async function sendInquiry({ vendorId, plannerId, message, eventDate, pla
     ...(intakeData ? { intake_data: intakeData } : {}),
   }
   const result = await supabase.from('inquiries').insert(payload)
+
+  // Insert first message into chat thread
+  if (!result.error) {
+    await supabase.from('messages').insert({
+      vendor_id: vendorId,
+      planner_id: plannerId,
+      sender_id: plannerId,
+      sender_role: 'planner',
+      body: message,
+    })
+  }
+
   if (!result.error && vendorEmail) {
     supabase.functions.invoke('send-notification-email', {
       body: { type: 'new_inquiry', recipientEmail: vendorEmail, recipientName: vendorName, actorName: plannerName, inquiryMessage: message },
