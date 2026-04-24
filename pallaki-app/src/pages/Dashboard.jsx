@@ -355,57 +355,11 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
           </div>
 
           <div className="an-body">
-            {/* KPIs */}
-            <div className="stat-row" style={{ gridTemplateColumns: 'repeat(2,1fr)' }}>
-              {[
-                { id: 'views', n: (anData?.views ?? '—').toLocaleString?.() ?? '—', l: 'Profile Views' },
-                { id: 'inq',   n: anData?.inquiries ?? '—',                          l: 'Inquiries' },
-              ].map(k => (
-                <div key={k.id} className="stat-c">
-                  <div className="sn">{k.n}</div>
-                  <div className="sl">{k.l}</div>
-                </div>
-              ))}
-            </div>
-
-            {/* Line chart */}
-            <div className="an-card">
-              <div className="an-card-head">
-                <h3>📈 Profile Views & Inquiries</h3>
-                <span style={{ fontSize: '.7rem', color: 'var(--tl)' }}>Updated daily</span>
-              </div>
-              <div className="an-card-body">
-                <div className="chart-wrap">
-                  <canvas ref={chartRef} />
-                </div>
-              </div>
-            </div>
-
-            {/* Conversion funnel */}
-            <div className="an-card">
-              <div className="an-card-head"><h3>🔄 Conversion Funnel</h3></div>
-              <div className="an-card-body">
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
-                  {(() => {
-                    const views = anData?.views ?? 0
-                    const inqs = anData?.inquiries ?? 0
-                    const inqPct = views > 0 ? Math.min(100, Math.round((inqs / views) * 100)) : 0
-                    return [
-                      { label: 'Profile Views', n: views.toLocaleString(), pct: '100%', color: 'var(--v)' },
-                      { label: 'Inquiries Sent', n: inqs, pct: `${inqPct}%`, color: 'var(--v)' },
-                    ].map(row => (
-                      <div key={row.label}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '.8rem', color: 'var(--tm)', marginBottom: '.4rem' }}>
-                          <span>{row.label}</span>
-                          <span style={{ fontWeight: 600, color: 'var(--vx)' }}>{row.n}</span>
-                        </div>
-                        <div style={{ height: 10, background: 'rgba(196,132,140,.1)', borderRadius: 6, overflow: 'hidden' }}>
-                          <div style={{ height: '100%', width: row.pct, background: `linear-gradient(90deg,${row.color},var(--vl))`, borderRadius: 6 }} />
-                        </div>
-                      </div>
-                    ))
-                  })()}
-                </div>
+            {/* KPI */}
+            <div className="stat-row" style={{ gridTemplateColumns: '1fr' }}>
+              <div className="stat-c">
+                <div className="sn">{anData?.inquiries ?? '—'}</div>
+                <div className="sl">Inquiries</div>
               </div>
             </div>
 
