@@ -97,10 +97,10 @@ export default function VendorOnboarding() {
           You're on your way!
         </h2>
         <p style={{ fontSize: '.95rem', color: 'var(--tm)', lineHeight: 1.8, marginBottom: '.5rem', fontWeight: 300 }}>
-          Your listing has been submitted for review. We'll verify your profile within 24–48 hours and notify you by email once you're live on Pallaki.
+          Your listing has been submitted for review. We will get back to you within 1–2 hours with your approval sent to your email.
         </p>
         <p style={{ fontSize: '.88rem', color: 'var(--tl)', marginBottom: '2rem', fontWeight: 300 }}>
-          In the meantime, you can update your profile and add more photos from your dashboard.
+          Once approved, you can edit your profile anytime from your dashboard if you need to make any changes.
         </p>
         <button className="btn-p" onClick={() => navigate('/dashboard')}>Go to My Dashboard →</button>
       </div>
