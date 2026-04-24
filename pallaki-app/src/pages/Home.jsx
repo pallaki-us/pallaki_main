@@ -147,7 +147,7 @@ export default function Home() {
               </select>
               <input
                 type="text"
-                placeholder="City or zip code…"
+                placeholder="City…"
                 value={city}
                 onChange={e => checkCity(e.target.value)}
               />
