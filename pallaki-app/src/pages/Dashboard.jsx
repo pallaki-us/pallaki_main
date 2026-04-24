@@ -218,7 +218,7 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
                   <div className="df"><label>Business Name</label><input type="text" value={bizName} onChange={e => setBizName(e.target.value)} /></div>
                   <div className="df"><label>Category</label>
                     <select value={category} onChange={e => setCategory(e.target.value)}>
-                      {['Photography','Videography','Mehndi Artist','Bridal Makeup','Catering','Mandap & Decor','Music & DJ','Priests & Pandits'].map(c => <option key={c}>{c}</option>)}
+                      {['Photography','Videography','Mehndi Artists','Bridal Makeup','Catering','Decor','Music & DJ','Event Planners','Party Rentals','Wedding Venue'].map(c => <option key={c}>{c}</option>)}
                     </select>
                   </div>
                   <div className="df"><label>City</label><input type="text" value={city} onChange={e => setCity(e.target.value)} /></div>

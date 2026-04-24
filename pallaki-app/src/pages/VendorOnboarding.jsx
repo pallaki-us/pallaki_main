@@ -7,7 +7,7 @@ import ImageUpload from '../components/ImageUpload'
 
 const STEPS = ['Business Basics', 'Your Story', 'Photos']
 
-const CATEGORIES = ['Photography', 'Videography', 'Mehndi Artist', 'Bridal Makeup', 'Catering', 'Mandap & Decor', 'Music & DJ', 'Priests & Pandits', 'Bridal Lehenga', 'Bridal Jewellery', 'Wedding Venue']
+const CATEGORIES = ['Photography', 'Videography', 'Mehndi Artists', 'Bridal Makeup', 'Catering', 'Decor', 'Music & DJ', 'Event Planners', 'Party Rentals', 'Wedding Venue']
 const STATES = ['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming']
 const SERVICES = ['Weddings', 'Engagements', 'Mehndi Night', 'Sangeet', 'Pre-Wedding', 'Birthdays', 'Baby Showers', 'House Warming']
 
