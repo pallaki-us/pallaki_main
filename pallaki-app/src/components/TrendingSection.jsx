@@ -10,9 +10,10 @@ const CAT_CHIPS = [
   { icon: '🪷', label: 'Mehndi Artists' },
   { icon: '💄', label: 'Bridal Makeup' },
   { icon: '🍛', label: 'Catering' },
-  { icon: '🌸', label: 'Mandap & Decor' },
+  { icon: '🌸', label: 'Decor' },
   { icon: '🎵', label: 'Music & DJ' },
-  { icon: '🪔', label: 'Priests & Pandits' },
+  { icon: '📋', label: 'Event Planners' },
+  { icon: '🎪', label: 'Party Rentals' },
 ]
 
 function renderStars(rating) {

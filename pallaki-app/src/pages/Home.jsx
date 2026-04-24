@@ -140,11 +140,10 @@ export default function Home() {
                 <option>Mehndi Artists</option>
                 <option>Bridal Makeup</option>
                 <option>Catering</option>
-                <option>Mandap &amp; Decor</option>
+                <option>Decor</option>
                 <option>Music &amp; DJ</option>
-                <option>Priests &amp; Pandits</option>
-                <option>Bridal Lehenga</option>
-                <option>Bridal Jewellery</option>
+                <option>Event Planners</option>
+                <option>Party Rentals</option>
                 <option>Wedding Venue</option>
               </select>
               <input
