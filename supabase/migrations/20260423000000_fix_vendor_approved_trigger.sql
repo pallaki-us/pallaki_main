@@ -30,7 +30,7 @@ BEGIN
                      'type',           'vendor_approved',
                      'recipientEmail', NEW.email,
                      'recipientName',  NEW.name
-                   )::text,
+                   ),
         headers := jsonb_build_object(
                      'Content-Type',  'application/json',
                      'Authorization', 'Bearer ' || v_anon_key

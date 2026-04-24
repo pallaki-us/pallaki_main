@@ -43,7 +43,7 @@ BEGIN
                    'actorName',      v_sender_name,
                    'messageBody',    NEW.body,
                    'link',           v_link
-                 )::text,
+                 ),
       headers := jsonb_build_object(
                    'Content-Type',  'application/json',
                    'Authorization', 'Bearer ' || v_anon_key
