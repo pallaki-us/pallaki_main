@@ -76,14 +76,16 @@ export function useVendorThreads(vendorId) {
 
     if (!data) { setThreads([]); setLoading(false); return }
 
-    const { data: unreadData } = await supabase
-      .from('messages')
-      .select('planner_id')
-      .eq('vendor_id', vendorId)
-      .eq('sender_role', 'planner')
-      .eq('is_read', false)
+    const [{ data: unreadData }, { data: latestMsgs }] = await Promise.all([
+      supabase.from('messages').select('planner_id').eq('vendor_id', vendorId).eq('sender_role', 'planner').eq('is_read', false),
+      supabase.from('messages').select('planner_id, created_at').eq('vendor_id', vendorId).order('created_at', { ascending: false }),
+    ])
 
     const unreadPlannerIds = new Set((unreadData || []).map(m => m.planner_id))
+    const latestMap = {}
+    for (const msg of (latestMsgs || [])) {
+      if (!latestMap[msg.planner_id]) latestMap[msg.planner_id] = msg.created_at
+    }
 
     const seen = new Set()
     const result = []
@@ -95,9 +97,11 @@ export function useVendorThreads(vendorId) {
           name: inq.intake_data?.contactName || inq.profiles?.name || inq.profiles?.email || 'Planner',
           email: inq.intake_data?.contactEmail || inq.profiles?.email,
           hasUnread: unreadPlannerIds.has(inq.planner_id),
+          lastMessageAt: latestMap[inq.planner_id] || inq.created_at,
         })
       }
     }
+    result.sort((a, b) => new Date(b.lastMessageAt) - new Date(a.lastMessageAt))
     setThreads(result)
     setLoading(false)
   }
@@ -124,14 +128,16 @@ export function usePlannerThreads(plannerId) {
 
     if (!data) { setThreads([]); setLoading(false); return }
 
-    const { data: unreadData } = await supabase
-      .from('messages')
-      .select('vendor_id')
-      .eq('planner_id', plannerId)
-      .eq('sender_role', 'vendor')
-      .eq('is_read', false)
+    const [{ data: unreadData }, { data: latestMsgs }] = await Promise.all([
+      supabase.from('messages').select('vendor_id').eq('planner_id', plannerId).eq('sender_role', 'vendor').eq('is_read', false),
+      supabase.from('messages').select('vendor_id, created_at').eq('planner_id', plannerId).order('created_at', { ascending: false }),
+    ])
 
     const unreadVendorIds = new Set((unreadData || []).map(m => m.vendor_id))
+    const latestMap = {}
+    for (const msg of (latestMsgs || [])) {
+      if (!latestMap[msg.vendor_id]) latestMap[msg.vendor_id] = msg.created_at
+    }
 
     const seen = new Set()
     const result = []
@@ -142,9 +148,11 @@ export function usePlannerThreads(plannerId) {
           vendor_id: inq.vendor_id,
           vendor: inq.vendors,
           hasUnread: unreadVendorIds.has(inq.vendor_id),
+          lastMessageAt: latestMap[inq.vendor_id] || inq.created_at,
         })
       }
     }
+    result.sort((a, b) => new Date(b.lastMessageAt) - new Date(a.lastMessageAt))
     setThreads(result)
     setLoading(false)
   }
