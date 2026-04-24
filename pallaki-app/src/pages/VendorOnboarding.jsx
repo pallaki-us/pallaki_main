@@ -71,6 +71,7 @@ export default function VendorOnboarding() {
     const { error } = await supabase.from('vendors').upsert({
       profile_id: user.id,
       name: bizName,
+      email: user.email,
       category,
       city,
       state,
