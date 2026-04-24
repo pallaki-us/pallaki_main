@@ -23,7 +23,6 @@ export default function PlannerProfile() {
   const [city, setCity] = useState('')
   const [state, setState] = useState('')
   const [zip, setZip] = useState('')
-  const [venueCity, setVenueCity] = useState('')
   const [eventType, setEventType] = useState('Wedding')
   const [dateStart, setDateStart] = useState('')
   const [dateEnd, setDateEnd] = useState('')
@@ -126,7 +125,6 @@ export default function PlannerProfile() {
                 </select>
               </div>
               <div className="df"><label>ZIP Code</label><input value={zip} onChange={e => setZip(e.target.value)} maxLength={10} /></div>
-              <div className="df"><label>Event Venue City</label><input value={venueCity} onChange={e => setVenueCity(e.target.value)} /></div>
             </div>
           </div>
         </div>
