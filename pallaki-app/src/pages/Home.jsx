@@ -114,7 +114,7 @@ export default function Home() {
               <div className="htb-side-dot" /><div className="htb-side-dot big" /><div className="htb-side-dot" />
             </div>
             <h1 style={{ textAlign: 'center' }}>Craft your dream celebration</h1>
-            <p className="hero-sub">Find the curated South Asian vendors who bring your unique story of life.</p>
+            <p className="hero-sub">Find the curated South Asian vendors who bring your unique story to life.</p>
           </div>
 
           <span className="ev-label">Looking vendors for</span>
