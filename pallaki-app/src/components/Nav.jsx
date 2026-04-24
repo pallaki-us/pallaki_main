@@ -54,7 +54,7 @@ export default function Nav({ onShowVendorListing }) {
                 📊 Back to Dashboard
               </div>
               <div className="nav-user-dd-item" onClick={() => navigate('/analytics')}>
-                📈 Analytics
+                💌 Conversations
               </div>
               <div className="nav-user-dd-item" onClick={onShowVendorListing}>
                 🔍 See Your Listing
