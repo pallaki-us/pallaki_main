@@ -38,6 +38,7 @@ export function useMessages(vendorId, plannerId) {
       sender_role: senderRole,
       body: body.trim(),
     })
+    if (error) console.error('messages insert error:', error)
     return { error }
   }
 
