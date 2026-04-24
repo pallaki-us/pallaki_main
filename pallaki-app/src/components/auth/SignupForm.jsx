@@ -112,7 +112,7 @@ export default function SignupForm({ role }) {
             {otpError && <span className="auth-field-err">{otpError}</span>}
           </div>
           <button type="submit" className="auth-submit" disabled={otpLoading}>
-            {otpLoading ? 'Verifying…' : 'Confirm Account →'}
+            {otpLoading ? 'Authenticating, please stand by…' : 'Confirm Account →'}
           </button>
         </form>
 
