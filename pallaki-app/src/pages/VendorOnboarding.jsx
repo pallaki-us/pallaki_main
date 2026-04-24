@@ -9,7 +9,7 @@ const STEPS = ['Business Basics', 'Your Story', 'Photos']
 
 const CATEGORIES = ['Photography', 'Videography', 'Mehndi Artists', 'Bridal Makeup', 'Catering', 'Decor', 'Music & DJ', 'Event Planners', 'Party Rentals', 'Wedding Venue']
 const STATES = ['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming']
-const SERVICES = ['Weddings', 'Engagements', 'Mehndi Night', 'Sangeet', 'Pre-Wedding', 'Birthdays', 'Baby Showers', 'House Warming']
+const SERVICES = ['Photography', 'Videography', 'Mehndi Artists', 'Bridal Makeup', 'Catering', 'Decor', 'Music & DJ', 'Event Planners', 'Party Rentals', 'Wedding Venue']
 
 export default function VendorOnboarding() {
   const navigate = useNavigate()
@@ -34,7 +34,7 @@ export default function VendorOnboarding() {
 
   // Step 2
   const [description, setDescription] = useState('')
-  const [services, setServices] = useState(['Weddings'])
+  const [services, setServices] = useState([])
   const [website, setWebsite] = useState('')
   const [instagram, setInstagram] = useState('')
 
