@@ -72,7 +72,7 @@ export const VENDORS = [
   {
     id: 6,
     name: 'Royal Decor & Mandap',
-    cat: 'Mandap & Decor',
+    cat: 'Decor',
     loc: 'Los Angeles, CA',
     icon: '🌸',
     rating: '4.9',
@@ -98,20 +98,6 @@ export const VENDORS = [
     bg: '#EAE8F5,#C8C4E8',
   },
   {
-    id: 8,
-    name: 'Pandit Sharma Ji',
-    cat: 'Priests & Pandits',
-    loc: 'New Jersey',
-    icon: '🪔',
-    rating: '5.0',
-    reviews: '112',
-    badge: 'top',
-    desc: 'Experienced Vedic priest for Hindu ceremonies. North and South Indian traditions. Available across the tri-state area.',
-    services: ['Hindu Wedding Ceremony', 'Griha Pravesh', 'Mundan', 'Satyanarayan Puja'],
-    events: '600+',
-    bg: '#FFF5EA,#F5DFCA',
-  },
-  {
     id: 9,
     name: 'Arjun Sharma Studios',
     cat: 'Videography',
@@ -128,10 +114,10 @@ export const VENDORS = [
 ];
 
 export const EVENT_CATS = {
-  Wedding: ['All', 'Photography', 'Videography', 'Mehndi Artists', 'Bridal Makeup', 'Catering', 'Mandap & Decor', 'Music & DJ', 'Priests & Pandits', 'Bridal Lehenga', 'Bridal Jewellery'],
-  'Pre-Wedding': ['All', 'Photography', 'Videography', 'Mehndi Artists', 'Bridal Makeup', 'Mandap & Decor', 'Music & DJ'],
-  'House Warming': ['All', 'Catering', 'Priests & Pandits', 'Decor', 'Music & DJ'],
-  Birthday: ['All', 'Catering', 'Photography', 'Decor', 'Music & DJ'],
+  Wedding: ['All', 'Photography', 'Videography', 'Mehndi Artists', 'Bridal Makeup', 'Catering', 'Decor', 'Music & DJ', 'Event Planners', 'Party Rentals'],
+  'Pre-Wedding': ['All', 'Photography', 'Videography', 'Mehndi Artists', 'Bridal Makeup', 'Decor', 'Music & DJ'],
+  'House Warming': ['All', 'Catering', 'Decor', 'Music & DJ'],
+  Birthday: ['All', 'Catering', 'Photography', 'Decor', 'Music & DJ', 'Party Rentals'],
   'Baby Shower': ['All', 'Catering', 'Photography', 'Decor'],
 };
 
@@ -164,7 +150,7 @@ export const CAT_VENDORS = {
     { id: 22, name: 'Tandoor House',         loc: 'Atlanta, GA',   icon: '🫕', bg: 'linear-gradient(135deg,#EBF2ED,#C4DCC8)', rating: '4.7', reviews: '44' },
     { id: 23, name: 'Mithai & More',         loc: 'Dallas, TX',    icon: '🍬', bg: 'linear-gradient(135deg,#FDEAED,#F5C4CB)', rating: '4.9', reviews: '33' },
   ],
-  'Mandap & Decor': [
+  Decor: [
     { id: 6,  name: 'Royal Decor & Mandap', loc: 'Los Angeles, CA',icon: '🌸', bg: 'linear-gradient(135deg,#FFF0F5,#F5D0DF)', rating: '4.9', reviews: '73' },
     { id: 24, name: 'Floral Dreams',         loc: 'New York, NY',   icon: '💐', bg: 'linear-gradient(135deg,#F0EAF8,#DDD0EC)', rating: '4.8', reviews: '55' },
     { id: 25, name: 'Shaadi Decor Co.',      loc: 'Houston, TX',    icon: '🏮', bg: 'linear-gradient(135deg,#FFF5EA,#F5DFCA)', rating: '4.7', reviews: '41' },
@@ -178,11 +164,18 @@ export const CAT_VENDORS = {
     { id: 30, name: 'Sangeet Sounds',           loc: 'Chicago, IL',   icon: '🎶', bg: 'linear-gradient(135deg,#EBF2ED,#C4DCC8)', rating: '4.8', reviews: '39' },
     { id: 31, name: 'Raaga Entertainment',      loc: 'Los Angeles, CA',icon: '🎤', bg: 'linear-gradient(135deg,#FFF0F5,#F5D0DF)', rating: '4.6', reviews: '31' },
   ],
-  'Priests & Pandits': [
-    { id: 8,  name: 'Pandit Sharma Ji',          loc: 'New Jersey',  icon: '🪔', bg: 'linear-gradient(135deg,#FFF5EA,#F5DFCA)', rating: '5.0', reviews: '112' },
-    { id: 32, name: 'Vedic Ceremonies',           loc: 'Chicago, IL', icon: '🕉️', bg: 'linear-gradient(135deg,#F5EACA,#EDD8A0)', rating: '4.9', reviews: '88' },
-    { id: 33, name: 'Pandit Raghavan',            loc: 'Houston, TX', icon: '🙏', bg: 'linear-gradient(135deg,#EBF2ED,#C4DCC8)', rating: '4.9', reviews: '67' },
-    { id: 34, name: 'Sacred Rituals by Suresh',   loc: 'Dallas, TX',  icon: '🌺', bg: 'linear-gradient(135deg,#FDEAED,#F5C4CB)', rating: '4.8', reviews: '52' },
-    { id: 35, name: 'Agnihotra Pandits',          loc: 'Los Angeles, CA',icon: '🔥', bg: 'linear-gradient(135deg,#F0EAF8,#DDD0EC)', rating: '4.7', reviews: '41' },
+  'Event Planners': [
+    { id: 36, name: 'Shaadi Planners Co.',    loc: 'New York, NY',    icon: '📋', bg: 'linear-gradient(135deg,#FDEAED,#F5C4CB)', rating: '4.9', reviews: '62' },
+    { id: 37, name: 'Celebration by Kavita', loc: 'Houston, TX',     icon: '🎉', bg: 'linear-gradient(135deg,#EBF2ED,#C4DCC8)', rating: '4.8', reviews: '47' },
+    { id: 38, name: 'The Event Studio',       loc: 'Chicago, IL',     icon: '✨', bg: 'linear-gradient(135deg,#F0EAF8,#DDD0EC)', rating: '4.7', reviews: '38' },
+    { id: 39, name: 'Ananya Events',          loc: 'Los Angeles, CA', icon: '🌟', bg: 'linear-gradient(135deg,#FFF5EA,#F5DFCA)', rating: '4.8', reviews: '29' },
+    { id: 40, name: 'Grand Affair Planning',  loc: 'Edison, NJ',      icon: '👑', bg: 'linear-gradient(135deg,#EAE8F5,#C8C4E8)', rating: '4.6', reviews: '21' },
+  ],
+  'Party Rentals': [
+    { id: 41, name: 'Royal Tents & Rentals', loc: 'New Jersey',       icon: '🎪', bg: 'linear-gradient(135deg,#F5EACA,#EDD8A0)', rating: '4.7', reviews: '53' },
+    { id: 42, name: 'Shaadi Furniture Co.',  loc: 'Houston, TX',      icon: '🪑', bg: 'linear-gradient(135deg,#FDEAED,#F5C4CB)', rating: '4.8', reviews: '41' },
+    { id: 43, name: 'Event Supply Hub',      loc: 'Chicago, IL',      icon: '🏕️', bg: 'linear-gradient(135deg,#EBF2ED,#C4DCC8)', rating: '4.6', reviews: '34' },
+    { id: 44, name: 'Luxe Linen Rentals',    loc: 'Los Angeles, CA',  icon: '🛋️', bg: 'linear-gradient(135deg,#F0EAF8,#DDD0EC)', rating: '4.7', reviews: '27' },
+    { id: 45, name: 'Party Essentials Inc.', loc: 'Atlanta, GA',      icon: '🎊', bg: 'linear-gradient(135deg,#FFF0F5,#F5D0DF)', rating: '4.5', reviews: '19' },
   ],
 };
