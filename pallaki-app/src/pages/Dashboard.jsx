@@ -20,7 +20,7 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
     navigate('/')
   }
   const navigate = useNavigate()
-  const { profile, saving, saveProfile, fetchProfile } = useVendorProfile()
+  const { profile, loading: profileLoading, saving, saveProfile, fetchProfile } = useVendorProfile()
   const { inquiries, updateStatus, saveReply, archiveInquiry } = useVendorInquiries(profile?.id)
   const [period, setPeriod] = useState(365)
   const { data: anData } = useVendorAnalytics(profile?.id, period)
@@ -150,6 +150,9 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
   }
 
   const name = user?.user_metadata?.name || 'Vendor'
+
+  // Wait for profile to load before rendering anything
+  if (profileLoading) return null
 
   // Onboarding not complete — redirect
   if (profile && !profile.category) {
