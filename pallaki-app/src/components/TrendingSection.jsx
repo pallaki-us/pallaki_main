@@ -61,16 +61,6 @@ export default function TrendingSection() {
     fetchTrending(label)
   }
 
-  function prevCat() {
-    const i = CAT_CHIPS.findIndex(c => c.label === activeCat)
-    selectCat(CAT_CHIPS[(i - 1 + CAT_CHIPS.length) % CAT_CHIPS.length].label)
-  }
-
-  function nextCat() {
-    const i = CAT_CHIPS.findIndex(c => c.label === activeCat)
-    selectCat(CAT_CHIPS[(i + 1) % CAT_CHIPS.length].label)
-  }
-
   return (
     <section className="trending-section">
       <div className="trending-inner">
@@ -90,11 +80,9 @@ export default function TrendingSection() {
           ))}
         </div>
         <div className="tv-header">
-          <span className="tv-label">{activeCat} · Most Searched</span>
           <span className="tv-view-all" onClick={() => navigate(`/vendors?cat=${encodeURIComponent(activeCat)}`)}>View All →</span>
         </div>
         <div className="tv-track-wrap">
-          <button className="tv-arr" onClick={prevCat}>‹</button>
           <div className="tv-track" id="tv-track">
             {vendors.map((v, i) => (
               <div key={v.id ?? i} className="tv-card" onClick={() => user ? navigate(`/vendor/${v.id}`) : navigate('/planner/login')}>
@@ -110,7 +98,6 @@ export default function TrendingSection() {
               </div>
             ))}
           </div>
-          <button className="tv-arr" onClick={nextCat}>›</button>
         </div>
       </div>
     </section>
