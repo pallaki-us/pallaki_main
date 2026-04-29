@@ -40,16 +40,43 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     if (!supabase) { setLoading(false); return }
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null)
-      if (session?.user) {
-        fetchUserType(session.user.id).finally(() => setLoading(false))
-      } else {
+    // Safety net: always unblock after 4s in case something hangs
+    const timeout = setTimeout(() => setLoading(false), 4000)
+
+    supabase.auth.getSession()
+      .then(({ data: { session }, error }) => {
+        if (error) {
+          // Stale / invalid token — clear it and start fresh
+          supabase.auth.signOut()
+          setUser(null)
+          setUserType(null)
+          setLoading(false)
+          return
+        }
+        setUser(session?.user ?? null)
+        if (session?.user) {
+          fetchUserType(session.user.id).finally(() => setLoading(false))
+        } else {
+          setLoading(false)
+        }
+      })
+      .catch(() => {
+        // Network or unexpected error — don't leave user stuck
+        setUser(null)
+        setUserType(null)
         setLoading(false)
-      }
-    })
+      })
+      .finally(() => clearTimeout(timeout))
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      // Stale token was rejected by Supabase — clear state
+      if (_event === 'SIGNED_OUT') {
+        setUser(null)
+        setUserType(null)
+        setLoading(false)
+        return
+      }
+
       if (_event === 'SIGNED_IN' && window.location.hash.includes('type=signup')) {
         window.history.replaceState(null, '', window.location.pathname)
         await supabase.auth.signOut()
@@ -73,7 +100,7 @@ export function AuthProvider({ children }) {
       }
     })
 
-    return () => subscription.unsubscribe()
+    return () => { subscription.unsubscribe(); clearTimeout(timeout) }
   }, [])
 
   async function signUp(email, password, type, name) {
