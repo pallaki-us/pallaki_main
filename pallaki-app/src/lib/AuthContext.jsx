@@ -3,6 +3,26 @@ import { supabase } from './supabase'
 
 const AuthContext = createContext(null)
 
+function LoadingScreen() {
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center',
+      background: 'var(--cr)', zIndex: 9999, gap: '1rem',
+    }}>
+      <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '2rem', color: 'var(--v)' }}>
+        🪷
+      </div>
+      <div style={{
+        width: 36, height: 36, borderRadius: '50%',
+        border: '3px solid var(--br)', borderTopColor: 'var(--v)',
+        animation: 'spin 0.7s linear infinite',
+      }} />
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    </div>
+  )
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [userType, setUserType] = useState(null)
@@ -20,9 +40,9 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     if (!supabase) { setLoading(false); return }
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setUser(session?.user ?? null)
-      if (session?.user) fetchUserType(session.user.id)
+      if (session?.user) await fetchUserType(session.user.id)
       setLoading(false)
     })
 
@@ -144,7 +164,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider value={{ user, userType, setUserType, loading, signUp, verifyOtp, signIn, signInWithGoogle, signOut, resetPassword }}>
-      {!loading && children}
+      {loading ? <LoadingScreen /> : children}
     </AuthContext.Provider>
   )
 }
