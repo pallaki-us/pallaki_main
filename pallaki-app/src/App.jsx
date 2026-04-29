@@ -25,7 +25,16 @@ function RequireAuth({ children, role }) {
   const { user, userType, loading } = useAuth()
   if (loading) return null
   if (!user) return <Navigate to={`/${role}/login`} replace />
-  if (userType && userType !== '__verified__' && userType !== role) {
+  // user is known but userType is still loading — show a small inline spinner
+  if (!userType || userType === '__verified__') {
+    if (userType === '__verified__') return null
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'var(--cr)' }}>
+        <div style={{ width: 32, height: 32, borderRadius: '50%', border: '3px solid var(--br)', borderTopColor: 'var(--v)', animation: 'spin 0.7s linear infinite' }} />
+      </div>
+    )
+  }
+  if (userType !== role) {
     return <Navigate to={userType === 'vendor' ? '/dashboard' : '/profile'} replace />
   }
   return children
