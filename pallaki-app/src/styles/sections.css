@@ -184,8 +184,17 @@ footer { background: var(--vx); padding: 3.5rem 4rem; }
 
 @media (max-width: 480px) {
   .fi { grid-template-columns: 1fr; }
-  .loved-circle { width: 50px; height: 50px; font-size: 1.2rem; }
-  .loved-name { font-size: .7rem; max-width: 52px; }
+  .trending-section { padding: 2rem 1rem 2.5rem; }
+  .loved-scroll { justify-content: flex-start; overflow-x: auto; gap: .75rem; padding-bottom: .5rem; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .loved-scroll::-webkit-scrollbar { display: none; }
+  .loved-circle { width: 52px; height: 52px; font-size: 1.3rem; }
+  .loved-name { font-size: .68rem; max-width: 54px; }
+  .about-section { padding: 2.5rem 1rem; }
+  .how-section { padding: 2.5rem 1rem; }
+  .ct-section { padding: 2.5rem 1rem; }
+  .cities-section { padding: 1.5rem 1rem 2rem; }
+  .testimonials-section { padding: 2rem 1rem; }
+  footer { padding: 2rem 1rem; }
 }
 
 /* ── SECTION DIVIDER ── */

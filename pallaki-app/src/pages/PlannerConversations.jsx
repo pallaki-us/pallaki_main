@@ -24,7 +24,7 @@ export default function PlannerConversations() {
 
       <div className="dash-body">
         <div className="dash-card" style={{ padding: 0, overflow: 'hidden' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '240px 1fr', height: 'calc(100vh - 180px)', minHeight: 500 }}>
+          <div className="conv-layout conv-layout-full">
             {/* Thread list */}
             <div style={{ borderRight: '1px solid var(--br)', overflowY: 'auto', background: 'var(--cr)' }}>
               <div style={{ padding: '.75rem 1rem', fontSize: '.72rem', fontWeight: 600, color: 'var(--tl)', textTransform: 'uppercase', letterSpacing: '.08em', borderBottom: '1px solid var(--br)' }}>

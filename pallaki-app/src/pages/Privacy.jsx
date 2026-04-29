@@ -4,7 +4,7 @@ export default function Privacy() {
   const navigate = useNavigate()
   return (
     <div style={{ paddingTop: 64, minHeight: '100vh', background: 'var(--cr)' }}>
-      <div style={{ maxWidth: 720, margin: '0 auto', padding: '4rem 2rem 6rem' }}>
+      <div style={{ maxWidth: 720, margin: '0 auto', padding: 'clamp(1.5rem, 5vw, 4rem) clamp(1rem, 5vw, 2rem) clamp(3rem, 8vw, 6rem)' }}>
         <button onClick={() => navigate(-1)} style={{ background: 'none', border: 'none', color: 'var(--tl)', fontSize: '.8rem', cursor: 'pointer', fontFamily: "'Cormorant Garamond',serif", marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: 5 }}>
           ← Back
         </button>

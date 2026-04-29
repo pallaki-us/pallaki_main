@@ -52,9 +52,9 @@
   .cat-tabs { padding: 0 .75rem; }
   .l-filters { padding: .5rem 1rem; gap: .4rem; }
   .lb { padding: 1rem; }
-  .lg { grid-template-columns: 1fr 1fr; gap: .6rem; }
-  .vc-img { height: 130px; font-size: 2.4rem; }
-  .vc-body { padding: .75rem; }
+  .lg { grid-template-columns: 1fr; gap: .75rem; }
+  .vc-img { height: 150px; font-size: 2.6rem; }
+  .vc-body { padding: .85rem; }
   .vc-name { font-size: 1rem; }
-  .vc-desc { font-size: .76rem; }
+  .vc-desc { font-size: .78rem; }
 }

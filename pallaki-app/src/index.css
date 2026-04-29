@@ -189,6 +189,86 @@ nav {
   to   { transform: translateY(-3px); }
 }
 
+/* ── CONVERSATION LAYOUT (two-panel: sidebar + chat) ── */
+.conv-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  height: 520px;
+}
+.conv-layout-full {
+  height: calc(100vh - 180px);
+  min-height: 500px;
+}
+@media (max-width: 640px) {
+  .conv-layout, .conv-layout.conv-layout-full {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+  }
+  .conv-layout > *:first-child {
+    max-height: 190px;
+    min-height: 120px;
+    overflow-y: auto;
+    border-right: none !important;
+    border-bottom: 1px solid var(--br);
+    flex-shrink: 0;
+  }
+  .conv-layout > *:last-child {
+    min-height: 360px;
+    flex: 1;
+  }
+}
+
+/* ── NAV HAMBURGER ── */
+.nav-hamburger {
+  display: none;
+  background: none;
+  border: 1.5px solid var(--br);
+  border-radius: 8px;
+  padding: .38rem .6rem;
+  cursor: pointer;
+  color: var(--vx);
+  font-size: 1rem;
+  line-height: 1;
+  transition: all .15s;
+}
+.nav-hamburger:hover { background: var(--vf); border-color: var(--v); }
+
+.nav-mobile-menu {
+  display: none;
+  position: fixed;
+  top: 64px;
+  left: 0;
+  right: 0;
+  background: rgba(254,249,247,0.98);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--br);
+  padding: .75rem 1rem;
+  flex-direction: column;
+  gap: .4rem;
+  z-index: 199;
+  box-shadow: 0 8px 24px rgba(196,132,140,.1);
+}
+.nav-mobile-menu.open { display: flex; }
+.nav-mobile-item {
+  padding: .75rem 1rem;
+  border-radius: 10px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: .88rem;
+  color: var(--tm);
+  cursor: pointer;
+  border: none;
+  background: none;
+  text-align: left;
+  transition: all .15s;
+  width: 100%;
+}
+.nav-mobile-item:hover { background: var(--vf); color: var(--v); }
+.nav-mobile-item.primary { background: var(--vx); color: #fff; font-weight: 500; }
+.nav-mobile-item.primary:hover { background: #1A0D14; }
+.nav-mobile-item.outline { border: 1.5px solid var(--br); color: var(--vx); }
+.nav-mobile-item.outline:hover { border-color: var(--v); background: var(--vp); }
+
 /* ── NAV MOBILE ── */
 @media (max-width: 768px) {
   nav { padding: 0 1rem; gap: .5rem; }
@@ -204,6 +284,8 @@ nav {
 @media (max-width: 480px) {
   nav { padding: 0 .75rem; }
   .nav-vendor { display: none; }
+  .nav-login { display: none; }
+  .nav-hamburger { display: inline-flex; align-items: center; }
   .auth-right { padding: 1.5rem 1rem; }
   .toast { font-size: .78rem; padding: .65rem 1.2rem; white-space: normal; text-align: center; max-width: 90vw; }
 }

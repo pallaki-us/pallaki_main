@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:prod": "vite --mode prod",
     "dev:demo": "vite --mode demo",
     "dev:staging": "op run --env-file='.env.1password.staging' -- vite",
     "dev:op": "op run --env-file='.env.1password' -- vite",

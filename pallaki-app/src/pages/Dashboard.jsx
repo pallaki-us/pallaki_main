@@ -363,7 +363,7 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
 
             {/* Conversations */}
             <div className="an-card" style={{ padding: 0, overflow: 'hidden' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr', height: 520 }}>
+              <div className="conv-layout">
 
                 {/* Thread list */}
                 <div style={{ borderRight: '1px solid var(--br)', overflowY: 'auto', background: 'var(--cr)' }}>

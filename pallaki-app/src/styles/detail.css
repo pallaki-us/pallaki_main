@@ -10,7 +10,8 @@
 .dh-r { display: flex; align-items: center; gap: .9rem; margin-top: .42rem; }
 .dh-rating { font-size: .86rem; color: var(--gl); font-weight: 500; }
 .dh-rev { font-size: .78rem; color: rgba(255,255,255,.48); }
-.tabs-bar { background: var(--wh); border-bottom: 2px solid var(--br); padding: 0 4rem; display: flex; position: sticky; top: 64px; z-index: 100; }
+.tabs-bar { background: var(--wh); border-bottom: 2px solid var(--br); padding: 0 4rem; display: flex; position: sticky; top: 64px; z-index: 100; overflow-x: auto; scrollbar-width: none; }
+.tabs-bar::-webkit-scrollbar { display: none; }
 .tab-btn { padding: .88rem 1.3rem; font-family: 'Cormorant Garamond', serif; font-size: .8rem; color: var(--tl); cursor: pointer; border: none; background: none; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all .15s; }
 .tab-btn:hover { color: var(--v); }
 .tab-btn.active { color: var(--v); border-bottom-color: var(--v); font-weight: 500; }
