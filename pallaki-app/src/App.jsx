@@ -15,6 +15,7 @@ import VendorOnboarding from './pages/VendorOnboarding'
 import Privacy from './pages/Privacy'
 import Terms from './pages/Terms'
 import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
 import PlannerLogin from './pages/planner/Login'
 import PlannerSignup from './pages/planner/Signup'
 import VendorLogin from './pages/vendor/Login'
@@ -88,7 +89,7 @@ function AppInner() {
     if (data) navigate(`/vendor/${data.id}?own=true`)
   }
 
-  const authPaths = ['/planner/login', '/planner/signup', '/vendor/login', '/vendor/signup', '/forgot-password']
+  const authPaths = ['/planner/login', '/planner/signup', '/vendor/login', '/vendor/signup', '/forgot-password', '/reset-password']
   const isAuthPage = authPaths.includes(location.pathname)
 
   return (
@@ -110,6 +111,7 @@ function AppInner() {
         <Route path="/vendor/login" element={<VendorLogin />} />
         <Route path="/vendor/signup" element={<VendorSignup />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
       </Routes>
     </>
   )
