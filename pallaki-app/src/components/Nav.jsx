@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/AuthContext'
 import AnimatedLogo from './AnimatedLogo'
@@ -10,8 +10,20 @@ export default function Nav({ onShowVendorListing }) {
   const navigate = useNavigate()
   const name = user?.user_metadata?.name || user?.email?.split('@')[0] || ''
   const [menuOpen, setMenuOpen] = useState(false)
+  const [ddOpen, setDdOpen] = useState(false)
+  const ddRef = useRef(null)
+
+  useEffect(() => {
+    if (!ddOpen) return
+    function handleOutside(e) {
+      if (ddRef.current && !ddRef.current.contains(e.target)) setDdOpen(false)
+    }
+    document.addEventListener('mousedown', handleOutside)
+    return () => document.removeEventListener('mousedown', handleOutside)
+  }, [ddOpen])
 
   async function handleSignOut() {
+    setDdOpen(false)
     await signOut()
     navigate('/')
     setMenuOpen(false)
@@ -59,17 +71,17 @@ export default function Nav({ onShowVendorListing }) {
               </button>
             </>
           ) : userType === 'vendor' ? (
-            <div className="nav-user">
+            <div ref={ddRef} className={`nav-user${ddOpen ? ' open' : ''}`} onClick={() => setDdOpen(o => !o)}>
               <span className="nav-user-name">My Dashboard</span>
               <div className="nav-user-av">{name.charAt(0).toUpperCase()}</div>
-              <div className="nav-user-dd">
-                <div className="nav-user-dd-item" onClick={() => navigate('/dashboard')}>
+              <div className="nav-user-dd" onClick={e => e.stopPropagation()}>
+                <div className="nav-user-dd-item" onClick={() => { navigate('/dashboard'); setDdOpen(false) }}>
                   📊 Back to Dashboard
                 </div>
-                <div className="nav-user-dd-item" onClick={() => navigate('/analytics')}>
+                <div className="nav-user-dd-item" onClick={() => { navigate('/analytics'); setDdOpen(false) }}>
                   💌 Conversations
                 </div>
-                <div className="nav-user-dd-item" onClick={onShowVendorListing}>
+                <div className="nav-user-dd-item" onClick={() => { onShowVendorListing(); setDdOpen(false) }}>
                   🔍 See Your Listing
                 </div>
                 <div className="nav-user-dd-div" />
@@ -79,17 +91,17 @@ export default function Nav({ onShowVendorListing }) {
               </div>
             </div>
           ) : (
-            <div className="nav-user">
+            <div ref={ddRef} className={`nav-user${ddOpen ? ' open' : ''}`} onClick={() => setDdOpen(o => !o)}>
               <span className="nav-user-name">{`Hi, ${name}`}</span>
               <div className="nav-user-av">{name.charAt(0).toUpperCase()}</div>
-              <div className="nav-user-dd">
-                <div className="nav-user-dd-item" onClick={() => navigate('/profile')}>
+              <div className="nav-user-dd" onClick={e => e.stopPropagation()}>
+                <div className="nav-user-dd-item" onClick={() => { navigate('/profile'); setDdOpen(false) }}>
                   ✎ Edit Profile
                 </div>
-                <div className="nav-user-dd-item" onClick={() => navigate('/conversations')}>
+                <div className="nav-user-dd-item" onClick={() => { navigate('/conversations'); setDdOpen(false) }}>
                   💌 My Conversations
                 </div>
-                <div className="nav-user-dd-item" onClick={() => navigate('/vendors')}>
+                <div className="nav-user-dd-item" onClick={() => { navigate('/vendors'); setDdOpen(false) }}>
                   🔍 Browse Vendors
                 </div>
                 <div className="nav-user-dd-div" />
