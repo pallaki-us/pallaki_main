@@ -36,6 +36,7 @@ export function useVendors(category = 'All', city = '', page = 1, topRated = fal
       let query = supabase
         .from('vendors')
         .select(LISTING_COLS, { count: 'exact' })
+        .eq('is_verified', true)
         .order('rating', { ascending: false })
         .range(start, end)
 
@@ -112,6 +113,7 @@ export function useVendor(id) {
           events: data.events_covered,
           bg: data.bg,
           is_verified: data.is_verified,
+          email: data.email || null,
           avatar_url: data.avatar_url || null,
           portfolio_urls: data.portfolio_urls || [],
           featured_urls: data.featured_urls || [],

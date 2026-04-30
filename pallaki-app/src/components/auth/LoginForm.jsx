@@ -46,12 +46,13 @@ export default function LoginForm({ role }) {
     const normalizedEmail = email.toLowerCase().trim()
 
     // Check if email is registered — and detect wrong-role attempts
+    // If the RPC doesn't exist (error), skip pre-flight and let signIn handle it
     if (supabase) {
-      const { data: exists } = await supabase.rpc('check_email_exists', {
+      const { data: exists, error: rpcErr } = await supabase.rpc('check_email_exists', {
         check_email: normalizedEmail,
         check_type: role,
       })
-      if (!exists) {
+      if (!rpcErr && !exists) {
         const otherRole = role === 'vendor' ? 'planner' : 'vendor'
         const { data: existsOther } = await supabase.rpc('check_email_exists', {
           check_email: normalizedEmail,

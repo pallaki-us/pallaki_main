@@ -25,6 +25,8 @@ export default function InquiryModal({ open, onClose, vendor }) {
       plannerId: user.id,
       message,
       eventDate,
+      vendorEmail: vendor.email,
+      vendorName: vendor.name,
     })
     setSending(false)
 
