@@ -1,5 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import Anthropic from 'npm:@anthropic-ai/sdk'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 // Set ANTHROPIC_API_KEY as a Supabase Edge Function secret:
 //   supabase secrets set ANTHROPIC_API_KEY=sk-ant-...
@@ -16,6 +17,20 @@ serve(async (req) => {
   }
 
   try {
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: CORS })
+    }
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: authHeader } } }
+    )
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: CORS })
+    }
+
     const { vendor, messages, message } = await req.json()
 
     if (!message?.trim()) {
