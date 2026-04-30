@@ -5,6 +5,7 @@ ALTER TABLE public.vendors ENABLE ROW LEVEL SECURITY;
 
 -- Anyone (including unauthenticated) can read vendor listings.
 -- Without this, enabling RLS would break /vendors and /vendor/:id for all visitors.
+DROP POLICY IF EXISTS "Public read vendors" ON public.vendors;
 CREATE POLICY "Public read vendors" ON public.vendors
   FOR SELECT
   USING (true);
