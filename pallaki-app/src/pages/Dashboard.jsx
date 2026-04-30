@@ -79,7 +79,7 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
     }
     const { supabase } = await import('../lib/supabase')
     if (!supabase) return
-    const BUCKET = import.meta.env.VITE_STORAGE_BUCKET || 'pallaki-media-staging'
+    const BUCKET = import.meta.env.VITE_STORAGE_BUCKET || 'pallaki-media'
     const ext = file.name.split('.').pop()
     const path = `${user.id}/avatar/${Date.now()}.${ext}`
     const { error } = await supabase.storage.from(BUCKET).upload(path, file, { upsert: false })

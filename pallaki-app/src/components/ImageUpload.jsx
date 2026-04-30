@@ -5,7 +5,7 @@ import { showToast } from '../lib/toast'
 
 const MAX_SIZE = 2 * 1024 * 1024 // 2MB
 const ALLOWED = ['image/jpeg', 'image/png', 'image/webp']
-const BUCKET = import.meta.env.VITE_STORAGE_BUCKET || 'pallaki-media-staging'
+const BUCKET = import.meta.env.VITE_STORAGE_BUCKET || 'pallaki-media'
 
 export default function ImageUpload({ folder = 'portfolio', maxFiles = 12, existingUrls = [], onUploadComplete }) {
   const { user } = useAuth()
