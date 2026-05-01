@@ -28,13 +28,15 @@ export function AuthProvider({ children }) {
   const [userType, setUserType] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  async function fetchUserType(userId) {
+  async function fetchUserType(userId, metaType) {
     const { data: vendorRow } = await supabase
       .from('vendors')
       .select('id')
       .eq('profile_id', userId)
       .maybeSingle()
-    setUserType(vendorRow ? 'vendor' : 'planner')
+    // New vendors have no vendors row yet (created during onboarding),
+    // so fall back to user_metadata.user_type set at signup time.
+    setUserType(vendorRow ? 'vendor' : (metaType === 'vendor' ? 'vendor' : 'planner'))
   }
 
   useEffect(() => {
@@ -55,7 +57,7 @@ export function AuthProvider({ children }) {
         }
         setUser(session?.user ?? null)
         if (session?.user) {
-          fetchUserType(session.user.id).finally(() => setLoading(false))
+          fetchUserType(session.user.id, session.user.user_metadata?.user_type).finally(() => setLoading(false))
         } else {
           setLoading(false)
         }
@@ -94,7 +96,7 @@ export function AuthProvider({ children }) {
             { onConflict: 'id' }
           )
         }
-        fetchUserType(session.user.id)
+        fetchUserType(session.user.id, session.user.user_metadata?.user_type)
       } else {
         setUserType(null)
       }
@@ -120,7 +122,7 @@ export function AuthProvider({ children }) {
     if (error) return { error }
 
     if (data.session?.user) {
-      await fetchUserType(data.session.user.id)
+      await fetchUserType(data.session.user.id, type)
     }
 
     supabase.functions.invoke('send-notification-email', {
@@ -156,7 +158,8 @@ export function AuthProvider({ children }) {
       .select('id')
       .eq('profile_id', data.user.id)
       .maybeSingle()
-    const actualType = vendorRow ? 'vendor' : 'planner'
+    const metaType = data.user.user_metadata?.user_type
+    const actualType = vendorRow ? 'vendor' : (metaType === 'vendor' ? 'vendor' : 'planner')
     setUserType(actualType)
     return { data, error: null, actualType }
   }
@@ -180,7 +183,7 @@ export function AuthProvider({ children }) {
     if (!supabase) return { error: { message: 'Not available in demo mode.' } }
     const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'signup' })
     if (error) return { error }
-    if (data.session?.user) await fetchUserType(data.session.user.id)
+    if (data.session?.user) await fetchUserType(data.session.user.id, data.session.user.user_metadata?.user_type)
     return { data, error: null }
   }
 
