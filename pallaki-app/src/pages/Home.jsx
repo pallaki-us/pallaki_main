@@ -134,6 +134,7 @@ export default function Home() {
           <div className="srch-wrap">
             <div className="srch-bar">
               <select value={cat} onChange={e => setCat(e.target.value)}>
+                <option value="" hidden>Categories</option>
                 <option value="">All Categories</option>
                 <option>Photography</option>
                 <option>Mehndi Artists</option>
