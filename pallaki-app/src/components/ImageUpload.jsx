@@ -2,9 +2,10 @@ import { useState, useRef } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../lib/AuthContext'
 import { showToast } from '../lib/toast'
+import { IMAGE_MAX_SIZE, IMAGE_ALLOWED_TYPES } from '../lib/constants'
 
-const MAX_SIZE = 2 * 1024 * 1024 // 2MB
-const ALLOWED = ['image/jpeg', 'image/png', 'image/webp']
+const MAX_SIZE = IMAGE_MAX_SIZE
+const ALLOWED = IMAGE_ALLOWED_TYPES
 const BUCKET = import.meta.env.VITE_STORAGE_BUCKET || 'pallaki-media'
 
 export default function ImageUpload({ folder = 'portfolio', maxFiles = 12, existingUrls = [], onUploadComplete }) {

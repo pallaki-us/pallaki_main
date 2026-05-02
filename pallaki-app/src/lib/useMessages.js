@@ -1,13 +1,15 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { supabase } from './supabase'
 
 // Messages within a single thread (vendor + planner pair)
 export function useMessages(vendorId, plannerId) {
   const [messages, setMessages] = useState([])
   const [loading, setLoading] = useState(true)
+  const activeRef = useRef(false)
 
   useEffect(() => {
     if (!vendorId || !plannerId || !supabase) { setLoading(false); return }
+    activeRef.current = true
     fetchMessages()
 
     const channel = supabase
@@ -15,7 +17,10 @@ export function useMessages(vendorId, plannerId) {
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, () => fetchMessages())
       .subscribe()
 
-    return () => supabase.removeChannel(channel)
+    return () => {
+      activeRef.current = false
+      supabase.removeChannel(channel)
+    }
   }, [vendorId, plannerId])
 
   async function fetchMessages() {
@@ -25,8 +30,10 @@ export function useMessages(vendorId, plannerId) {
       .eq('vendor_id', vendorId)
       .eq('planner_id', plannerId)
       .order('created_at', { ascending: true })
-    setMessages(data || [])
-    setLoading(false)
+    if (activeRef.current) {
+      setMessages(data || [])
+      setLoading(false)
+    }
   }
 
   async function send(body, senderRole, senderId) {

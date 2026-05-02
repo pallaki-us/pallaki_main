@@ -62,7 +62,8 @@ export function AuthProvider({ children }) {
           setLoading(false)
         }
       })
-      .catch(() => {
+      .catch(err => {
+        console.error('Auth session fetch failed:', err)
         // Network or unexpected error — don't leave user stuck
         setUser(null)
         setUserType(null)
@@ -131,24 +132,17 @@ export function AuthProvider({ children }) {
         recipientEmail: email,
         recipientName: name,
       },
-    })
+    }).catch(err => console.error('Failed to send welcome email:', err))
 
     return { data, error: null }
   }
 
   async function signIn(email, password) {
     if (!supabase) {
-      if (email === 'test@pallaki.com' && password === 'test123') {
-        setUser({ email, user_metadata: { name: 'Ria' } })
-        setUserType('planner')
-        return { error: null, actualType: 'planner' }
-      }
-      if (email === 'vendor@pallaki.com' && password === 'test123') {
-        setUser({ email, user_metadata: { name: 'KJF Artistry' } })
-        setUserType('vendor')
-        return { error: null, actualType: 'vendor' }
-      }
-      return { error: { message: 'Incorrect email or password.' }, actualType: null }
+      const demoType = email.includes('vendor') ? 'vendor' : 'planner'
+      setUser({ email, user_metadata: { name: email.split('@')[0] } })
+      setUserType(demoType)
+      return { error: null, actualType: demoType }
     }
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) return { error, actualType: null }
@@ -173,10 +167,10 @@ export function AuthProvider({ children }) {
     return { error }
   }
 
-  async function signOut() {
-    if (supabase) await supabase.auth.signOut()
+  function signOut() {
     setUser(null)
     setUserType(null)
+    if (supabase) supabase.auth.signOut().catch(err => console.error('signOut error:', err))
   }
 
   async function verifyOtp(email, token) {

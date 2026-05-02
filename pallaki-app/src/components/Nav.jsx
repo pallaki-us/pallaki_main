@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../lib/AuthContext'
 import AnimatedLogo from './AnimatedLogo'
 import PalanquinProcession from './PalanquinProcession'
@@ -8,6 +8,7 @@ import NotificationBell from './NotificationBell'
 export default function Nav({ onShowVendorListing }) {
   const { user, userType, signOut } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
   const name = user?.user_metadata?.name || user?.email?.split('@')[0] || ''
   const [menuOpen, setMenuOpen] = useState(false)
   const [ddOpen, setDdOpen] = useState(false)
@@ -22,9 +23,9 @@ export default function Nav({ onShowVendorListing }) {
     return () => document.removeEventListener('mousedown', handleOutside)
   }, [ddOpen])
 
-  async function handleSignOut() {
+  function handleSignOut() {
     setDdOpen(false)
-    await signOut()
+    signOut()
     navigate('/')
     setMenuOpen(false)
   }
@@ -95,7 +96,7 @@ export default function Nav({ onShowVendorListing }) {
               <span className="nav-user-name">{`Hi, ${name}`}</span>
               <div className="nav-user-av">{name.charAt(0).toUpperCase()}</div>
               <div className="nav-user-dd" onClick={e => e.stopPropagation()}>
-                <div className="nav-user-dd-item" onClick={() => { navigate('/profile'); setDdOpen(false) }}>
+                <div className="nav-user-dd-item" onClick={() => { setDdOpen(false); if (location.pathname === '/profile') window.scrollTo({ top: 0, behavior: 'smooth' }); else navigate('/profile') }}>
                   ✎ Edit Profile
                 </div>
                 <div className="nav-user-dd-item" onClick={() => { navigate('/conversations'); setDdOpen(false) }}>

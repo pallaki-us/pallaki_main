@@ -26,6 +26,8 @@ export function useVendors(category = 'All', city = '', page = 1, topRated = fal
       return
     }
 
+    let cancelled = false
+
     async function fetchVendors() {
       setLoading(true)
       setError(null)
@@ -45,6 +47,8 @@ export function useVendors(category = 'All', city = '', page = 1, topRated = fal
       if (topRated) query = query.eq('badge', 'top')
 
       const { data, error: err, count } = await query
+
+      if (cancelled) return
 
       if (err) {
         setError(err.message)
@@ -72,6 +76,7 @@ export function useVendors(category = 'All', city = '', page = 1, topRated = fal
     }
 
     fetchVendors()
+    return () => { cancelled = true }
   }, [category, city, page, topRated])
 
   return { vendors, loading, error, total }
@@ -91,12 +96,16 @@ export function useVendor(id) {
       return
     }
 
+    let cancelled = false
+
     async function fetchVendor() {
       const { data, error } = await supabase
         .from('vendors')
         .select('*')
         .eq('id', id)
         .single()
+
+      if (cancelled) return
 
       if (!error && data) {
         setVendor({
@@ -126,6 +135,7 @@ export function useVendor(id) {
     }
 
     fetchVendor()
+    return () => { cancelled = true }
   }, [id])
 
   return { vendor, loading }

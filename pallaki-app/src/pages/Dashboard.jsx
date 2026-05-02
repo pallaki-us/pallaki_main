@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/AuthContext'
 import { showToast } from '../lib/toast'
 import ImageUpload from '../components/ImageUpload'
+import { IMAGE_MAX_SIZE, IMAGE_ALLOWED_TYPES } from '../lib/constants'
 import { useVendorProfile } from '../lib/useVendorProfile'
 import { useVendorInquiries } from '../lib/useInquiries'
 import { useVendorAnalytics } from '../lib/useVendorAnalytics'
@@ -71,10 +72,10 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
   async function handleAvatarUpload(e) {
     const file = e.target.files?.[0]
     if (!file) return
-    if (!['image/jpeg','image/png','image/webp'].includes(file.type)) {
+    if (!IMAGE_ALLOWED_TYPES.includes(file.type)) {
       showToast('Only JPG, PNG or WebP allowed.'); return
     }
-    if (file.size > 2 * 1024 * 1024) {
+    if (file.size > IMAGE_MAX_SIZE) {
       showToast('Max 2MB for profile photo.'); return
     }
     const { supabase } = await import('../lib/supabase')

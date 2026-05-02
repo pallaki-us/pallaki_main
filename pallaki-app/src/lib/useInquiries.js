@@ -29,7 +29,7 @@ export async function sendInquiry({ vendorId, plannerId, message, eventDate, pla
   if (!result.error && vendorEmail) {
     supabase.functions.invoke('send-notification-email', {
       body: { type: 'new_inquiry', recipientEmail: vendorEmail, recipientName: vendorName, actorName: plannerName, inquiryMessage: message },
-    }).catch(() => {})
+    }).catch(err => console.error('Failed to send inquiry notification email:', err))
   }
   return result
 }
@@ -70,7 +70,7 @@ export function useVendorInquiries(vendorId) {
     if (plannerEmail) {
       supabase.functions.invoke('send-notification-email', {
         body: { type: 'inquiry_reply', recipientEmail: plannerEmail, recipientName: plannerName, actorName: vendorName, inquiryMessage: reply },
-      }).catch(() => {})
+      }).catch(err => console.error('Failed to send reply notification email:', err))
     }
     await fetchAll()
   }
