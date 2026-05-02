@@ -1,24 +1,12 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pallaki — South Asian Wedding Vendors</title>
-    <meta name="google-site-verification" content="NhlhLABIBIw7UOvX8DoZ9Ig06KNxKqYYNnWOJf-Lebc" />
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&display=swap" rel="stylesheet" />
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-4HXGJ4TPYD"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-4HXGJ4TPYD');
-    </script>
-    <script type="module" crossorigin src="/assets/index-sue0oBoa.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-CaWdGscJ.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<!DOCTYPE html>
+<html>
+<script>
+  var l = window.location;
+  var segs = l.pathname.split('/').filter(Boolean);
+  if (segs.length > 0) {
+    var base = '/' + segs[0] + '/';
+    var rest = l.pathname.slice(base.length);
+    l.replace(l.protocol + '//' + l.host + base + '?p=' + encodeURIComponent('/' + rest) + l.hash);
+  }
+</script>
 </html>
