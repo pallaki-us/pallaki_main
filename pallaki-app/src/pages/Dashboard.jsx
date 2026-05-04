@@ -185,7 +185,7 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
             <div><div className="dash-title">My Vendor Profile</div></div>
             <div className="dash-actions">
               <button className="dash-btn dash-btn-out" onClick={() => navigate('/')}>🌐 Browse Website</button>
-              <button className="dash-btn dash-btn-out" onClick={() => navigate('/analytics')}>View Analytics</button>
+              <button className="dash-btn dash-btn-out" onClick={() => navigate('/analytics')}>💌 Conversations</button>
               <button className="dash-btn dash-btn-gold" onClick={() => profile?.id ? onShowVendorListing() : showToast('Save your profile first!')}>Preview Listing</button>
             </div>
           </div>
