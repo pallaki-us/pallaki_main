@@ -101,6 +101,8 @@ nav {
 .auth-submit:disabled { opacity: .6; cursor: not-allowed; }
 .auth-vendor .auth-submit { background: var(--g); }
 .auth-vendor .auth-submit:hover:not(:disabled) { background: var(--gl); }
+.auth-demo-btn { margin-top: .5rem; width: 100%; padding: .75rem; background: transparent; border: 1.5px dashed currentColor; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: .85rem; cursor: pointer; opacity: .7; transition: opacity .2s; }
+.auth-demo-btn:hover { opacity: 1; }
 
 /* Role toggle */
 .auth-role-toggle { display: flex; gap: .5rem; padding: .3rem; background: rgba(196,132,140,.1); border-radius: 10px; }

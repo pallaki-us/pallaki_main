@@ -27,11 +27,22 @@ export default function LoginForm({ role }) {
   const isVendor = role === 'vendor'
   const justVerified = searchParams.get('verified') === 'true'
   const wrongRole = searchParams.get('wrongrole')
+  const isDemo = import.meta.env.VITE_APP_MODE === 'demo'
+
+  function handleDemoFill() {
+    if (role === 'vendor') {
+      setEmail(import.meta.env.VITE_DEMO_VENDOR_EMAIL)
+      setPassword(import.meta.env.VITE_DEMO_VENDOR_PW)
+    } else {
+      setEmail(import.meta.env.VITE_DEMO_PLANNER_EMAIL)
+      setPassword(import.meta.env.VITE_DEMO_PLANNER_PW)
+    }
+  }
 
   // Redirect already-logged-in users away from auth pages
   useEffect(() => {
     if (user && userType && userType !== '__verified__') {
-      navigate(userType === 'vendor' ? '/dashboard' : '/profile', { replace: true })
+      navigate(userType === 'vendor' ? '/dashboard' : '/vendors', { replace: true })
     }
   }, [user, userType])
 
@@ -100,7 +111,7 @@ export default function LoginForm({ role }) {
         navigate('/dashboard')
       }
     } else {
-      navigate('/profile')
+      navigate('/vendors')
     }
   }
 
@@ -193,6 +204,12 @@ export default function LoginForm({ role }) {
       <button type="submit" className="auth-submit" disabled={loading}>
         {loading ? 'Signing in…' : 'Sign In →'}
       </button>
+
+      {isDemo && (
+        <button type="button" onClick={handleDemoFill} className="auth-demo-btn">
+          ✨ Use demo {role} credentials
+        </button>
+      )}
 
       <p className="auth-form-footer">
         Don&apos;t have an account?{' '}
