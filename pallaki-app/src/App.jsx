@@ -80,7 +80,7 @@ function AppInner() {
   }, [userType, location.pathname])
 
   async function showVendorListing() {
-    if (!supabase) return
+    if (!supabase) { navigate('/vendor/1?own=true'); return }
     const { data: { session } } = await supabase.auth.getSession()
     if (!session?.user) return
     const { data } = await supabase
