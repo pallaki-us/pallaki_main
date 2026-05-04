@@ -348,7 +348,7 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
                   <div className="an-title">Hi, {name} 👋</div>
                   <span className="an-badge">PREMIUM</span>
                 </div>
-                <div style={{ fontSize: '.78rem', color: 'rgba(255,255,255,.55)', marginTop: '.2rem' }}>Vendor Dashboard · Analytics</div>
+                <div style={{ fontSize: '.78rem', color: 'rgba(255,255,255,.55)', marginTop: '.2rem' }}>Vendor Dashboard · Conversations</div>
               </div>
             </div>
           </div>
