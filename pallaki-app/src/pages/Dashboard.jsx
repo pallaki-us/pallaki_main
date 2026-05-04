@@ -185,8 +185,8 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
             <div><div className="dash-title">My Vendor Profile</div></div>
             <div className="dash-actions">
               <button className="dash-btn dash-btn-out" onClick={() => navigate('/')}>🌐 Browse Website</button>
-              <button className="dash-btn dash-btn-out" onClick={() => navigate('/analytics')}>View Analytics</button>
-              <button className="dash-btn dash-btn-gold" onClick={() => profile?.id ? onShowVendorListing() : showToast('Save your profile first!')}>Preview Listing</button>
+              <button className="dash-btn dash-btn-out" onClick={() => navigate('/analytics')}>💌 Conversations</button>
+              <button className="dash-btn dash-btn-gold" onClick={() => (profile?.id || !supabase) ? onShowVendorListing() : showToast('Save your profile first!')}>Preview Listing</button>
             </div>
           </div>
 
@@ -348,7 +348,7 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
                   <div className="an-title">Hi, {name} 👋</div>
                   <span className="an-badge">PREMIUM</span>
                 </div>
-                <div style={{ fontSize: '.78rem', color: 'rgba(255,255,255,.55)', marginTop: '.2rem' }}>Vendor Dashboard · Analytics</div>
+                <div style={{ fontSize: '.78rem', color: 'rgba(255,255,255,.55)', marginTop: '.2rem' }}>Vendor Dashboard · Conversations</div>
               </div>
             </div>
           </div>
