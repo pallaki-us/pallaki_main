@@ -126,13 +126,15 @@ export function AuthProvider({ children }) {
       await fetchUserType(data.session.user.id, type)
     }
 
-    supabase.functions.invoke('send-notification-email', {
-      body: {
-        type: type === 'vendor' ? 'welcome_vendor' : 'welcome_planner',
-        recipientEmail: email,
-        recipientName: name,
-      },
-    }).catch(err => console.error('Failed to send welcome email:', err))
+    if (type !== 'vendor') {
+      supabase.functions.invoke('send-notification-email', {
+        body: {
+          type: 'welcome_planner',
+          recipientEmail: email,
+          recipientName: name,
+        },
+      }).catch(err => console.error('Failed to send welcome email:', err))
+    }
 
     return { data, error: null }
   }
