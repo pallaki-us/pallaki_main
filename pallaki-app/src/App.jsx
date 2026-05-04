@@ -36,7 +36,7 @@ function RequireAuth({ children, role }) {
     )
   }
   if (userType !== role) {
-    return <Navigate to={userType === 'vendor' ? '/dashboard' : '/profile'} replace />
+    return <Navigate to={userType === 'vendor' ? '/dashboard' : '/vendors'} replace />
   }
   return children
 }
@@ -68,7 +68,7 @@ function AppInner() {
           navigate(`/${oauthIntended}/login?wrongrole=${userType}`, { replace: true })
         })
       } else {
-        navigate(userType === 'vendor' ? '/dashboard' : '/profile', { replace: true })
+        navigate(userType === 'vendor' ? '/dashboard' : '/vendors', { replace: true })
       }
       return
     }
