@@ -71,5 +71,5 @@
   .srch-bar select { min-width: unset; width: 90px; flex-shrink: 0; font-size: .76rem; padding: .65rem .3rem .65rem .65rem; -webkit-appearance: menulist; appearance: auto; background-image: none; }
   .srch-bar input { flex: 1; min-width: 0; font-size: .8rem; padding: .65rem .5rem; }
   .srch-btn { flex-shrink: 0; padding: 0 .85rem; font-size: .72rem; letter-spacing: .03em; border-radius: 0 20px 20px 0; }
-  .pop-tags { justify-content: flex-start; padding-bottom: .25rem; }
+  .pop-tags { justify-content: flex-start; padding-bottom: .25rem; padding-left: .5rem; padding-right: .5rem; }
 }
