@@ -3,6 +3,11 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') || ''
 const FROM_EMAIL = Deno.env.get('RESEND_FROM_EMAIL') || 'Pallaki <noreply@pallaki.us>'
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
 function escapeHtml(str: string): string {
   return str
     .replace(/&/g, '&amp;')
@@ -14,7 +19,7 @@ function escapeHtml(str: string): string {
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type' } })
+    return new Response('ok', { headers: corsHeaders })
   }
 
   try {
@@ -25,7 +30,7 @@ serve(async (req) => {
     const safeInquiryMessage = inquiryMessage ? escapeHtml(String(inquiryMessage)) : null
 
     if (!recipientEmail) {
-      return new Response(JSON.stringify({ error: 'Missing recipientEmail' }), { status: 400 })
+      return new Response(JSON.stringify({ error: 'Missing recipientEmail' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
 
     let subject = ''
@@ -172,7 +177,7 @@ serve(async (req) => {
           </div>
         </div>`
     } else {
-      return new Response(JSON.stringify({ error: 'Unknown type' }), { status: 400 })
+      return new Response(JSON.stringify({ error: 'Unknown type' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
 
     const res = await fetch('https://api.resend.com/emails', {
@@ -191,11 +196,11 @@ serve(async (req) => {
 
     if (!res.ok) {
       const err = await res.text()
-      return new Response(JSON.stringify({ error: err }), { status: res.status })
+      return new Response(JSON.stringify({ error: err }), { status: res.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
 
-    return new Response(JSON.stringify({ ok: true }), { status: 200 })
+    return new Response(JSON.stringify({ ok: true }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), { status: 500 })
+    return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
   }
 })
