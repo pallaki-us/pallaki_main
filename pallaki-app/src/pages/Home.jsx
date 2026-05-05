@@ -183,21 +183,6 @@ export default function Home() {
             <p>We're Shruti and Vamsi, the founders of Pallaki. Like many of you, our journey began with a vision for a beautiful wedding—and a spreadsheet that quickly got out of hand.</p>
             <p>When we planned our own wedding at the BAPS Swaminarayan Temple in Chino Hills, we didn't struggle to find talent; we struggled to find it easily. Our days were spent endlessly scrolling through Instagram, jumping between portfolios, and waiting on DMs. We realized there was a missing link: a central space where culture, tradition, and convenience met.</p>
             <p>We created Pallaki to be the platform we wish we'd had. We believe that finding a vendor who understands your traditions shouldn't require a dozen tabs and a week of research. We've brought everything together in one place so you can spend less time searching and more time celebrating.</p>
-            {!IS_PROD && (
-              <div className="stats-mini" style={{ marginTop: '2rem' }}>
-                {[
-                  [stats.vendors > 0 ? `${stats.vendors}+` : '—', 'Verified Vendors'],
-                  [stats.cities > 0 ? `${stats.cities}` : '—', 'Cities Covered'],
-                  [stats.categories > 0 ? `${stats.categories}` : '—', 'Categories'],
-                  [stats.planners > 0 ? `${stats.planners * 2}+` : '—', 'Happy Families'],
-                ].map(([n, l]) => (
-                  <div key={l} className="smi">
-                    <div className="smi-n">{n}</div>
-                    <div className="smi-l">{l}</div>
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
         </div>
       </section>
