@@ -148,26 +148,26 @@ serve(async (req) => {
           </div>
         </div>`
     } else if (type === 'welcome_vendor') {
-      subject = `Welcome to Pallaki! — Your application is under review`
+      subject = `Your Pallaki listing is under review`
       html = `
         <div style="font-family: Georgia, serif; max-width: 520px; margin: 0 auto; color: #3D1D2A;">
           <div style="background: linear-gradient(135deg, #6B3A46, #3D1D2A); padding: 28px 32px; border-radius: 12px 12px 0 0;">
             <h1 style="color: #fff; font-size: 1.4rem; font-weight: 400; margin: 0;">पल्लकी</h1>
           </div>
           <div style="background: #FFF6F8; padding: 28px 32px; border: 1px solid #F5D0D6; border-top: none; border-radius: 0 0 12px 12px;">
-            <h2 style="font-size: 1.2rem; font-weight: 500; color: #6B3A46; margin-top: 0;">Welcome${safeRecipientName ? `, ${safeRecipientName}` : ''}!</h2>
+            <h2 style="font-size: 1.2rem; font-weight: 500; color: #6B3A46; margin-top: 0;">Your listing has been submitted${safeRecipientName ? `, ${safeRecipientName}` : ''}!</h2>
             <p style="color: #5A3A3A; line-height: 1.7; font-size: .95rem;">
-              Thanks for applying to list your business on Pallaki. Your application is now under review — we'll send you an email once it's approved.
+              Thank you for submitting your listing on Pallaki. Your account is now sent for approval — we will review it and get back to you within 1–2 hours.
             </p>
             <div style="background: #fff; border: 1px solid #F5D0D6; border-radius: 8px; padding: 14px 16px; margin: 16px 0; color: #5A3A3A; line-height: 1.65; font-size: .92rem;">
               <strong style="color: #6B3A46;">While you wait</strong><br/>
-              Log in to complete your profile and add photos so you're ready to go live.
+              Browse our website and explore other vendors. We'd love to hear your feedback — reply to this email with any thoughts!
             </div>
-            <a href="https://pallaki.us/vendor/login" style="display: inline-block; background: #C4848C; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-size: .9rem; margin-top: 8px;">
-              Complete My Profile →
+            <a href="https://pallaki.us" style="display: inline-block; background: #C4848C; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-size: .9rem; margin-top: 8px;">
+              Browse Pallaki →
             </a>
             <p style="color: #9B7B80; font-size: .78rem; margin-top: 24px; line-height: 1.6;">
-              You're receiving this because you applied as a vendor on Pallaki.
+              You're receiving this because you submitted a vendor listing on Pallaki.
             </p>
           </div>
         </div>`

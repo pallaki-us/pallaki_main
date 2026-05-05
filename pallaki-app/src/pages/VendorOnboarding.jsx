@@ -90,6 +90,15 @@ export default function VendorOnboarding() {
 
     setSaving(false)
     if (error) { showToast('Error saving profile: ' + error.message); return }
+
+    supabase.functions.invoke('send-notification-email', {
+      body: {
+        type: 'welcome_vendor',
+        recipientEmail: user.email,
+        recipientName: bizName,
+      },
+    }).catch(err => console.error('Failed to send listing submission email:', err))
+
     setDone(true)
   }
 
