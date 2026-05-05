@@ -119,7 +119,7 @@ serve(async (req) => {
               <strong style="color: #6B3A46;">What's next?</strong><br/>
               Log in to your dashboard to complete your profile, add portfolio photos, and update your availability.
             </div>
-            <a href="https://pallaki.us/dashboard" style="display: inline-block; background: #C4848C; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-size: .9rem; margin-top: 8px;">
+            <a href="https://pallaki.us" style="display: inline-block; background: #C4848C; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-size: .9rem; margin-top: 8px;">
               Go to My Dashboard →
             </a>
             <p style="color: #9B7B80; font-size: .78rem; margin-top: 24px; line-height: 1.6;">
