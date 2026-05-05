@@ -34,12 +34,7 @@ export default function Detail() {
   useEffect(() => {
     if (!vendorId || !supabase || !user) return
     if (isOwnListing) return
-    const today = new Date().toISOString().split('T')[0]
-    supabase.from('profile_views')
-      .upsert(
-        { vendor_id: vendorId, viewer_id: user.id, view_date: today, viewed_at: new Date().toISOString() },
-        { onConflict: 'vendor_id,viewer_id,view_date', ignoreDuplicates: true }
-      )
+    supabase.rpc('record_profile_view', { p_vendor_id: vendorId, p_viewer_id: user.id })
       .then(({ error }) => { if (error) console.error('profile_view error:', error) })
   }, [vendorId, user?.id, isOwnListing])
 
