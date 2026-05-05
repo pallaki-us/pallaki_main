@@ -79,9 +79,6 @@ export default function TrendingSection() {
             </div>
           ))}
         </div>
-        <div className="tv-header">
-          <span className="tv-view-all" onClick={() => navigate(`/vendors?cat=${encodeURIComponent(activeCat)}`)}>View All →</span>
-        </div>
         <div className="tv-track-wrap">
           <div className="tv-track" id="tv-track">
             {vendors.map((v, i) => (
