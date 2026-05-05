@@ -89,13 +89,13 @@ export function AuthProvider({ children }) {
       }
       setUser(session?.user ?? null)
       if (session?.user) {
-        // Google OAuth: create planner profile if none exists
+        // Google OAuth: create planner profile if none exists (fire-and-forget so fetchUserType isn't blocked)
         if (session.user.app_metadata?.provider === 'google') {
           const name = session.user.user_metadata?.full_name || session.user.user_metadata?.name || ''
-          await supabase.from('profiles').upsert(
+          supabase.from('profiles').upsert(
             { id: session.user.id, user_type: 'planner', name, email: session.user.email },
             { onConflict: 'id' }
-          )
+          ).catch(err => console.error('Google profile upsert failed:', err))
         }
         fetchUserType(session.user.id, session.user.user_metadata?.user_type)
       } else {
