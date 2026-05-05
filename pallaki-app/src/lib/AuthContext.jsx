@@ -82,10 +82,16 @@ export function AuthProvider({ children }) {
 
       if (_event === 'SIGNED_IN' && window.location.hash.includes('type=signup')) {
         window.history.replaceState(null, '', window.location.pathname)
-        await supabase.auth.signOut()
-        setUser(null)
-        setUserType('__verified__')
-        return
+        if (session?.user?.app_metadata?.provider === 'google') {
+          // First-time Google signup — flag so AppInner redirects to /profile
+          sessionStorage.setItem('pallaki_google_new_signup', 'true')
+        } else {
+          // Email signup via magic link — sign out and show OTP screen instead
+          await supabase.auth.signOut()
+          setUser(null)
+          setUserType('__verified__')
+          return
+        }
       }
       setUser(session?.user ?? null)
       if (session?.user) {

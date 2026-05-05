@@ -64,11 +64,14 @@ function AppInner() {
     if (oauthIntended) {
       sessionStorage.removeItem('pallaki_oauth_type')
       if (userType !== oauthIntended) {
-        signOut().then(() => {
-          navigate(`/${oauthIntended}/login?wrongrole=${userType}`, { replace: true })
-        })
+        signOut()
+        navigate(`/${oauthIntended}/login?wrongrole=${userType}`, { replace: true })
+      } else if (userType === 'vendor') {
+        navigate('/dashboard', { replace: true })
       } else {
-        navigate(userType === 'vendor' ? '/dashboard' : '/vendors', { replace: true })
+        const isNewGoogleUser = sessionStorage.getItem('pallaki_google_new_signup')
+        sessionStorage.removeItem('pallaki_google_new_signup')
+        navigate(isNewGoogleUser ? '/profile' : '/vendors', { replace: true })
       }
       return
     }
