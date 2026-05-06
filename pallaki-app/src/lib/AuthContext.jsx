@@ -46,15 +46,7 @@ export function AuthProvider({ children }) {
     const timeout = setTimeout(() => setLoading(false), 4000)
 
     supabase.auth.getSession()
-      .then(({ data: { session }, error }) => {
-        if (error) {
-          // Stale / invalid token — clear it and start fresh
-          supabase.auth.signOut()
-          setUser(null)
-          setUserType(null)
-          setLoading(false)
-          return
-        }
+      .then(({ data: { session } }) => {
         setUser(session?.user ?? null)
         if (session?.user) {
           fetchUserType(session.user.id, session.user.user_metadata?.user_type).finally(() => setLoading(false))
@@ -62,13 +54,7 @@ export function AuthProvider({ children }) {
           setLoading(false)
         }
       })
-      .catch(err => {
-        console.error('Auth session fetch failed:', err)
-        // Network or unexpected error — don't leave user stuck
-        setUser(null)
-        setUserType(null)
-        setLoading(false)
-      })
+      .catch(() => setLoading(false))
       .finally(() => clearTimeout(timeout))
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
@@ -98,10 +84,13 @@ export function AuthProvider({ children }) {
         // Google OAuth: create planner profile if none exists (fire-and-forget so fetchUserType isn't blocked)
         if (session.user.app_metadata?.provider === 'google') {
           const name = session.user.user_metadata?.full_name || session.user.user_metadata?.name || ''
-          supabase.from('profiles').upsert(
+          // PKCE returns no hash, so detect new signups via created_at (account < 2 min old)
+          const isNewUser = Date.now() - new Date(session.user.created_at).getTime() < 120_000
+          if (isNewUser) sessionStorage.setItem('pallaki_google_new_signup', 'true')
+          Promise.resolve(supabase.from('profiles').upsert(
             { id: session.user.id, user_type: 'planner', name, email: session.user.email },
             { onConflict: 'id' }
-          ).catch(err => console.error('Google profile upsert failed:', err))
+          )).catch(err => console.error('Google profile upsert failed:', err))
         }
         fetchUserType(session.user.id, session.user.user_metadata?.user_type)
       } else {
