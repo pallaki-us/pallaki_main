@@ -9,31 +9,36 @@ function validateEmail(email) {
   return ''
 }
 
+// step: 'email' | 'otp' | 'password' | 'done'
 export default function ForgotPassword() {
   const navigate = useNavigate()
+  const [step, setStep] = useState('email')
   const [email, setEmail] = useState('')
   const [emailErr, setEmailErr] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [codeSent, setCodeSent] = useState(false)
+  const [emailLoading, setEmailLoading] = useState(false)
   const [otp, setOtp] = useState('')
   const [otpErr, setOtpErr] = useState('')
   const [otpLoading, setOtpLoading] = useState(false)
+  const [password, setPassword] = useState('')
+  const [confirm, setConfirm] = useState('')
+  const [showPw, setShowPw] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
+  const [pwErr, setPwErr] = useState('')
+  const [pwLoading, setPwLoading] = useState(false)
 
   async function handleEmailSubmit(e) {
     e.preventDefault()
     const err = validateEmail(email)
     if (err) { setEmailErr(err); return }
     setEmailErr('')
-    setLoading(true)
-
+    setEmailLoading(true)
     if (supabase) {
       await supabase.auth.resetPasswordForEmail(email.toLowerCase().trim(), {
         redirectTo: `${window.location.origin}/reset-password`,
       })
     }
-
-    setLoading(false)
-    setCodeSent(true)
+    setEmailLoading(false)
+    setStep('otp')
   }
 
   async function handleOtpSubmit(e) {
@@ -42,22 +47,101 @@ export default function ForgotPassword() {
     if (code.length !== 8) { setOtpErr('Enter the 8-digit code from your email.'); return }
     setOtpErr('')
     setOtpLoading(true)
-
     const { error } = await supabase.auth.verifyOtp({
       email: email.toLowerCase().trim(),
       token: code,
       type: 'recovery',
     })
-
     setOtpLoading(false)
-    if (error) {
-      setOtpErr('Invalid or expired code. Please try again.')
-      return
-    }
-    navigate('/reset-password')
+    if (error) { setOtpErr('Invalid or expired code. Please try again.'); return }
+    setStep('password')
   }
 
-  if (codeSent) {
+  async function handlePasswordSubmit(e) {
+    e.preventDefault()
+    if (!password) { setPwErr('Password is required.'); return }
+    if (password.length < 8) { setPwErr('Password must be at least 8 characters.'); return }
+    if (password !== confirm) { setPwErr('Passwords do not match.'); return }
+    setPwErr('')
+    setPwLoading(true)
+    const { error } = await supabase.auth.updateUser({ password })
+    setPwLoading(false)
+    if (error) { setPwErr(error.message); return }
+    await supabase.auth.signOut()
+    setStep('done')
+    setTimeout(() => navigate('/planner/login'), 2500)
+  }
+
+  if (step === 'done') {
+    return (
+      <AuthLayout role="planner">
+        <div className="auth-form auth-verify">
+          <div className="auth-verify-icon">✅</div>
+          <h1 className="auth-form-title">Password updated</h1>
+          <p className="auth-verify-text">
+            Your password has been changed. Redirecting you to sign in…
+          </p>
+        </div>
+      </AuthLayout>
+    )
+  }
+
+  if (step === 'password') {
+    return (
+      <AuthLayout role="planner">
+        <form className="auth-form" onSubmit={handlePasswordSubmit} noValidate>
+          <h1 className="auth-form-title">Set a new password</h1>
+          <p className="auth-form-sub">Choose a strong password for your Pallaki account.</p>
+
+          <div className="auth-field">
+            <label htmlFor="fp-pw">New Password</label>
+            <div className="auth-pw-wrap">
+              <input
+                id="fp-pw"
+                type={showPw ? 'text' : 'password'}
+                value={password}
+                onChange={e => { setPassword(e.target.value); setPwErr('') }}
+                placeholder="Min. 8 characters"
+                autoComplete="new-password"
+                className={pwErr ? 'err' : ''}
+                autoFocus
+              />
+              <button type="button" className="auth-pw-toggle" onClick={() => setShowPw(v => !v)}
+                tabIndex={-1} aria-label={showPw ? 'Hide password' : 'Show password'}>
+                {showPw ? '🙈' : '👁'}
+              </button>
+            </div>
+          </div>
+
+          <div className="auth-field">
+            <label htmlFor="fp-confirm">Confirm Password</label>
+            <div className="auth-pw-wrap">
+              <input
+                id="fp-confirm"
+                type={showConfirm ? 'text' : 'password'}
+                value={confirm}
+                onChange={e => { setConfirm(e.target.value); setPwErr('') }}
+                placeholder="Repeat your password"
+                autoComplete="new-password"
+                className={pwErr ? 'err' : ''}
+              />
+              <button type="button" className="auth-pw-toggle" onClick={() => setShowConfirm(v => !v)}
+                tabIndex={-1} aria-label={showConfirm ? 'Hide password' : 'Show password'}>
+                {showConfirm ? '🙈' : '👁'}
+              </button>
+            </div>
+            {pwErr && <span className="auth-field-err">{pwErr}</span>}
+          </div>
+
+          <button type="submit" className="auth-submit" disabled={pwLoading}>
+            {pwLoading ? 'Updating…' : 'Update Password →'}
+          </button>
+        </form>
+      </AuthLayout>
+    )
+  }
+
+  if (step === 'otp') {
     return (
       <AuthLayout role="planner">
         <form className="auth-form" onSubmit={handleOtpSubmit} noValidate>
@@ -90,8 +174,9 @@ export default function ForgotPassword() {
 
           <p className="auth-verify-hint">
             Didn&apos;t receive it? Check your spam folder or{' '}
-            <button type="button" className="auth-link" style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
-              onClick={() => { setCodeSent(false); setOtp(''); setOtpErr('') }}>
+            <button type="button" className="auth-link"
+              style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+              onClick={() => { setStep('email'); setOtp(''); setOtpErr('') }}>
               try again
             </button>.
           </p>
@@ -122,8 +207,8 @@ export default function ForgotPassword() {
           {emailErr && <span className="auth-field-err">{emailErr}</span>}
         </div>
 
-        <button type="submit" className="auth-submit" disabled={loading}>
-          {loading ? 'Sending…' : 'Send Reset Code →'}
+        <button type="submit" className="auth-submit" disabled={emailLoading}>
+          {emailLoading ? 'Sending…' : 'Send Reset Code →'}
         </button>
 
         <p className="auth-form-footer">
