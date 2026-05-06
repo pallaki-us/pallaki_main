@@ -32,11 +32,26 @@ export default function ForgotPassword() {
     if (err) { setEmailErr(err); return }
     setEmailErr('')
     setEmailLoading(true)
+
+    const normalizedEmail = email.toLowerCase().trim()
+
     if (supabase) {
-      await supabase.auth.resetPasswordForEmail(email.toLowerCase().trim(), {
+      const [{ data: isPlanner }, { data: isVendor }] = await Promise.all([
+        supabase.rpc('check_email_exists', { check_email: normalizedEmail, check_type: 'planner' }),
+        supabase.rpc('check_email_exists', { check_email: normalizedEmail, check_type: 'vendor' }),
+      ])
+
+      if (!isPlanner && !isVendor) {
+        setEmailErr('There\'s no account with this email. Please try another email.')
+        setEmailLoading(false)
+        return
+      }
+
+      await supabase.auth.resetPasswordForEmail(normalizedEmail, {
         redirectTo: `${window.location.origin}/reset-password`,
       })
     }
+
     setEmailLoading(false)
     setStep('otp')
   }
