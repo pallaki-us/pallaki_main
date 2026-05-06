@@ -26,7 +26,8 @@ export default function LoginForm({ role }) {
 
   const isVendor = role === 'vendor'
   const justVerified = searchParams.get('verified') === 'true'
-  const wrongRole = searchParams.get('wrongrole')
+  const rawWrongRole = searchParams.get('wrongrole')
+  const wrongRole = rawWrongRole === 'vendor' || rawWrongRole === 'planner' ? rawWrongRole : null
   const isDemo = import.meta.env.VITE_APP_MODE === 'demo'
 
   function handleDemoFill() {
