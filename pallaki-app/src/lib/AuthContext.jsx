@@ -121,16 +121,6 @@ export function AuthProvider({ children }) {
       await fetchUserType(data.session.user.id, type)
     }
 
-    if (type !== 'vendor') {
-      supabase.functions.invoke('send-notification-email', {
-        body: {
-          type: 'welcome_planner',
-          recipientEmail: email,
-          recipientName: name,
-        },
-      }).catch(err => console.error('Failed to send welcome email:', err))
-    }
-
     return { data, error: null }
   }
 
@@ -174,7 +164,15 @@ export function AuthProvider({ children }) {
     if (!supabase) return { error: { message: 'Not available in demo mode.' } }
     const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'signup' })
     if (error) return { error }
-    if (data.session?.user) await fetchUserType(data.session.user.id, data.session.user.user_metadata?.user_type)
+    if (data.session?.user) {
+      const meta = data.session.user.user_metadata
+      await fetchUserType(data.session.user.id, meta?.user_type)
+      if (meta?.user_type !== 'vendor') {
+        supabase.functions.invoke('send-notification-email', {
+          body: { type: 'welcome_planner', recipientEmail: email, recipientName: meta?.name || '' },
+        }).catch(err => console.error('Failed to send welcome email:', err))
+      }
+    }
     return { data, error: null }
   }
 
