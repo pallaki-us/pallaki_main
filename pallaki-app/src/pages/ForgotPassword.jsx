@@ -82,7 +82,7 @@ export default function ForgotPassword() {
     const { error } = await supabase.auth.updateUser({ password })
     setPwLoading(false)
     if (error) { setPwErr(error.message); return }
-    await supabase.auth.signOut()
+    await supabase.auth.signOut({ scope: 'global' })
     setStep('done')
     setTimeout(() => navigate('/planner/login'), 2500)
   }
