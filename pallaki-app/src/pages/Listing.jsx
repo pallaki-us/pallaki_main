@@ -4,7 +4,6 @@ import { EVENT_CATS } from '../data/vendors'
 import { useVendors } from '../lib/useVendors'
 import { useAuth } from '../lib/AuthContext'
 import { trackSearch } from '../lib/analytics'
-import TrendingSection from '../components/TrendingSection'
 
 export default function Listing() {
   const { user } = useAuth()
@@ -77,8 +76,6 @@ export default function Listing() {
           )}
         </div>
       </div>
-
-      <TrendingSection />
 
       {/* Grid */}
       <div className="lb">
