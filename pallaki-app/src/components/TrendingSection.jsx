@@ -27,7 +27,7 @@ function renderStars(rating) {
 export default function TrendingSection() {
   const { user } = useAuth()
   const navigate = useNavigate()
-  const [activeCat, setActiveCat] = useState('Photography')
+  const [activeCat, setActiveCat] = useState('All')
   const [vendors, setVendors] = useState([])
   const [slide, setSlide] = useState(0)
   const [animated, setAnimated] = useState(true)
@@ -37,7 +37,7 @@ export default function TrendingSection() {
   const slideRef = useRef(0)
   slideRef.current = slide
 
-  useEffect(() => { fetchTrending('Photography') }, [])
+  useEffect(() => { fetchTrending('All') }, [])
 
   // Measure card width whenever vendors or window size changes
   useEffect(() => {
@@ -80,16 +80,20 @@ export default function TrendingSection() {
   async function fetchTrending(category) {
     setSlide(0)
     if (!supabase || IS_DEMO) {
-      setVendors(IS_PROD ? [] : (CAT_VENDORS[category] || []))
+      const demo = category === 'All'
+        ? Object.values(CAT_VENDORS).flat()
+        : (CAT_VENDORS[category] || [])
+      setVendors(IS_PROD ? [] : demo)
       return
     }
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('vendors')
         .select('id, name, city, state, icon, bg, rating, review_count, category, avatar_url')
-        .eq('category', category)
         .order('rating', { ascending: false })
         .limit(8)
+      if (category !== 'All') query = query.eq('category', category)
+      const { data, error } = await query
       if (error) throw error
       setVendors(data?.map(v => ({
         id: v.id,
