@@ -94,8 +94,10 @@ export default function Listing() {
           <div className="lg">
             {vendors.map(v => (
               <div key={v.id} className="vc" onClick={() => handleVendorClick(v.id)}>
-                <div className="vc-img" style={{ background: `linear-gradient(135deg,${v.bg})` }}>
-                  {v.icon}
+                <div className="vc-img" style={v.avatar_url ? {} : { background: `linear-gradient(135deg,${v.bg})` }}>
+                  {v.avatar_url
+                    ? <img src={v.avatar_url} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    : v.icon}
                   {v.badge === 'featured' && <div className="vcbdg bdg-f">Featured</div>}
                   {v.badge === 'top' && <div className="vcbdg bdg-t">Top Rated</div>}
                 </div>
