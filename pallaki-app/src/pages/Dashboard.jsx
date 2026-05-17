@@ -76,7 +76,7 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
       showToast('Only JPG, PNG or WebP allowed.'); return
     }
     if (file.size > IMAGE_MAX_SIZE) {
-      showToast('Max 2MB for profile photo.'); return
+      showToast('Max 50MB for profile photo.'); return
     }
     const { supabase } = await import('../lib/supabase')
     if (!supabase) return
@@ -210,7 +210,7 @@ export default function Dashboard({ activePage, onShowVendorListing }) {
                   <input ref={avatarInputRef} type="file" accept="image/jpeg,image/png,image/webp" style={{ display: 'none' }} onChange={handleAvatarUpload} />
                   <div>
                     <p style={{ fontSize: '.86rem', color: 'var(--tm)' }}>Your business profile photo — visible to families browsing Pallaki.</p>
-                    <p style={{ fontSize: '.76rem', color: 'var(--tl)', marginTop: 4 }}>Click the photo to upload. JPG, PNG or WebP · Max 2MB.</p>
+                    <p style={{ fontSize: '.76rem', color: 'var(--tl)', marginTop: 4 }}>Click the photo to upload. JPG, PNG or WebP · Max 50MB.</p>
                   </div>
                 </div>
                 <div className="details-form" style={{ marginTop: '1.5rem' }}>
