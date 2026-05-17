@@ -25,7 +25,7 @@ export default function ImageUpload({ folder = 'portfolio', maxFiles = 12, exist
         return
       }
       if (file.size > MAX_SIZE) {
-        showToast(`${file.name} is too large. Max 2MB per image.`)
+        showToast(`${file.name} is too large. Max 50MB per image.`)
         return
       }
     }
@@ -138,7 +138,7 @@ export default function ImageUpload({ folder = 'portfolio', maxFiles = 12, exist
       )}
 
       <p style={{ fontSize: '.68rem', color: 'var(--tl)', marginTop: '.4rem' }}>
-        JPG, PNG or WebP · Max 2MB per image · Up to {maxFiles} photos
+        JPG, PNG or WebP · Max 50MB per image · Up to {maxFiles} photos
       </p>
     </div>
   )
