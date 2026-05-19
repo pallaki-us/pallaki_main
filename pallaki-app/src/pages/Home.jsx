@@ -145,6 +145,7 @@ export default function Home() {
                 <option>Event Planners</option>
                 <option>Party Rentals</option>
                 <option>Wedding Venue</option>
+                <option>Wedding Attire &amp; Boutique</option>
               </select>
               <input
                 type="text"

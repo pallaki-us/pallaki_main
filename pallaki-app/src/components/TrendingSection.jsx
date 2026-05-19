@@ -14,6 +14,7 @@ const CAT_CHIPS = [
   { icon: '🎵', label: 'Music & DJ' },
   { icon: '📋', label: 'Event Planners' },
   { icon: '🎪', label: 'Party Rentals' },
+  { icon: '👗', label: 'Wedding Attire & Boutique' },
 ]
 
 const VISIBLE = 4
