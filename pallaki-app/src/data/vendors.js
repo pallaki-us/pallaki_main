@@ -114,7 +114,7 @@ export const VENDORS = [
 ];
 
 export const EVENT_CATS = {
-  Wedding: ['All', 'Photography', 'Videography', 'Mehndi Artists', 'Bridal Makeup', 'Catering', 'Decor', 'Music & DJ', 'Event Planners', 'Party Rentals'],
+  Wedding: ['All', 'Photography', 'Videography', 'Mehndi Artists', 'Bridal Makeup', 'Catering', 'Decor', 'Music & DJ', 'Event Planners', 'Party Rentals', 'Wedding Attire & Boutique'],
   'Pre-Wedding': ['All', 'Photography', 'Videography', 'Mehndi Artists', 'Bridal Makeup', 'Decor', 'Music & DJ'],
   'House Warming': ['All', 'Catering', 'Decor', 'Music & DJ'],
   Birthday: ['All', 'Catering', 'Photography', 'Decor', 'Music & DJ', 'Party Rentals'],
@@ -177,5 +177,12 @@ export const CAT_VENDORS = {
     { id: 43, name: 'Event Supply Hub',      loc: 'Chicago, IL',      icon: '🏕️', bg: 'linear-gradient(135deg,#EBF2ED,#C4DCC8)', rating: '4.6', reviews: '34' },
     { id: 44, name: 'Luxe Linen Rentals',    loc: 'Los Angeles, CA',  icon: '🛋️', bg: 'linear-gradient(135deg,#F0EAF8,#DDD0EC)', rating: '4.7', reviews: '27' },
     { id: 45, name: 'Party Essentials Inc.', loc: 'Atlanta, GA',      icon: '🎊', bg: 'linear-gradient(135deg,#FFF0F5,#F5D0DF)', rating: '4.5', reviews: '19' },
+  ],
+  'Wedding Attire & Boutique': [
+    { id: 46, name: 'Bridal House by Meera',  loc: 'New York, NY',    icon: '👗', bg: 'linear-gradient(135deg,#FFF0F5,#F5D0DF)', rating: '4.9', reviews: '57' },
+    { id: 47, name: 'Lehenga Lounge',          loc: 'Edison, NJ',      icon: '✨', bg: 'linear-gradient(135deg,#F0EAF8,#DDD0EC)', rating: '4.8', reviews: '43' },
+    { id: 48, name: 'Shaadi Couture',          loc: 'Chicago, IL',     icon: '🥻', bg: 'linear-gradient(135deg,#FDEAED,#F5C4CB)', rating: '4.7', reviews: '36' },
+    { id: 49, name: 'The Bridal Wardrobe',     loc: 'Los Angeles, CA', icon: '💎', bg: 'linear-gradient(135deg,#F5EACA,#EDD8A0)', rating: '4.8', reviews: '29' },
+    { id: 50, name: 'Desi Bride Boutique',     loc: 'Houston, TX',     icon: '👑', bg: 'linear-gradient(135deg,#EBF2ED,#C4DCC8)', rating: '4.6', reviews: '21' },
   ],
 };
