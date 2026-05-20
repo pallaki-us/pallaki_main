@@ -16,7 +16,8 @@
 .tv-track { display: flex; gap: 1rem; will-change: transform; }
 .tv-card { flex: 0 0 calc((100% - 3rem) / 4); background: var(--wh); border: 1px solid var(--br); border-radius: 14px; overflow: hidden; cursor: pointer; transition: transform .2s, box-shadow .2s; }
 .tv-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(196,132,140,.14); }
-.tv-card-img { height: 160px; display: flex; align-items: center; justify-content: center; position: relative; }
+.tv-card-img { height: 120px; display: flex; align-items: center; justify-content: center; position: relative; background: var(--cd); }
+.tv-avatar { width: 80px; height: 80px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 3px solid var(--br); box-shadow: 0 4px 14px rgba(196,132,140,.18); flex-shrink: 0; }
 .tv-card-body { padding: .9rem; }
 .tv-card-name { font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: var(--vx); font-weight: 400; margin-bottom: .2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tv-card-loc { font-size: .72rem; color: var(--tl); margin-bottom: .25rem; }

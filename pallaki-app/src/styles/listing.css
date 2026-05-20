@@ -17,7 +17,8 @@
 .lg { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.2rem; }
 .vc { background: var(--wh); border: 1px solid var(--br); border-radius: 14px; overflow: hidden; cursor: pointer; transition: all .2s; }
 .vc:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(196,132,140,.14); border-color: rgba(196,132,140,.3); }
-.vc-img { height: 160px; display: flex; align-items: center; justify-content: center; font-size: 3rem; position: relative; }
+.vc-img { height: 130px; display: flex; align-items: center; justify-content: center; font-size: 3rem; position: relative; background: var(--cd); }
+.vc-avatar { width: 88px; height: 88px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 3px solid var(--br); box-shadow: 0 4px 14px rgba(196,132,140,.18); flex-shrink: 0; }
 .vcbdg { position: absolute; top: .7rem; right: .7rem; font-size: .61rem; font-weight: 500; letter-spacing: .07em; text-transform: uppercase; padding: .2rem .58rem; border-radius: 20px; }
 .bdg-f { background: var(--g); color: var(--vx); }
 .bdg-t { background: var(--v); color: var(--wh); }
@@ -53,7 +54,8 @@
   .l-filters { padding: .5rem 1rem; gap: .4rem; }
   .lb { padding: 1rem; }
   .lg { grid-template-columns: 1fr; gap: .75rem; }
-  .vc-img { height: 150px; font-size: 2.6rem; }
+  .vc-img { height: 110px; font-size: 2.6rem; }
+  .vc-avatar { width: 76px; height: 76px; }
   .vc-body { padding: .85rem; }
   .vc-name { font-size: 1rem; }
   .vc-desc { font-size: .78rem; }
