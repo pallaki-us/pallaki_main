@@ -14,13 +14,13 @@
 .tv-slideshow { display: flex; align-items: center; gap: .8rem; margin-top: 2rem; }
 .tv-slideshow-wrap { overflow: hidden; flex: 1; }
 .tv-track { display: flex; gap: 1rem; will-change: transform; }
-.tv-card { flex: 0 0 calc((100% - 3rem) / 4); background: var(--wh); border: 1px solid var(--br); border-radius: 14px; overflow: hidden; cursor: pointer; transition: transform .2s, box-shadow .2s; }
+.tv-card { flex: 0 0 calc((100% - 3rem) / 4); background: var(--wh); border: 1px solid var(--br); border-radius: 14px; overflow: hidden; cursor: pointer; transition: transform .2s, box-shadow .2s; display: flex; align-items: center; gap: .75rem; padding: .9rem; }
 .tv-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(196,132,140,.14); }
-.tv-card-img { height: 160px; display: flex; align-items: center; justify-content: center; position: relative; }
-.tv-card-body { padding: .9rem; }
-.tv-card-name { font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: var(--vx); font-weight: 400; margin-bottom: .2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.tv-card-loc { font-size: .72rem; color: var(--tl); margin-bottom: .25rem; }
-.tv-card-rat { font-size: .72rem; color: var(--g); }
+.tv-avatar { width: 58px; height: 58px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 2px solid var(--br); font-size: 1.5rem; }
+.tv-card-body { flex: 1; min-width: 0; }
+.tv-card-name { font-family: 'Cormorant Garamond', serif; font-size: .9rem; color: var(--vx); font-weight: 400; margin-bottom: .15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tv-card-loc { font-size: .68rem; color: var(--tl); margin-bottom: .2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tv-card-rat { font-size: .68rem; color: var(--g); }
 .tv-arr { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--br); background: var(--wh); color: var(--v); font-size: 1.4rem; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .15s; line-height: 1; }
 .tv-arr:hover { background: var(--v); color: #fff; border-color: var(--v); }
 
