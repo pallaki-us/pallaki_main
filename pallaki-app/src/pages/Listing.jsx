@@ -94,29 +94,23 @@ export default function Listing() {
           <div className="lg">
             {vendors.map(v => (
               <div key={v.id} className="vc" onClick={() => handleVendorClick(v.id)}>
-                <div className="vc-img">
-                  <div className="vc-avatar" style={v.avatar_url ? {} : { background: `linear-gradient(135deg,${v.bg})` }}>
-                    {v.avatar_url
-                      ? <img src={v.avatar_url} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      : v.icon}
-                  </div>
-                  {v.badge === 'featured' && <div className="vcbdg bdg-f">Featured</div>}
-                  {v.badge === 'top' && <div className="vcbdg bdg-t">Top Rated</div>}
+                <div className="vc-avatar" style={v.avatar_url ? {} : { background: `linear-gradient(135deg,${v.bg})` }}>
+                  {v.avatar_url
+                    ? <img src={v.avatar_url} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    : v.icon}
                 </div>
                 <div className="vc-body">
-                  <div className="vc-meta">
-                    <span className="vc-cat">{v.cat}</span>
-                    <div className="vc-rat">
-                      <span className="stars">{'★'.repeat(Math.round(parseFloat(v.rating) || 0))}{'☆'.repeat(5 - Math.round(parseFloat(v.rating) || 0))}</span> {v.rating} ({v.reviews})
-                    </div>
-                  </div>
+                  <div className="vc-cat">{v.cat}</div>
                   <div className="vc-name">{v.name}</div>
                   <div className="vc-loc">📍 {v.loc}</div>
-                  <p className="vc-desc">{v.desc}</p>
-                  <div className="vc-foot">
-                    <button className="vc-btn">View Profile</button>
+                  <div className="vc-rat">
+                    <span className="stars">{'★'.repeat(Math.round(parseFloat(v.rating) || 0))}{'☆'.repeat(5 - Math.round(parseFloat(v.rating) || 0))}</span>
+                    {v.rating} · {v.reviews} reviews
                   </div>
+                  <button className="vc-btn">View Profile →</button>
                 </div>
+                {v.badge === 'featured' && <div className="vcbdg bdg-f">Featured</div>}
+                {v.badge === 'top' && <div className="vcbdg bdg-t">Top Rated</div>}
               </div>
             ))}
           </div>

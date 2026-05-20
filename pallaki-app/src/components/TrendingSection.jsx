@@ -170,12 +170,10 @@ export default function TrendingSection() {
                   className="tv-card"
                   onClick={() => user ? navigate(`/vendor/${v.id}`) : navigate('/planner/login')}
                 >
-                  <div className="tv-card-img">
-                    <div className="tv-avatar" style={v.avatar_url ? {} : { background: v.bg }}>
-                      {v.avatar_url
-                        ? <img src={v.avatar_url} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        : <span style={{ fontSize: '2rem' }}>📷</span>}
-                    </div>
+                  <div className="tv-avatar" style={v.avatar_url ? {} : { background: v.bg }}>
+                    {v.avatar_url
+                      ? <img src={v.avatar_url} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      : <span style={{ fontSize: '1.5rem' }}>📷</span>}
                   </div>
                   <div className="tv-card-body">
                     <div className="tv-card-name">{v.name}</div>
