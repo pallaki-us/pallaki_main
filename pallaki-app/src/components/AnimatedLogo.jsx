@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react'
 
 const SCRIPTS = [
-  { text: 'Pallaki', font: "'Cormorant Garamond', serif" },       // English
-  { text: 'पल्लकी', font: "'Tiro Devanagari Hindi', serif" },     // Hindi
-  { text: 'పల్లకి', font: "'Noto Sans Telugu', serif" },           // Telugu
-  { text: 'ಪಲ್ಲಕಿ', font: "'Noto Sans Kannada', serif" },          // Kannada
-  { text: 'பல்லக்கு', font: "'Noto Sans Tamil', serif" },          // Tamil
-  { text: 'ਪਾਲਕੀ', font: "'Noto Sans Gurmukhi', serif" },          // Punjabi
-  { text: 'پالکی', font: "'Noto Nastaliq Urdu', serif" },          // Urdu
+  { text: 'Pallaki',   font: "'Cormorant Garamond', serif",   lineHeight: 1 },         // English
+  { text: 'पल्लकी',   font: "'Tiro Devanagari Hindi', serif", lineHeight: 1 },         // Hindi
+  { text: 'పల్లకి',   font: "'Noto Sans Telugu', serif",      lineHeight: 1 },         // Telugu
+  { text: 'ಪಲ್ಲಕಿ',  font: "'Noto Sans Kannada', serif",     lineHeight: 1 },         // Kannada
+  { text: 'பல்லக்கு', font: "'Noto Sans Tamil', serif",       lineHeight: 1 },         // Tamil
+  { text: 'ਪਾਲਕੀ',   font: "'Noto Sans Gurmukhi', serif",    lineHeight: 1 },         // Punjabi
+  { text: 'پالکی',    font: "'Noto Nastaliq Urdu', serif",    lineHeight: 1.8, scale: 0.6 }, // Urdu — Nastaliq glyphs are tall
 ]
 
 export default function AnimatedLogo({ size = '2rem', color = 'var(--v)', onClick }) {
@@ -32,13 +32,13 @@ export default function AnimatedLogo({ size = '2rem', color = 'var(--v)', onClic
       onClick={onClick}
       style={{
         fontFamily: current.font,
-        fontSize: size,
+        fontSize: current.scale ? `calc(${size} * ${current.scale})` : size,
         color,
         cursor: onClick ? 'pointer' : 'default',
         transition: 'opacity 0.2s ease',
         opacity: fade ? 1 : 0,
         display: 'inline-block',
-        lineHeight: 1,
+        lineHeight: current.lineHeight,
         letterSpacing: '0.02em',
       }}
     >
