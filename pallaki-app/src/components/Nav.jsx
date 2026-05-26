@@ -45,7 +45,7 @@ export default function Nav({ onShowVendorListing }) {
     <>
       <nav>
         <div className="logo-wrap" onClick={goHome} style={{ width: 120, flexShrink: 0 }}>
-          <AnimatedLogo size="2rem" color="var(--v)" />
+          <AnimatedLogo size="2rem" color="var(--vx)" />
         </div>
         <div style={{ flex: 1, overflow: 'hidden', height: '100%', display: 'flex', alignItems: 'center' }}>
           <video
