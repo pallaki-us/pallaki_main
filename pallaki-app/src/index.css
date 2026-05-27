@@ -42,19 +42,49 @@ body {
 nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 200;
   display: flex; align-items: center; justify-content: space-between;
-  padding: 0 3rem; height: 64px;
+  padding: 0 3rem; height: 90px;
   background: rgba(254,249,247,0.97); backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--br);
 }
-.logo-wrap { display: flex; align-items: center; cursor: pointer; text-decoration: none; line-height: 1; }
+.logo-wrap { display: flex; align-items: center; cursor: pointer; text-decoration: none; line-height: 1; width: clamp(80px, 20vw, 120px) !important; flex-shrink: 0; }
+.logo-wrap span { font-size: clamp(1rem, 3.5vw, 2rem) !important; }
 .logo-deva { font-family: 'Tiro Devanagari Hindi', serif; font-size: 2rem; color: var(--v); letter-spacing: 0.02em; line-height: 1; }
 .nav-r { display: flex; align-items: center; gap: 0.1rem; }
+
+/* ── NAV VIDEO MARQUEE ── */
+.nav-video-wrap {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  padding: 0 16px 0 48px; /* bigger left gap from logo, small right gap before buttons */
+}
+.nav-video-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.nav-video-single {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 52px;
+  width: auto;
+  animation: nav-scroll 35s linear infinite;
+  mix-blend-mode: multiply;
+}
+@keyframes nav-scroll {
+  0%   { left: -5%; }
+  100% { left: 105%; }
+}
 .nl { display: flex; align-items: center; gap: 3px; padding: 0.42rem 0.8rem; border-radius: 4px; font-size: 0.8rem; color: var(--tm); cursor: pointer; border: none; background: none; font-family: 'Cormorant Garamond', serif; transition: all .15s; white-space: nowrap; }
 .nl:hover { color: var(--v); background: var(--vf); }
-.nav-login { background: var(--vx) !important; color: var(--wh) !important; border-radius: 20px !important; font-weight: 500 !important; padding: 0.42rem 1.2rem !important; font-size: 0.78rem !important; }
+.nav-login { background: var(--vx) !important; color: var(--wh) !important; border-radius: 20px !important; font-weight: 700 !important; padding: 0.42rem 1.2rem !important; font-size: 0.9rem !important; }
 .nav-login:hover { background: #1A0D14 !important; }
-.nav-vendor { color: var(--vx) !important; border: 1.5px solid var(--br) !important; border-radius: 20px !important; padding: 0.4rem 1rem !important; font-size: 0.78rem !important; margin-right: 4px; }
-.nav-vendor:hover { background: var(--vp) !important; border-color: var(--v) !important; }
+.nav-vendor { color: var(--vx) !important; border: 1.5px solid var(--vx) !important; border-radius: 20px !important; padding: 0.4rem 1rem !important; font-size: 0.9rem !important; font-weight: 700 !important; margin-right: 4px; }
+.nav-vendor:hover { background: var(--vp) !important; border-color: var(--vx) !important; }
 .nav-user { display: flex; align-items: center; gap: .5rem; padding: .3rem .3rem .3rem .85rem; border-radius: 20px; border: 1.5px solid var(--br); background: var(--wh); cursor: pointer; transition: all .15s; position: relative; }
 .nav-user:hover { border-color: var(--v); background: var(--vf); }
 .nav-user-name { font-size: .78rem; font-weight: 500; color: var(--vx); font-family: 'Cormorant Garamond', serif; }
@@ -275,13 +305,13 @@ nav {
 /* ── NAV MOBILE ── */
 @media (max-width: 768px) {
   nav { padding: 0 1rem; gap: .5rem; }
-  nav > div:nth-child(2) { display: none; }
-  .logo-wrap { width: auto !important; }
-  .logo-deva { font-size: 1.5rem; }
+  .logo-deva { font-size: 1.4rem; }
   .nl { padding: .38rem .55rem; font-size: .74rem; }
-  .nav-login { padding: .38rem .85rem !important; font-size: .74rem !important; }
-  .nav-vendor { padding: .35rem .7rem !important; font-size: .74rem !important; }
+  .nav-login { padding: .38rem .85rem !important; font-size: .84rem !important; }
+  .nav-vendor { padding: .35rem .7rem !important; font-size: .84rem !important; }
   .nav-user-name { display: none; }
+  .nav-video-wrap { padding: 0 8px 0 10px; }
+  .nav-video-single { height: 42px; }
 }
 
 @media (max-width: 480px) {
@@ -289,6 +319,8 @@ nav {
   .nav-vendor { display: none; }
   .nav-login { display: none; }
   .nav-hamburger { display: inline-flex; align-items: center; }
+  .nav-video-wrap { padding: 0 6px 0 8px; }
+  .nav-video-single { height: 36px; }
   .auth-right { padding: 1.5rem 1rem; }
   .toast { font-size: .78rem; padding: .65rem 1.2rem; white-space: normal; text-align: center; max-width: 90vw; }
 }
