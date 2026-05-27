@@ -47,15 +47,10 @@ export default function Nav({ onShowVendorListing }) {
         <div className="logo-wrap" onClick={goHome} style={{ width: 120, flexShrink: 0 }}>
           <AnimatedLogo size="2rem" color="var(--v)" />
         </div>
-        <div style={{ flex: 1, overflow: 'hidden', height: '100%', display: 'flex', alignItems: 'center' }}>
-          <video
-            src={`${import.meta.env.BASE_URL}procession.mp4`}
-            autoPlay
-            loop
-            muted
-            playsInline
-            style={{ height: 44, width: '100%', objectFit: 'contain' }}
-          />
+        <div className="nav-video-wrap">
+          <div className="nav-video-inner">
+            <video className="nav-video-single" src={`${import.meta.env.BASE_URL}procession3.mp4`} autoPlay loop muted playsInline />
+          </div>
         </div>
         <div className="nav-r">
           {user && <NotificationBell userType={userType} />}
