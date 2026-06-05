@@ -18,7 +18,6 @@ export default function Detail() {
   const [activeTab, setActiveTab] = useState('overview')
   const [inquiryOpen, setInquiryOpen] = useState(false)
   const [chatOpen, setChatOpen] = useState(false)
-  const [reviews, setReviews] = useState([])
   const [portfolioUrls, setPortfolioUrls] = useState(null)
   const [featuredUrls, setFeaturedUrls] = useState(null)
 
@@ -38,22 +37,6 @@ export default function Detail() {
       .then(({ error }) => { if (error) console.error('profile_view error:', error) })
   }, [vendorId, user?.id, isOwnListing])
 
-  useEffect(() => {
-    if (!vendorId || !supabase) return
-    supabase
-      .from('reviews')
-      .select('id, reviewer_name, event_type, body, review_text, rating, stars, created_at')
-      .eq('vendor_id', vendorId)
-      .order('created_at', { ascending: false })
-      .then(({ data }) => setReviews((data || []).map(r => ({
-        id: r.id,
-        reviewer_name: r.reviewer_name || 'Anonymous',
-        event_type: r.event_type,
-        review_text: r.review_text || r.body,
-        stars: r.stars || r.rating,
-        created_at: r.created_at,
-      }))))
-  }, [vendorId])
 
   if (loading) return (
     <div style={{ paddingTop: 64, textAlign: 'center', padding: '8rem 2rem', fontFamily: "'Cormorant Garamond',serif", fontSize: '1.2rem', fontStyle: 'italic', color: 'var(--tl)' }}>
@@ -96,17 +79,13 @@ export default function Detail() {
               <span className="dh-tag">{v.cat}</span>
               <span className="dh-tag">📍 {v.loc}</span>
             </div>
-            <div className="dh-r">
-              <span className="dh-rating">{'★'.repeat(Math.round(parseFloat(v.rating) || 0))}{'☆'.repeat(5 - Math.round(parseFloat(v.rating) || 0))} {v.rating}</span>
-              <span className="dh-rev">({v.reviews} reviews)</span>
-            </div>
           </div>
         </div>
       </div>
 
       {/* Tabs */}
       <div className="tabs-bar">
-        {['overview', 'gallery', 'reviews', ...(userType !== 'vendor' ? ['contact'] : [])].map(tab => (
+        {['overview', 'gallery', ...(userType !== 'vendor' ? ['contact'] : [])].map(tab => (
           <button
             key={tab}
             className={`tab-btn${activeTab === tab ? ' active' : ''}`}
@@ -224,59 +203,6 @@ export default function Detail() {
         </div>
       )}
 
-      {activeTab === 'reviews' && (
-        <div className="tc active">
-          <div className="rv-sum">
-            <div>
-              <div className="big-r">{v.rating || '—'}</div>
-              <div className="r-lbl">{reviews.length} reviews</div>
-            </div>
-            <div className="r-bars">
-              {[5,4,3,2,1].map(s => {
-                const count = reviews.filter(r => r.stars === s).length
-                const pct = reviews.length ? Math.round((count / reviews.length) * 100) : 0
-                return (
-                  <div key={s} className="r-row">
-                    {s}★
-                    <div className="r-bg"><div className="r-fill" style={{ width: `${pct}%` }} /></div>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-          <div className="rv-cards">
-            {reviews.length === 0 ? (
-              <p style={{ textAlign: 'center', color: 'var(--tl)', fontStyle: 'italic', padding: '2rem' }}>No reviews yet.</p>
-            ) : reviews.map(r => (
-              <div key={r.id} className="rv-card">
-                <div className="rv-top">
-                  <div>
-                    <div className="rv-name">{r.reviewer_name}</div>
-                    <div className="rv-det">{r.event_type}</div>
-                  </div>
-                  <div style={{ color: 'var(--g)', fontSize: '.82rem' }}>{'★'.repeat(r.stars)}{'☆'.repeat(5 - r.stars)}</div>
-                </div>
-                <p className="rv-txt">{r.review_text}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Vendor-added testimonials */}
-          {(v.testimonials || []).length > 0 && (
-            <div style={{ marginTop: '2rem' }}>
-              <h4 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '1.05rem', color: 'var(--vx)', fontWeight: 500, marginBottom: '1rem', letterSpacing: '.04em' }}>Words from Our Clients</h4>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
-                {v.testimonials.map((t, i) => (
-                  <div key={i} style={{ padding: '1rem 1.2rem', background: 'var(--vf)', border: '1px solid var(--br)', borderRadius: 14 }}>
-                    <div style={{ fontSize: '.88rem', fontStyle: 'italic', color: 'var(--tm)', lineHeight: 1.8, marginBottom: '.5rem' }}>"{t.quote}"</div>
-                    <div style={{ fontSize: '.76rem', color: 'var(--tl)', fontWeight: 500 }}>— {t.name}{t.event_type ? ` · ${t.event_type}` : ''}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
 
       {activeTab === 'contact' && userType !== 'vendor' && (
         <div className="tc active">
@@ -299,13 +225,6 @@ export default function Detail() {
                 <div className="cc-row">📍 <span>{v.loc}</span></div>
                 <div className="cc-row">✓ Identity verified by Pallaki</div>
                 <button className="inq-btn chat-now-btn" onClick={() => { setChatOpen(true); trackChatOpened(v.id, v.name) }}>💬 Chat Now — Instant answers</button>
-              </div>
-              <div className="gr-plug">
-                <span className="gr-logo">⭐</span>
-                <div className="gr-text">
-                  <div className="gr-t">Google Reviews Integration</div>
-                  <div className="gr-s">Live reviews coming soon</div>
-                </div>
               </div>
             </div>
           </div>

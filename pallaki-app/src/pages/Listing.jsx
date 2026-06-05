@@ -103,10 +103,6 @@ export default function Listing() {
                   <div className="vc-cat">{v.cat}</div>
                   <div className="vc-name">{v.name}</div>
                   <div className="vc-loc">📍 {v.loc}</div>
-                  <div className="vc-rat">
-                    <span className="stars">{'★'.repeat(Math.round(parseFloat(v.rating) || 0))}{'☆'.repeat(5 - Math.round(parseFloat(v.rating) || 0))}</span>
-                    {v.rating} · {v.reviews} reviews
-                  </div>
                   <button className="vc-btn">View Profile →</button>
                 </div>
                 {v.badge === 'featured' && <div className="vcbdg bdg-f">Featured</div>}
