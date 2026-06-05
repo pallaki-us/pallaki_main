@@ -20,11 +20,6 @@ const CAT_CHIPS = [
 const VISIBLE = 4
 const GAP = 16
 
-function renderStars(rating) {
-  const n = Math.round(parseFloat(rating) || 0)
-  return '★'.repeat(n) + '☆'.repeat(5 - n)
-}
-
 export default function TrendingSection() {
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -178,7 +173,6 @@ export default function TrendingSection() {
                   <div className="tv-card-body">
                     <div className="tv-card-name">{v.name}</div>
                     <div className="tv-card-loc">📍 {v.loc}</div>
-                    <div className="tv-card-rat">{renderStars(v.rating)} {v.rating} · {v.reviews} reviews</div>
                   </div>
                 </div>
               ))}
