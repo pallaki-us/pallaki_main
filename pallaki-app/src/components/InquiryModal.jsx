@@ -66,7 +66,7 @@ export default function InquiryModal({ open, onClose, vendor }) {
                 <span className="mvc-icon">{vendor?.icon}</span>
                 <div>
                   <div className="mvc-name">{vendor?.name}</div>
-                  <div className="mvc-meta">📍 {vendor?.loc} · ★ {vendor?.rating}</div>
+                  <div className="mvc-meta">📍 {vendor?.loc}</div>
                 </div>
               </div>
 
