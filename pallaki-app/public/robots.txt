@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+
+# Keep crawlers out of authenticated/account areas
+Disallow: /dashboard
+Disallow: /analytics
+Disallow: /profile
+Disallow: /conversations
+Disallow: /onboarding
+Disallow: /reset-password
+Disallow: /forgot-password
+
+Sitemap: https://pallaki.us/sitemap.xml
