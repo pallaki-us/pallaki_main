@@ -10,4 +10,4 @@ Disallow: /onboarding
 Disallow: /reset-password
 Disallow: /forgot-password
 
-Sitemap: https://pallaki.us/sitemap.xml
+Sitemap: https://www.pallaki.us/sitemap.xml
