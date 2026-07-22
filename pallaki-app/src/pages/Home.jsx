@@ -88,46 +88,24 @@ export default function Home() {
         <div className="hero-bg" />
         <div className="hero-pat" />
         <div className="hero-c">
-          <div className="hero-title-box">
-            <span className="htb-corner tl">❧</span>
-            <span className="htb-corner tr">❧</span>
-            <span className="htb-corner bl">❧</span>
-            <span className="htb-corner br">❧</span>
-            <div className="htb-edge top">
-              <div className="htb-edge-bg">
-                <div className="htb-edge-dot" />
-                <span className="htb-edge-gem">◆ ◇ ◆ ◇ ◆</span>
-                <div className="htb-edge-dot" />
-              </div>
-            </div>
-            <div className="htb-edge bot">
-              <div className="htb-edge-bg">
-                <div className="htb-edge-dot" />
-                <span className="htb-edge-gem">◇ ◆ ◇ ◆ ◇</span>
-                <div className="htb-edge-dot" />
-              </div>
-            </div>
-            <div className="htb-side left">
-              <div className="htb-side-dot" /><div className="htb-side-dot big" /><div className="htb-side-dot" />
-            </div>
-            <div className="htb-side right">
-              <div className="htb-side-dot" /><div className="htb-side-dot big" /><div className="htb-side-dot" />
-            </div>
-            <h1 style={{ textAlign: 'center' }}>Craft your dream celebration</h1>
+          <div className="hero-head">
+            <span className="hero-eyebrow">South Asian Wedding &amp; Event Vendors</span>
+            <h1>Craft your <em>dream</em> celebration</h1>
             <p className="hero-sub">Find the curated South Asian vendors who bring your unique story to life.</p>
           </div>
 
           <span className="ev-label">Looking vendors for</span>
           <div className="ev-row">
             {EVENT_TYPES.map(e => (
-              <div
+              <button
                 key={e.label}
+                type="button"
                 className={`ev-card${selEvent === e.label ? ' sel' : ''}`}
                 onClick={() => setSelEvent(e.label)}
               >
                 <span className="ei">{e.icon}</span>
                 <span className="en">{e.label}</span>
-              </div>
+              </button>
             ))}
           </div>
 
@@ -160,7 +138,7 @@ export default function Home() {
             )}
             <div className="pop-tags">
               {FEATURED_CITIES.map(c => (
-                <span key={c} className="tag" onClick={() => { setCity(c); setNoMatch(false) }}>📍 {c}</span>
+                <button key={c} type="button" className="tag" onClick={() => { setCity(c); setNoMatch(false) }}>📍 {c}</button>
               ))}
             </div>
           </div>
@@ -175,10 +153,13 @@ export default function Home() {
 
       {/* ── OUR STORY ── */}
       <section className="about-section" id="our-story">
-        <h2 className="how-title" style={{ marginBottom: '2.5rem' }}>Our Story</h2>
+        <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+          <span className="sec-eyebrow">The Founders</span>
+          <h2 className="how-title" style={{ marginBottom: 0 }}>Our Story</h2>
+        </div>
         <div className="about-inner">
           <div className="about-photo" style={{ marginBottom: '2rem' }}>
-            <img src={ourStoryImg} alt="Shruti and Vamsi" />
+            <img src={ourStoryImg} alt="Shruti and Vamsi" loading="lazy" decoding="async" />
           </div>
           <div className="about-text">
             <p>We're Shruti and Vamsi, the founders of Pallaki. Like many of you, our journey began with a vision for a beautiful wedding—and a spreadsheet that quickly got out of hand.</p>

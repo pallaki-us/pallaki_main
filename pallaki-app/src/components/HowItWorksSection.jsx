@@ -9,7 +9,10 @@ export default function HowItWorksSection() {
   return (
     <section className="how-section" id="how-it-works">
       <div className="how-inner">
-        <h2 className="how-title">How Pallaki Works</h2>
+        <div style={{ textAlign: 'center' }}>
+          <span className="sec-eyebrow">The Process</span>
+          <h2 className="how-title">How Pallaki Works</h2>
+        </div>
         <div className="how-timeline">
           {STEPS.map(step => (
             <div key={step.n} className="how-item">

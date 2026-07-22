@@ -132,6 +132,7 @@ export default function TrendingSection() {
     <section className="trending-section">
       <div className="trending-inner">
         <div className="trending-header">
+          <span className="sec-eyebrow">Discover</span>
           <h2 className="trending-title">Trending on Pallaki</h2>
         </div>
         <div className="loved-scroll">
