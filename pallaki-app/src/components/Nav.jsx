@@ -12,7 +12,16 @@ export default function Nav({ onShowVendorListing }) {
   const name = user?.user_metadata?.name || user?.email?.split('@')[0] || ''
   const [menuOpen, setMenuOpen] = useState(false)
   const [ddOpen, setDdOpen] = useState(false)
+  const [videoReady, setVideoReady] = useState(false)
   const ddRef = useRef(null)
+
+  // defer the ~7MB marquee video until the rest of the page has loaded
+  useEffect(() => {
+    if (document.readyState === 'complete') { setVideoReady(true); return }
+    const onLoad = () => setVideoReady(true)
+    window.addEventListener('load', onLoad)
+    return () => window.removeEventListener('load', onLoad)
+  }, [])
 
   useEffect(() => {
     if (!ddOpen) return
@@ -49,7 +58,9 @@ export default function Nav({ onShowVendorListing }) {
         </div>
         <div className="nav-video-wrap">
           <div className="nav-video-inner">
-            <video className="nav-video-single" src={`${import.meta.env.BASE_URL}procession3.mp4`} autoPlay loop muted playsInline />
+            {videoReady && (
+              <video className="nav-video-single" src={`${import.meta.env.BASE_URL}procession3.mp4`} autoPlay loop muted playsInline />
+            )}
           </div>
         </div>
         <div className="nav-r">

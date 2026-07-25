@@ -1,8 +1,11 @@
+/* ── SECTION HEADERS ── */
+.sec-eyebrow { font-family: var(--sans); font-size: .62rem; font-weight: 600; letter-spacing: .24em; text-transform: uppercase; color: var(--g); display: block; margin-bottom: .55rem; }
+
 /* ── TRENDING ── */
 .trending-section { padding: 1.5rem 3rem 4rem; background: var(--cr); }
 .trending-inner { max-width: 1200px; margin: 0 auto; }
 .trending-header { text-align: center; margin-bottom: 1.5rem; }
-.trending-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 300; letter-spacing: 0.06em; color: var(--vx); margin: 0; }
+.trending-title { font-family: var(--serif); font-size: clamp(1.7rem, 3vw, 2.3rem); font-weight: 500; letter-spacing: 0.02em; color: var(--vx); margin: 0; }
 .loved-scroll { display: flex; gap: 0; justify-content: space-between; padding: 1.5rem 0 1rem; }
 .loved-chip { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: .7rem; cursor: pointer; transition: transform .2s; }
 .loved-chip:hover { transform: translateY(-3px); }
@@ -19,14 +22,14 @@
 .tv-avatar { width: 58px; height: 58px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 2px solid var(--br); font-size: 1.5rem; }
 .tv-card-body { flex: 1; min-width: 0; }
 .tv-card-name { font-family: 'Cormorant Garamond', serif; font-size: .9rem; color: var(--vx); font-weight: 400; margin-bottom: .15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.tv-card-loc { font-size: .68rem; color: var(--tl); margin-bottom: .2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.tv-card-rat { font-size: .68rem; color: var(--g); }
+.tv-card-loc { font-family: var(--sans); font-size: .64rem; color: var(--tl); margin-bottom: .2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tv-card-rat { font-family: var(--sans); font-size: .64rem; color: var(--g); }
 .tv-arr { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--br); background: var(--wh); color: var(--v); font-size: 1.4rem; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .15s; line-height: 1; }
 .tv-arr:hover { background: var(--v); color: #fff; border-color: var(--v); }
 
 /* ── HOW IT WORKS ── */
 .how-section { padding: 4rem; background: var(--cd); }
-.how-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 300; letter-spacing: 0.06em; color: var(--vx); text-align: center; margin-bottom: 2rem; }
+.how-title { font-family: var(--serif); font-size: clamp(1.7rem, 3vw, 2.3rem); font-weight: 500; letter-spacing: 0.02em; color: var(--vx); text-align: center; margin-bottom: 2rem; }
 .how-inner { max-width: 600px; margin: 0 auto; }
 .how-timeline { display: flex; flex-direction: column; gap: 0; margin-top: 2rem; position: relative; }
 .how-item { display: flex; gap: 1.5rem; align-items: flex-start; position: relative; }
@@ -49,7 +52,7 @@
 .stats-mini { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
 .smi { background: var(--wh); border: 1px solid var(--br); border-radius: 12px; padding: 1rem; text-align: center; }
 .smi-n { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-style: italic; color: var(--v); line-height: 1; }
-.smi-l { font-size: .66rem; color: var(--tl); text-transform: uppercase; letter-spacing: .08em; margin-top: 4px; }
+.smi-l { font-family: var(--sans); font-size: .6rem; font-weight: 500; color: var(--tl); text-transform: uppercase; letter-spacing: .08em; margin-top: 4px; }
 
 /* ── FOR VENDORS ── */
 .fv-section { position: relative; overflow: hidden; background: linear-gradient(135deg, var(--vx) 0%, #3D1D2A 100%); }
@@ -115,29 +118,29 @@
 .fg { display: grid; grid-template-columns: 1fr 1fr; gap: .9rem; }
 .ff { display: flex; flex-direction: column; gap: .36rem; }
 .ff.full { grid-column: 1/-1; }
-.ff label { font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; color: var(--tm); font-weight: 500; }
+.ff label { font-family: var(--sans); font-size: .62rem; letter-spacing: .1em; text-transform: uppercase; color: var(--tm); font-weight: 600; }
 .ff input, .ff textarea { padding: .75rem .95rem; border: 1.5px solid var(--br); border-radius: 8px; font-family: 'Cormorant Garamond', serif; font-size: .87rem; color: var(--td); outline: none; transition: border-color .15s; background: var(--wh); }
 .ff input:focus, .ff textarea:focus { border-color: var(--v); }
 .ff textarea { resize: vertical; min-height: 95px; }
-.btn-sub { margin-top: 1.3rem; padding: .9rem 2rem; background: var(--v); color: var(--wh); border: none; border-radius: 20px; font-family: 'Cormorant Garamond', serif; font-size: .87rem; font-weight: 500; letter-spacing: .07em; text-transform: uppercase; cursor: pointer; transition: background .2s; }
-.btn-sub:hover { background: var(--vd); }
+.btn-sub { margin-top: 1.3rem; padding: .9rem 2.2rem; background: var(--vd); color: var(--wh); border: none; border-radius: 100px; font-family: var(--sans); font-size: .76rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; transition: background .2s; }
+.btn-sub:hover { background: var(--vx); }
 
 /* ── FOOTER ── */
 footer { background: var(--vx); padding: 3.5rem 4rem; }
 .fi { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 2.5rem; }
-.flogo { font-family: 'Cormorant Garamond', serif; font-size: 1.65rem; font-weight: 600; color: var(--cr); cursor: pointer; }
-.ftag { font-size: .8rem; color: rgba(254,249,247,.44); margin-top: .75rem; line-height: 1.7; font-weight: 300; }
-.fc h4 { font-size: .65rem; letter-spacing: .14em; text-transform: uppercase; color: var(--cr); font-weight: 500; margin-bottom: 1rem; padding-bottom: .55rem; border-bottom: 1px solid rgba(254,249,247,.1); }
-.fc a { display: block; font-size: .82rem; color: rgba(254,249,247,.48); text-decoration: none; margin-bottom: .55rem; cursor: pointer; transition: all .15s; border-left: 2px solid transparent; padding-left: .5rem; }
+.flogo { font-family: var(--serif); font-size: 1.65rem; font-weight: 600; color: var(--cr); cursor: pointer; }
+.ftag { font-family: var(--serif); font-size: .9rem; font-style: italic; color: rgba(254,249,247,.5); margin-top: .75rem; line-height: 1.7; font-weight: 300; }
+.fc h4 { font-family: var(--sans); font-size: .6rem; letter-spacing: .16em; text-transform: uppercase; color: rgba(254,249,247,.85); font-weight: 600; margin-bottom: 1rem; padding-bottom: .55rem; border-bottom: 1px solid rgba(254,249,247,.1); }
+.fc a { display: block; font-family: var(--sans); font-size: .76rem; color: rgba(254,249,247,.52); text-decoration: none; margin-bottom: .55rem; cursor: pointer; transition: all .15s; border-left: 2px solid transparent; padding-left: .5rem; }
 .fc a:hover { color: var(--gl); border-left-color: var(--gl); padding-left: .75rem; }
-.fb { max-width: 1200px; margin: 2rem auto 0; padding-top: 1rem; border-top: 1px solid rgba(254,249,247,.1); display: flex; justify-content: space-between; font-size: .73rem; color: rgba(254,249,247,.28); flex-wrap: wrap; gap: .4rem; }
+.fb { max-width: 1200px; margin: 2rem auto 0; padding-top: 1rem; border-top: 1px solid rgba(254,249,247,.1); display: flex; justify-content: space-between; font-family: var(--sans); font-size: .68rem; color: rgba(254,249,247,.35); flex-wrap: wrap; gap: .4rem; }
 
 /* ── BUTTONS ── */
-.btn-p { background: var(--v); color: var(--wh); padding: .85rem 2rem; border: none; border-radius: 20px; font-family: 'Cormorant Garamond', serif; font-size: .84rem; font-weight: 500; letter-spacing: .07em; text-transform: uppercase; cursor: pointer; display: inline-block; transition: all .2s; }
-.btn-p:hover { background: var(--vd); transform: translateY(-1px); }
-.btn-s { background: transparent; color: var(--wh); padding: .85rem 2rem; border: 1.5px solid rgba(255,255,255,.35); border-radius: 20px; font-family: 'Cormorant Garamond', serif; font-size: .84rem; font-weight: 500; letter-spacing: .07em; text-transform: uppercase; cursor: pointer; display: inline-block; transition: all .2s; }
+.btn-p { background: var(--vd); color: var(--wh); padding: .85rem 2.2rem; border: none; border-radius: 100px; font-family: var(--sans); font-size: .76rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; display: inline-block; transition: all .2s; }
+.btn-p:hover { background: var(--vx); transform: translateY(-1px); }
+.btn-s { background: transparent; color: var(--wh); padding: .85rem 2.2rem; border: 1.5px solid rgba(255,255,255,.35); border-radius: 100px; font-family: var(--sans); font-size: .76rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; display: inline-block; transition: all .2s; }
 .btn-s:hover { border-color: var(--wh); background: rgba(255,255,255,.1); }
-.btn-o { background: transparent; color: var(--v); padding: .85rem 2rem; border: 1.5px solid var(--br); border-radius: 20px; font-family: 'Cormorant Garamond', serif; font-size: .84rem; font-weight: 500; letter-spacing: .07em; text-transform: uppercase; cursor: pointer; display: inline-block; transition: all .2s; }
+.btn-o { background: transparent; color: var(--vd); padding: .85rem 2.2rem; border: 1.5px solid var(--br); border-radius: 100px; font-family: var(--sans); font-size: .76rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; display: inline-block; transition: all .2s; }
 .btn-o:hover { border-color: var(--v); background: var(--vf); }
 
 /* ── MOBILE ── */
